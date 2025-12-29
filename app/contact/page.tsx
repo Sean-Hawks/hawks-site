@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Mail, Github, Twitter, MessageSquare } from "lucide-react";
+import { Mail, Github, MessageSquare } from "lucide-react";
 import ThemeStyles from "../components/ThemeStyles";
 import Header from "../components/Header";
 
