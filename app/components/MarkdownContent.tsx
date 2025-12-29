@@ -60,19 +60,22 @@ export default function MarkdownContent({ content }: { content?: string }) {
   }
 
   const components: Components = {
-    pre: ({ node: _node, className, children, ...props }: PreProps & { node?: unknown }) => (
-      <pre
-        className={[
-          "bg-[rgb(var(--bg))] border border-[rgba(255,255,255,0.06)] p-4 rounded-xl overflow-x-auto my-6",
-          className,
-        ]
-          .filter(Boolean)
-          .join(" ")}
-        {...props}
-      >
-        {children}
-      </pre>
-    ),
+    pre: ({ node, className, children, ...props }: PreProps & { node?: unknown }) => {
+      void node;
+      return (
+        <pre
+          className={[
+            "bg-[rgb(var(--bg))] border border-[rgba(255,255,255,0.06)] p-4 rounded-xl overflow-x-auto my-6",
+            className,
+          ]
+            .filter(Boolean)
+            .join(" ")}
+          {...props}
+        >
+          {children}
+        </pre>
+      );
+    },
 
     h1: (props) => (
       <h1 className="text-4xl font-bold mt-10 mb-6 text-[rgb(var(--text))]" {...props} />
@@ -107,7 +110,9 @@ export default function MarkdownContent({ content }: { content?: string }) {
     ),
     hr: (props) => <hr className="border-[rgba(255,255,255,0.06)] my-8" {...props} />,
 
-    code: ({ node: _node, inline, className, children, ...props }: CodeProps & { node?: unknown }) => {
+    code: ({ node, inline, className, children, ...props }: CodeProps & { node?: unknown }) => {
+      void node;
+
       if (!inline) {
         return (
           <code className={className} {...props}>

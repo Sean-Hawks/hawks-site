@@ -1,6 +1,7 @@
 import { Post } from "../types";
 
 // NOTE: 這些內容會在 build 時被打包進靜態輸出（GitHub Pages 友善）；date 建議固定 YYYY-MM-DD（避免 CI/環境差異）
+// NOTE: slug 必須唯一（對應 /blog/[slug]）
 export const posts: Post[] = [
   // 範例：複製這個區塊來新增文章
   {

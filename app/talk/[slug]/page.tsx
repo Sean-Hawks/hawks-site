@@ -12,9 +12,14 @@ export async function generateStaticParams() {
   }));
 }
 
-export default function TalkDetailPage({ params }: { params: { slug: string } }) {
+// Next.js 15: params is a Promise
+type PageProps = { params: Promise<{ slug: string }> };
+
+export default async function TalkDetailPage({ params }: PageProps) {
+  const { slug } = await params;
+
   const talks = getSortedTalksData();
-  const talk = talks.find((t) => t.id === params.slug);
+  const talk = talks.find((t) => t.id === slug);
 
   if (!talk) {
     return (
