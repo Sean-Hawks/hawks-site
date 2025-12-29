@@ -74,34 +74,81 @@ export default function MarkdownContent({ content }: MarkdownContentProps) {
         <ReactMarkdown
           remarkPlugins={[remarkGfm, remarkDirective, remarkAdmonitions]}
           components={{
-            // IMPORTANT: render children; self-closing <pre /> drops them and can trigger DOM repair.
-            pre: ({ children, ...props }) => (
+            pre: ({ children, className, ...props }) => (
               <pre
-                className="bg-[rgb(var(--bg))] border border-[rgba(255,255,255,0.06)] p-4 rounded-xl overflow-x-auto my-6"
+                className={[
+                  "bg-[rgb(var(--bg))] border border-[rgba(255,255,255,0.06)] p-4 rounded-xl overflow-x-auto my-6",
+                  className,
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
                 {...props}
               >
                 {children}
               </pre>
             ),
 
-            h1: ({node, ...props}) => <h1 className="text-4xl font-bold mt-10 mb-6 text-[rgb(var(--text))]" {...props} />,
-            h2: ({node, ...props}) => <h2 className="text-3xl font-bold mt-8 mb-4 text-[rgb(var(--text))]" {...props} />,
-            h3: ({node, ...props}) => <h3 className="text-2xl font-bold mt-6 mb-3 text-[rgb(var(--text))]" {...props} />,
-            h4: ({node, ...props}) => <h4 className="text-xl font-bold mt-4 mb-2 text-[rgb(var(--text))]" {...props} />,
-            
-            // 2. 將 p 改為 div，避免 Hydration Mismatch
-            p: ({node, ...props}) => <div className="my-4 leading-relaxed text-[rgb(var(--muted))]" {...props} />,
-            
-            ul: ({node, ...props}) => <ul className="list-disc list-inside my-4 space-y-1 text-[rgb(var(--muted))]" {...props} />,
-            ol: ({node, ...props}) => <ol className="list-decimal list-inside my-4 space-y-1 text-[rgb(var(--muted))]" {...props} />,
-            li: ({node, ...props}) => <li className="ml-4" {...props} />,
-            a: ({node, ...props}) => <a className="text-[rgb(var(--accent))] no-underline hover:underline" {...props} />,
-            blockquote: ({node, ...props}) => (
-              <blockquote className="border-l-4 border-[rgb(var(--accent))] bg-[rgba(251,191,36,0.05)] py-2 px-4 my-6 rounded-r-lg text-[rgb(var(--muted))]" {...props} />
+            h1: (props) => (
+              <h1
+                className="text-4xl font-bold mt-10 mb-6 text-[rgb(var(--text))]"
+                {...props}
+              />
             ),
-            hr: ({node, ...props}) => <hr className="border-[rgba(255,255,255,0.06)] my-8" {...props} />,
-            
-            // 3. 簡化 code 處理
+            h2: (props) => (
+              <h2
+                className="text-3xl font-bold mt-8 mb-4 text-[rgb(var(--text))]"
+                {...props}
+              />
+            ),
+            h3: (props) => (
+              <h3
+                className="text-2xl font-bold mt-6 mb-3 text-[rgb(var(--text))]"
+                {...props}
+              />
+            ),
+            h4: (props) => (
+              <h4
+                className="text-xl font-bold mt-4 mb-2 text-[rgb(var(--text))]"
+                {...props}
+              />
+            ),
+
+            p: (props) => (
+              <div
+                className="my-4 leading-relaxed text-[rgb(var(--muted))]"
+                {...props}
+              />
+            ),
+
+            ul: (props) => (
+              <ul
+                className="list-disc list-inside my-4 space-y-1 text-[rgb(var(--muted))]"
+                {...props}
+              />
+            ),
+            ol: (props) => (
+              <ol
+                className="list-decimal list-inside my-4 space-y-1 text-[rgb(var(--muted))]"
+                {...props}
+              />
+            ),
+            li: (props) => <li className="ml-4" {...props} />,
+            a: (props) => (
+              <a
+                className="text-[rgb(var(--accent))] no-underline hover:underline"
+                {...props}
+              />
+            ),
+            blockquote: (props) => (
+              <blockquote
+                className="border-l-4 border-[rgb(var(--accent))] bg-[rgba(251,191,36,0.05)] py-2 px-4 my-6 rounded-r-lg text-[rgb(var(--muted))]"
+                {...props}
+              />
+            ),
+            hr: (props) => (
+              <hr className="border-[rgba(255,255,255,0.06)] my-8" {...props} />
+            ),
+
             code: ({ className, children, ...props }: any) => {
               const match = /language-(\w+)/.exec(className || "");
               const isBlock = !!match || String(children).includes("\n");
@@ -116,24 +163,42 @@ export default function MarkdownContent({ content }: MarkdownContentProps) {
 
               return (
                 <code
-                  className="text-[rgb(var(--accent))] bg-[rgba(255,255,255,0.06)] px-1.5 py-0.5 rounded text-sm font-mono"
+                  className={[
+                    "text-[rgb(var(--accent))] bg-[rgba(255,255,255,0.06)] px-1.5 py-0.5 rounded text-sm font-mono",
+                    className,
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
                   {...props}
                 >
                   {children}
                 </code>
               );
             },
-            
-            img: ({node, ...props}) => (
-              <img className="rounded-xl border border-[rgba(255,255,255,0.06)] w-full h-auto object-cover my-8" {...props} />
+
+            img: (props) => (
+              <img
+                className="rounded-xl border border-[rgba(255,255,255,0.06)] w-full h-auto object-cover my-8"
+                {...props}
+              />
             ),
-            table: ({node, ...props}) => (
+            table: (props) => (
               <div className="overflow-x-auto my-6">
                 <table className="w-full text-left border-collapse" {...props} />
               </div>
             ),
-            th: ({node, ...props}) => <th className="border-b border-[rgba(255,255,255,0.1)] pb-2 pt-2 font-bold text-[rgb(var(--text))]" {...props} />,
-            td: ({node, ...props}) => <td className="border-b border-[rgba(255,255,255,0.06)] py-2 text-[rgb(var(--muted))]" {...props} />,
+            th: (props) => (
+              <th
+                className="border-b border-[rgba(255,255,255,0.1)] pb-2 pt-2 font-bold text-[rgb(var(--text))]"
+                {...props}
+              />
+            ),
+            td: (props) => (
+              <td
+                className="border-b border-[rgba(255,255,255,0.06)] py-2 text-[rgb(var(--muted))]"
+                {...props}
+              />
+            ),
           }}
         >
           {content}

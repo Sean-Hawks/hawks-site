@@ -1,5 +1,7 @@
 import { Post } from "../types";
 
+// NOTE: 這些內容會在 build 時被打包進靜態輸出（GitHub Pages 友善）
+// NOTE: date 建議固定使用 YYYY-MM-DD（避免排序/解析在 CI 或不同環境出現差異）
 export const posts: Post[] = [
   // 範例：複製這個區塊來新增文章
   {
