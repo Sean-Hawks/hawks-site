@@ -2,8 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { FileText, MessageCircle } from "lucide-react";
-import Chip from "./Chip";
+import { FileText, NotebookText } from "lucide-react";
 import { Post, Talk } from "../types";
 
 interface PostsAsideProps {
@@ -23,8 +22,8 @@ export default function PostsAside({ posts, talks }: PostsAsideProps) {
     ...talks.map((t) => ({
       ...t,
       type: "talk",
-      url: `/talk#${t.id}`,
-      icon: MessageCircle,
+      url: `/talk/${t.id}`, // 改為獨立頁面連結
+      icon: NotebookText,    // 改為筆記圖示
     })),
   ]
     .sort((a, b) => (a.date < b.date ? 1 : -1))

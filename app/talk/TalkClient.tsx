@@ -5,14 +5,11 @@ import { Calendar, Presentation, Video, Sparkles } from "lucide-react";
 import ThemeStyles from "../components/ThemeStyles";
 import Header from "../components/Header";
 import { Talk } from "../types";
+import MarkdownContent from "../components/MarkdownContent";
 
 export default function TalkClient({ talks }: { talks: Talk[] }) {
-  // 取得所有年份並去重
   const years = Array.from(new Set(talks.map((t) => t.year)));
-  
-  // 取得最新的一場演講
   const latestTalk = talks[0];
-  // 其餘演講
   const otherTalks = talks.slice(1);
 
   return (
@@ -23,7 +20,6 @@ export default function TalkClient({ talks }: { talks: Talk[] }) {
       <div className="w-full px-4 sm:px-3">
         <main className="mx-auto max-w-6xl py-8">
           
-          {/* Header Section */}
           <div className="mb-10">
             <h1 className="text-3xl font-bold">Talks</h1>
             <p className="mt-2 text-[rgb(var(--muted))]">分享、演講與教學記錄。</p>
@@ -58,9 +54,9 @@ export default function TalkClient({ talks }: { talks: Talk[] }) {
                   )}
                 </div>
                 
-                <p className="text-[rgb(var(--muted))] leading-relaxed max-w-3xl mb-6 text-lg">
-                  {latestTalk.desc}
-                </p>
+                <div className="text-[rgb(var(--muted))] leading-relaxed max-w-3xl mb-6 text-lg">
+                  <MarkdownContent content={latestTalk.desc} />
+                </div>
 
                 <div className="flex gap-3">
                   {latestTalk.slides && (
@@ -80,7 +76,6 @@ export default function TalkClient({ talks }: { talks: Talk[] }) {
 
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-[200px_1fr]">
             
-            {/* 左側：黏性目錄 (Timeline) */}
             <aside className="hidden lg:block">
               <div className="sticky top-24">
                 <h3 className="mb-4 text-sm font-bold uppercase tracking-wider text-[rgb(var(--muted))]">
@@ -112,11 +107,9 @@ export default function TalkClient({ talks }: { talks: Talk[] }) {
               </div>
             </aside>
 
-            {/* 右側：其餘演講列表 */}
             <div className="space-y-12">
               {otherTalks.map((talk) => (
                 <div key={talk.id} id={talk.id} className="relative scroll-mt-24 pl-8 border-l border-[rgba(255,255,255,0.1)]">
-                  {/* 時間軸圓點 */}
                   <div className="absolute -left-[5px] top-2 h-2.5 w-2.5 rounded-full bg-[rgb(var(--panel2))]" />
                   
                   <div className="rounded-xl border border-[rgba(255,255,255,0.07)] bg-[rgb(var(--panel))] p-6 transition-colors hover:border-[rgba(255,255,255,0.15)]">
@@ -135,9 +128,10 @@ export default function TalkClient({ talks }: { talks: Talk[] }) {
                     <h2 className="mt-3 text-xl font-bold text-[rgb(var(--text))]">
                       {talk.title}
                     </h2>
-                    <p className="mt-2 text-[rgb(var(--muted))] leading-relaxed">
-                      {talk.desc}
-                    </p>
+                    
+                    <div className="mt-2 text-[rgb(var(--muted))] leading-relaxed">
+                      <MarkdownContent content={talk.desc} />
+                    </div>
 
                     <div className="mt-4 flex gap-3">
                       {talk.slides && (

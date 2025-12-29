@@ -1,10 +1,12 @@
+export const dynamic = "force-static";
+
 import { getSortedPostsData } from "./lib/posts";
 import { getSortedTalksData } from "./lib/talks";
-import HomeClient from "./components/HomeClient";
+import HomeHydrationGate from "./components/HomeHydrationGate";
 
 export default function Page() {
-  const posts = getSortedPostsData();
-  const talks = getSortedTalksData();
-  
-  return <HomeClient posts={posts} talks={talks} />;
+	const posts = getSortedPostsData();
+	const talks = getSortedTalksData();
+
+	return <HomeHydrationGate posts={posts} talks={talks} />;
 }

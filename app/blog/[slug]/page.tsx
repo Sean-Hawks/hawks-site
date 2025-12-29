@@ -3,7 +3,7 @@ import { ArrowLeft } from "lucide-react";
 import { getSortedPostsData, getPostBySlug } from "../../lib/posts";
 import ThemeStyles from "../../components/ThemeStyles";
 import Header from "../../components/Header";
-import PostContent from "./post-content";
+import MarkdownContent from "../../components/MarkdownContent"; // Import shared component
 
 export async function generateStaticParams() {
   const posts = getSortedPostsData();
@@ -37,7 +37,6 @@ export default function PostPage({ params }: { params: { slug: string } }) {
       <Header />
 
       <div className="w-full px-4 sm:px-3">
-        {/* 修改：將 max-w-3xl 改為 max-w-5xl 以加寬閱讀區塊 */}
         <main className="max-w-5xl mx-auto py-8">
           <Link 
             href="/blog"
@@ -50,9 +49,7 @@ export default function PostPage({ params }: { params: { slug: string } }) {
           </Link>
 
           <article className="rounded-2xl border border-[rgba(255,255,255,0.07)] bg-[rgb(var(--panel))] overflow-hidden shadow-xl">
-            {/* Header Section */}
             <div className="border-b border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)] p-6 sm:p-10">
-                {/* 新增：Banner 圖片顯示 */}
                 {post.banner && (
                   <div className="-mx-6 -mt-6 mb-8 sm:-mx-10 sm:-mt-10 border-b border-[rgba(255,255,255,0.06)]">
                     <img 
@@ -84,9 +81,8 @@ export default function PostPage({ params }: { params: { slug: string } }) {
                 </div>
             </div>
 
-            {/* Content Section */}
             <div className="p-6 sm:p-10">
-                <PostContent content={post.content} />
+                <MarkdownContent content={post.content} />
             </div>
           </article>
         </main>
