@@ -4,6 +4,7 @@ import { getSortedTalksData } from "../../lib/talks";
 import ThemeStyles from "../../components/ThemeStyles";
 import Header from "../../components/Header";
 import MarkdownContent from "../../components/MarkdownContent";
+import type { Metadata } from "next";
 
 export async function generateStaticParams() {
   const talks = getSortedTalksData();
@@ -12,14 +13,25 @@ export async function generateStaticParams() {
   }));
 }
 
-// Next.js 15: params is a Promise
 type PageProps = { params: Promise<{ slug: string }> };
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const talk = getSortedTalksData().find((t) => t.id === slug);
+  return {
+    metadataBase: new URL("https://hawks.tw"),
+    title: talk ? `${talk.title} | Hawks Talks` : "Talk 未找到 | Hawks",
+    icons: [{ rel: "icon", url: "/avatar.jpg" }],
+  };
+}
 
 export default async function TalkDetailPage({ params }: PageProps) {
   const { slug } = await params;
-
   const talks = getSortedTalksData();
   const talk = talks.find((t) => t.id === slug);
+  
+  // 優先使用 content (完整 Markdown)，若無則退回 desc
+  const content = (talk as any)?.content || talk?.desc;
 
   if (!talk) {
     return (
@@ -68,6 +80,10 @@ export default async function TalkDetailPage({ params }: PageProps) {
                   )}
                 </div>
 
+                <div className="text-xs uppercase tracking-[0.12em] text-[rgb(var(--muted))] mb-1">
+                  {talk.date}
+                </div>
+
                 <h1 className="text-3xl sm:text-4xl font-bold leading-tight text-[rgb(var(--text))]">
                     {talk.title}
                 </h1>
@@ -87,7 +103,7 @@ export default async function TalkDetailPage({ params }: PageProps) {
             </div>
 
             <div className="p-6 sm:p-10">
-                <MarkdownContent content={talk.desc} />
+                <MarkdownContent content={content} />
             </div>
           </article>
         </main>
