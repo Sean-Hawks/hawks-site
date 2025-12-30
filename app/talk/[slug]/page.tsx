@@ -25,6 +25,25 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
+// 加回 buildToc 函式，雖然目前沒用到左側目錄，但保留以防未來需要或避免引用錯誤
+function buildToc(content?: string) {
+  if (!content) return [];
+  const lines = content.split("\n");
+  return lines
+    .map((line) => {
+      const match = /^(#{1,3})\s+(.*)$/.exec(line.trim());
+      if (!match) return null;
+      const level = match[1].length;
+      const title = match[2].trim();
+      const id = title
+        .toLowerCase()
+        .replace(/[^a-z0-9\u4e00-\u9fa5]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+      return { id, title, level };
+    })
+    .filter(Boolean) as { id: string; title: string; level: number }[];
+}
+
 export default async function TalkDetailPage({ params }: PageProps) {
   const { slug } = await params;
   const talks = getSortedTalksData();
@@ -32,6 +51,9 @@ export default async function TalkDetailPage({ params }: PageProps) {
   
   // Fix: 使用 unknown 轉型來繞過 ESLint 的 no-explicit-any 檢查
   const content = (talk as unknown as { content?: string })?.content || talk?.desc;
+  
+  // 雖然目前版面沒用到 toc，但保留變數定義以免報錯
+  const toc = buildToc(content);
 
   if (!talk) {
     return (

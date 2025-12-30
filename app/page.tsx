@@ -1,3 +1,10 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "hawks.tw",
+  description: "Hawks 的個人網站與部落格",
+};
+
 export const dynamic = "force-static"; // 靜態輸出/部署到 GitHub Pages 時維持穩定
 // NOTE: 若 GitHub Actions 出現多個 deploy workflow 衝突，請刪除 .github/workflows/ 下多餘的 yml
 // NOTE: 若 next build 因 PageProps/params 失敗，先檢查 app/**/[slug]/page.tsx 的 params 是否為 Promise（Next.js 15）

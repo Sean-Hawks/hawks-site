@@ -1,20 +1,15 @@
-import React from "react";
 import Link from "next/link";
 import { Calendar, Presentation, Video, Sparkles } from "lucide-react";
+import { getSortedTalksData } from "../lib/talks";
 import ThemeStyles from "../components/ThemeStyles";
 import Header from "../components/Header";
-import { getSortedTalksData } from "../lib/talks";
 import MarkdownContent from "../components/MarkdownContent";
 
 export default function TalkPage() {
   const talks = getSortedTalksData();
-
   // 取得所有年份並去重
   const years = Array.from(new Set(talks.map((t) => t.year)));
-  
-  // 取得最新的一場演講
   const latestTalk = talks[0];
-  // 其餘演講
   const otherTalks = talks.slice(1);
 
   return (
@@ -25,7 +20,6 @@ export default function TalkPage() {
       <div className="w-full px-4 sm:px-3">
         <main className="mx-auto max-w-6xl py-8">
           
-          {/* Header Section */}
           <div className="mb-10">
             <h1 className="text-3xl font-bold">Talks</h1>
             <p className="mt-2 text-[rgb(var(--muted))]">分享、演講與教學記錄。</p>
@@ -33,54 +27,53 @@ export default function TalkPage() {
 
           {/* Latest Talk Highlight */}
           {latestTalk && (
-            <Link href={`/talk/${latestTalk.id}`} className="block group">
-              <div className="mb-16 rounded-2xl border border-[rgba(251,191,36,0.2)] bg-[rgba(251,191,36,0.03)] p-6 sm:p-8 relative overflow-hidden transition-all hover:border-[rgba(251,191,36,0.4)] hover:bg-[rgba(251,191,36,0.05)]">
-                <div className="absolute top-0 right-0 p-4 opacity-10">
-                  <Sparkles className="w-32 h-32 text-[rgb(var(--accent))]" />
+            <div className="mb-16 rounded-2xl border border-[rgba(251,191,36,0.2)] bg-[rgba(251,191,36,0.03)] p-6 sm:p-8 relative overflow-hidden transition-all hover:border-[rgba(251,191,36,0.4)] hover:bg-[rgba(251,191,36,0.05)] group">
+              <div className="absolute top-0 right-0 p-4 opacity-10">
+                <Sparkles className="w-32 h-32 text-[rgb(var(--accent))]" />
+              </div>
+              
+              <div className="relative z-10">
+                <div className="inline-flex items-center gap-2 rounded-full bg-[rgba(251,191,36,0.1)] px-3 py-1 text-xs font-bold text-[rgb(var(--accent))] mb-4">
+                  <Sparkles className="w-3 h-3" />
+                  LATEST TALK
                 </div>
                 
-                <div className="relative z-10">
-                  <div className="inline-flex items-center gap-2 rounded-full bg-[rgba(251,191,36,0.1)] px-3 py-1 text-xs font-bold text-[rgb(var(--accent))] mb-4">
-                    <Sparkles className="w-3 h-3" />
-                    LATEST TALK
-                  </div>
-                  
-                  <h2 className="text-2xl sm:text-3xl font-bold text-[rgb(var(--text))] mb-3 group-hover:text-[rgb(var(--accent))] transition-colors">
+                <h2 className="text-2xl sm:text-3xl font-bold text-[rgb(var(--text))] mb-3 group-hover:text-[rgb(var(--accent))] transition-colors">
+                  <Link href={`/talk/${latestTalk.id}`} className="before:absolute before:inset-0 focus:outline-none">
                     {latestTalk.title}
-                  </h2>
-                  
-                  <div className="flex flex-wrap items-center gap-4 text-sm text-[rgb(var(--muted))] mb-4">
-                    <span className="flex items-center gap-1.5">
-                      <Calendar className="h-4 w-4" />
-                      {latestTalk.date}
+                  </Link>
+                </h2>
+                
+                <div className="flex flex-wrap items-center gap-4 text-sm text-[rgb(var(--muted))] mb-4">
+                  <span className="flex items-center gap-1.5">
+                    <Calendar className="h-4 w-4" />
+                    {latestTalk.date}
+                  </span>
+                  {latestTalk.event && (
+                    <span className="rounded bg-[rgba(255,255,255,0.06)] px-2.5 py-0.5 text-xs">
+                      {latestTalk.event}
                     </span>
-                    {latestTalk.event && (
-                      <span className="rounded bg-[rgba(255,255,255,0.06)] px-2.5 py-0.5 text-xs">
-                        {latestTalk.event}
-                      </span>
-                    )}
-                  </div>
-                  
-                  {/* 使用 MarkdownContent 渲染 desc，並將 p 改為 div */}
-                  <div className="text-[rgb(var(--muted))] leading-relaxed max-w-3xl mb-6 text-lg line-clamp-3">
-                    <MarkdownContent content={latestTalk.desc} />
-                  </div>
+                  )}
+                </div>
+                
+                <div className="text-[rgb(var(--muted))] leading-relaxed max-w-3xl mb-6 text-lg line-clamp-3">
+                  <MarkdownContent content={latestTalk.desc} />
+                </div>
 
-                  <div className="flex gap-3">
-                    {latestTalk.slides && (
-                      <span className="inline-flex items-center gap-2 rounded-lg bg-[rgb(var(--accent))] px-4 py-2 text-sm font-bold text-black group-hover:opacity-90 transition-opacity">
-                        <Presentation className="h-4 w-4" /> View Slides
-                      </span>
-                    )}
-                    {latestTalk.video && (
-                      <span className="inline-flex items-center gap-2 rounded-lg bg-[rgba(255,255,255,0.1)] px-4 py-2 text-sm font-medium text-[rgb(var(--text))] group-hover:bg-[rgba(255,255,255,0.15)] transition-colors">
-                        <Video className="h-4 w-4" /> Watch Video
-                      </span>
-                    )}
-                  </div>
+                <div className="flex gap-3 relative z-20">
+                  {latestTalk.slides && (
+                    <a href={latestTalk.slides} target="_blank" className="inline-flex items-center gap-2 rounded-lg bg-[rgb(var(--accent))] px-4 py-2 text-sm font-bold text-black hover:opacity-90 transition-opacity">
+                      <Presentation className="h-4 w-4" /> View Slides
+                    </a>
+                  )}
+                  {latestTalk.video && (
+                    <a href={latestTalk.video} target="_blank" className="inline-flex items-center gap-2 rounded-lg bg-[rgba(255,255,255,0.1)] px-4 py-2 text-sm font-medium text-[rgb(var(--text))] hover:bg-[rgba(255,255,255,0.15)] transition-colors">
+                      <Video className="h-4 w-4" /> Watch Video
+                    </a>
+                  )}
                 </div>
               </div>
-            </Link>
+            </div>
           )}
 
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-[200px_1fr]">
@@ -120,47 +113,45 @@ export default function TalkPage() {
             {/* 右側：其餘演講列表 */}
             <div className="space-y-12">
               {otherTalks.map((talk) => (
-                <div key={talk.id} className="relative pl-8 border-l border-[rgba(255,255,255,0.1)]">
-                  {/* 時間軸圓點 */}
+                <div key={talk.id} id={talk.id} className="relative scroll-mt-24 pl-8 border-l border-[rgba(255,255,255,0.1)]">
                   <div className="absolute -left-[5px] top-2 h-2.5 w-2.5 rounded-full bg-[rgb(var(--panel2))]" />
                   
-                  <Link href={`/talk/${talk.id}`} className="block group">
-                    <div className="rounded-xl border border-[rgba(255,255,255,0.07)] bg-[rgb(var(--panel))] p-6 transition-colors hover:border-[rgba(255,255,255,0.15)] hover:bg-[rgba(255,255,255,0.03)]">
-                      <div className="flex flex-wrap items-center gap-3 text-sm text-[rgb(var(--muted))]">
-                        <span className="flex items-center gap-1">
-                          <Calendar className="h-3.5 w-3.5" />
-                          {talk.date}
+                  <div className="rounded-xl border border-[rgba(255,255,255,0.07)] bg-[rgb(var(--panel))] p-6 transition-colors hover:border-[rgba(255,255,255,0.15)] hover:bg-[rgba(255,255,255,0.03)] relative group">
+                    <div className="flex flex-wrap items-center gap-3 text-sm text-[rgb(var(--muted))]">
+                      <span className="flex items-center gap-1">
+                        <Calendar className="h-3.5 w-3.5" />
+                        {talk.date}
+                      </span>
+                      {talk.event && (
+                        <span className="rounded bg-[rgba(255,255,255,0.06)] px-2 py-0.5 text-xs">
+                          {talk.event}
                         </span>
-                        {talk.event && (
-                          <span className="rounded bg-[rgba(255,255,255,0.06)] px-2 py-0.5 text-xs">
-                            {talk.event}
-                          </span>
-                        )}
-                      </div>
-
-                      <h2 className="mt-3 text-xl font-bold text-[rgb(var(--text))] group-hover:text-[rgb(var(--accent))] transition-colors">
-                        {talk.title}
-                      </h2>
-                      
-                      {/* 使用 MarkdownContent 渲染 desc，並將 p 改為 div */}
-                      <div className="mt-2 text-[rgb(var(--muted))] leading-relaxed line-clamp-2">
-                        <MarkdownContent content={talk.desc} />
-                      </div>
-
-                      <div className="mt-4 flex gap-3">
-                        {talk.slides && (
-                          <span className="flex items-center gap-2 text-sm text-[rgb(var(--accent))] opacity-80">
-                            <Presentation className="h-4 w-4" /> Slides
-                          </span>
-                        )}
-                        {talk.video && (
-                          <span className="flex items-center gap-2 text-sm text-[rgb(var(--accent))] opacity-80">
-                            <Video className="h-4 w-4" /> Video
-                          </span>
-                        )}
-                      </div>
+                      )}
                     </div>
-                  </Link>
+
+                    <h2 className="mt-3 text-xl font-bold text-[rgb(var(--text))] group-hover:text-[rgb(var(--accent))] transition-colors">
+                      <Link href={`/talk/${talk.id}`} className="before:absolute before:inset-0 focus:outline-none">
+                        {talk.title}
+                      </Link>
+                    </h2>
+                    
+                    <div className="mt-2 text-[rgb(var(--muted))] leading-relaxed line-clamp-2">
+                      <MarkdownContent content={talk.desc} />
+                    </div>
+
+                    <div className="mt-4 flex gap-3 relative z-20">
+                      {talk.slides && (
+                        <a href={talk.slides} target="_blank" className="flex items-center gap-2 text-sm text-[rgb(var(--accent))] hover:underline">
+                          <Presentation className="h-4 w-4" /> Slides
+                        </a>
+                      )}
+                      {talk.video && (
+                        <a href={talk.video} target="_blank" className="flex items-center gap-2 text-sm text-[rgb(var(--accent))] hover:underline">
+                          <Video className="h-4 w-4" /> Video
+                        </a>
+                      )}
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
