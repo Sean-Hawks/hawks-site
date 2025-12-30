@@ -60,11 +60,9 @@ export default function PostsAside({ posts, talks }: PostsAsideProps) {
               {item.title}
             </h3>
 
-            {/* 如果是 Post 顯示描述，如果是 Talk 顯示 Event */}
+            {/* 修改：移除 item.type === 'post' 的判斷，讓 talk 也能顯示 desc (內容擷取) */}
             <p className="mt-1 text-xs text-[rgb(var(--muted))] line-clamp-1 opacity-60">
-              {item.type === "post"
-                ? (item as Post).desc
-                : (item as Talk).event || "隨筆"}
+              {item.desc}
             </p>
           </Link>
         ))}
