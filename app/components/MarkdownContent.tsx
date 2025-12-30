@@ -1,5 +1,6 @@
 "use client";
 
+/* eslint-disable @next/next/no-img-element */
 import React from "react";
 import ReactMarkdown from "react-markdown";
 import type { Components } from "react-markdown";
@@ -46,8 +47,9 @@ const remarkAdmonitions: Plugin = () => {
   };
 };
 
-type CodeProps = Parameters<NonNullable<Components["code"]>>[0];
-type PreProps = Parameters<NonNullable<Components["pre"]>>[0];
+// 修正：改用 React 原生屬性型別，避免 Parameters<string> 錯誤
+type PreProps = React.ComponentPropsWithoutRef<"pre">;
+type CodeProps = React.ComponentPropsWithoutRef<"code"> & { inline?: boolean };
 
 export default function MarkdownContent({ content }: { content?: string }) {
   const [mounted, setMounted] = React.useState(false);

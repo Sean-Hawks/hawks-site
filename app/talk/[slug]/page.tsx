@@ -30,8 +30,8 @@ export default async function TalkDetailPage({ params }: PageProps) {
   const talks = getSortedTalksData();
   const talk = talks.find((t) => t.id === slug);
   
-  // 優先使用 content (完整 Markdown)，若無則退回 desc
-  const content = (talk as any)?.content || talk?.desc;
+  // Fix: 使用 unknown 轉型來繞過 ESLint 的 no-explicit-any 檢查
+  const content = (talk as unknown as { content?: string })?.content || talk?.desc;
 
   if (!talk) {
     return (
