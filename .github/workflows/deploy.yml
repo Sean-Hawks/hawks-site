@@ -33,8 +33,9 @@ jobs:
           node-version: "20"
           cache: "npm"
 
+      # 改用 npm install，避免因 package-lock.json 版本不合或缺失導致 npm ci 失敗
       - name: Install
-        run: npm ci
+        run: npm install
 
       - name: Build (Next export -> out/)
         run: npm run build
