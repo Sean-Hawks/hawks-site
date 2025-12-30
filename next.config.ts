@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
   // 1. 啟用靜態輸出：這會讓 `next build` 產生 `out/` 資料夾，裡面全是 HTML
   output: "export",
 
+  // 重要：GitHub Pages 需要 trailingSlash: true 才能正確處理子路徑（如 /talk 變成 /talk/index.html）
   trailingSlash: true,
 
   // 2. 關閉圖片優化：GitHub Pages 不支援 Next.js 的即時圖片處理伺服器
