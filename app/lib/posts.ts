@@ -35,10 +35,24 @@ export function getSortedPostsData(): Post[] {
       }
     }
 
+    // 處理日期格式
+    let dateStr = '';
+    if (data.date) {
+      if (data.date instanceof Date) {
+        // 如果 gray-matter 把日期解析成了 Date 物件，將其轉回 YYYY-MM-DD 格式
+        // 為了避免時區問題，使用 getFullYear 等方法組合
+        const d = data.date;
+        dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      } else {
+        dateStr = String(data.date);
+      }
+    }
+
     return {
       slug,
       content,
-      ...(data as Omit<Post, 'slug' | 'content'>),
+      ...(data as Omit<Post, 'slug' | 'content' | 'date'>),
+      date: dateStr,
       banner,
     };
   });
@@ -65,10 +79,33 @@ export function getPostBySlug(slug: string): Post | undefined {
     }
   }
 
+  // 處理日期格式
+  let dateStr = '';
+  if (data.date) {
+    if (data.date instanceof Date) {
+      const d = data.date;
+      dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    } else {
+       // 嘗試處理已經變成長字串的日期
+       const str = String(data.date);
+       if (str.includes('GMT') || str.match(/^[A-Z][a-z]{2}\s[A-Z][a-z]{2}\s\d{2}\s\d{4}/)) {
+          const d = new Date(str);
+          if (!isNaN(d.getTime())) {
+            dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+          } else {
+            dateStr = str;
+          }
+       } else {
+         dateStr = str;
+       }
+    }
+  }
+
   return {
     slug,
     content,
-    ...(data as Omit<Post, 'slug' | 'content'>),
+    ...(data as Omit<Post, 'slug' | 'content' | 'date'>),
+    date: dateStr,
     banner,
   };
 }

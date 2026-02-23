@@ -53,6 +53,7 @@ export default async function TalkDetailPage({ params }: PageProps) {
   const content = (talk as unknown as { content?: string })?.content || talk?.desc;
   
   // 雖然目前版面沒用到 toc，但保留變數定義以免報錯
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const toc = buildToc(content);
 
   if (!talk) {
@@ -92,6 +93,7 @@ export default async function TalkDetailPage({ params }: PageProps) {
             <div className="border-b border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)] p-6 sm:p-10">
                 {talk.banner && (
                   <div className="-mx-6 -mt-6 mb-8 sm:-mx-10 sm:-mt-10 border-b border-[rgba(255,255,255,0.06)]">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={talk.banner}
                       alt={talk.title}

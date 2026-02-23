@@ -99,6 +99,7 @@ export default async function PostPage({ params }: PageProps) {
               <div className="border-b border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)] p-6 sm:p-10">
                 {post.banner && (
                   <div className="-mx-6 -mt-6 mb-8 sm:-mx-10 sm:-mt-10 border-b border-[rgba(255,255,255,0.06)]">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={post.banner}
                       alt={post.title}
