@@ -23,10 +23,23 @@ export function getSortedPostsData(): Post[] {
     // 使用 gray-matter 解析 metadata 區塊
     const { data, content } = matter(fileContents);
 
+    // 處理 Obsidian 格式的 banner 圖片連結 (例如: "[[image.png]]" -> "/images/image.png")
+    let banner = data.banner;
+    if (banner && typeof banner === 'string') {
+      const match = banner.match(/^\[\[(.*?)\]\]$/);
+      if (match) {
+        banner = `/images/${match[1]}`;
+      } else if (!banner.startsWith('/')) {
+        // 如果只寫檔名，自動補上 /images/
+        banner = `/images/${banner}`;
+      }
+    }
+
     return {
       slug,
       content,
       ...(data as Omit<Post, 'slug' | 'content'>),
+      banner,
     };
   });
 
@@ -41,9 +54,21 @@ export function getPostBySlug(slug: string): Post | undefined {
   const fileContents = fs.readFileSync(fullPath, 'utf8');
   const { data, content } = matter(fileContents);
 
+  // 處理 Obsidian 格式的 banner 圖片連結
+  let banner = data.banner;
+  if (banner && typeof banner === 'string') {
+    const match = banner.match(/^\[\[(.*?)\]\]$/);
+    if (match) {
+      banner = `/images/${match[1]}`;
+    } else if (!banner.startsWith('/')) {
+      banner = `/images/${banner}`;
+    }
+  }
+
   return {
     slug,
     content,
     ...(data as Omit<Post, 'slug' | 'content'>),
+    banner,
   };
 }

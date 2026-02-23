@@ -22,4 +22,5 @@ export interface Talk {
   desc: string;    // 對應 Markdown 的內文
   slides?: string;
   video?: string;
+  banner?: string; // 新增：Talk 封面圖片路徑
 }

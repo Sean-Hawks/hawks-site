@@ -23,11 +23,23 @@ export function getSortedTalksData(): Talk[] {
     // 使用 gray-matter 解析 metadata
     const { data, content } = matter(fileContents);
 
+    // 處理 Obsidian 格式的 banner 圖片連結
+    let banner = data.banner;
+    if (banner && typeof banner === 'string') {
+      const match = banner.match(/^\[\[(.*?)\]\]$/);
+      if (match) {
+        banner = `/images/${match[1]}`;
+      } else if (!banner.startsWith('/')) {
+        banner = `/images/${banner}`;
+      }
+    }
+
     return {
       id,
       desc: content, // 內文作為描述
       year: data.date ? data.date.split('-')[0] : 'Unknown', // 自動從日期提取年份
       ...(data as Omit<Talk, 'id' | 'desc' | 'year'>),
+      banner,
     };
   });
 

@@ -90,6 +90,15 @@ export default async function TalkDetailPage({ params }: PageProps) {
 
           <article className="rounded-2xl border border-[rgba(255,255,255,0.07)] bg-[rgb(var(--panel))] overflow-hidden shadow-xl">
             <div className="border-b border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)] p-6 sm:p-10">
+                {talk.banner && (
+                  <div className="-mx-6 -mt-6 mb-8 sm:-mx-10 sm:-mt-10 border-b border-[rgba(255,255,255,0.06)]">
+                    <img
+                      src={talk.banner}
+                      alt={talk.title}
+                      className="w-full h-auto max-h-[500px] object-cover"
+                    />
+                  </div>
+                )}
                 <div className="flex flex-wrap items-center gap-4 text-sm text-[rgb(var(--muted))] mb-4">
                   <span className="flex items-center gap-1.5">
                     <Calendar className="h-4 w-4" />
