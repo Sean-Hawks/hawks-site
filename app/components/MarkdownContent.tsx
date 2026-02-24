@@ -80,35 +80,35 @@ export default function MarkdownContent({ content }: { content?: string }) {
     },
 
     h1: (props) => (
-      <h1 className="text-4xl font-bold mt-10 mb-6 text-[rgb(var(--text))]" {...props} />
+      <h1 className="text-3xl sm:text-4xl font-extrabold mt-12 mb-6 text-[rgb(var(--text))] tracking-tight border-b border-[rgba(255,255,255,0.06)] pb-4" {...props} />
     ),
     h2: (props) => (
-      <h2 className="text-3xl font-bold mt-8 mb-4 text-[rgb(var(--text))]" {...props} />
+      <h2 className="text-2xl sm:text-3xl font-bold mt-10 mb-4 text-[rgb(var(--text))] tracking-tight" {...props} />
     ),
     h3: (props) => (
-      <h3 className="text-2xl font-bold mt-6 mb-3 text-[rgb(var(--text))]" {...props} />
+      <h3 className="text-xl sm:text-2xl font-bold mt-8 mb-3 text-[rgb(var(--text))] tracking-tight" {...props} />
     ),
     h4: (props) => (
-      <h4 className="text-xl font-bold mt-4 mb-2 text-[rgb(var(--text))]" {...props} />
+      <h4 className="text-lg sm:text-xl font-bold mt-6 mb-2 text-[rgb(var(--text))]" {...props} />
     ),
 
     // 避免 p 內塞進 block element（admonition/pre 等）造成 DOM repair
     p: (props) => (
-      <div className="my-4 leading-relaxed text-[rgb(var(--muted))]" {...props} />
+      <div className="my-5 leading-8 text-[rgb(var(--muted))] text-base sm:text-lg tracking-wide" {...props} />
     ),
 
     ul: (props) => (
-      <ul className="list-disc list-inside my-4 space-y-1 text-[rgb(var(--muted))]" {...props} />
+      <ul className="list-disc list-inside my-6 space-y-2 text-[rgb(var(--muted))] marker:text-[rgb(var(--accent))]" {...props} />
     ),
     ol: (props) => (
-      <ol className="list-decimal list-inside my-4 space-y-1 text-[rgb(var(--muted))]" {...props} />
+      <ol className="list-decimal list-inside my-6 space-y-2 text-[rgb(var(--muted))] marker:text-[rgb(var(--accent))]" {...props} />
     ),
-    li: (props) => <li className="ml-4" {...props} />,
+    li: (props) => <li className="ml-4 pl-1" {...props} />,
     a: (props) => (
-      <a className="text-[rgb(var(--accent))] no-underline hover:underline" {...props} />
+      <a className="text-[rgb(var(--accent))] font-medium no-underline hover:underline decoration-2 underline-offset-2 transition-all hover:text-[rgb(251,191,36)]" {...props} />
     ),
     blockquote: (props) => (
-      <blockquote className="border-l-4 border-[rgb(var(--accent))] bg-[rgba(251,191,36,0.05)] py-2 px-4 my-6 rounded-r-lg text-[rgb(var(--muted))]" {...props} />
+      <blockquote className="border-l-4 border-[rgb(var(--accent))] bg-[rgba(255,255,255,0.03)] py-4 px-6 my-8 rounded-r-xl text-[rgb(var(--muted))] italic font-medium" {...props} />
     ),
     hr: (props) => <hr className="border-[rgba(255,255,255,0.06)] my-8" {...props} />,
 
@@ -126,7 +126,7 @@ export default function MarkdownContent({ content }: { content?: string }) {
       return (
         <code
           className={[
-            "text-[rgb(var(--accent))] bg-[rgba(255,255,255,0.06)] px-1.5 py-0.5 rounded text-sm font-mono",
+            "text-[rgb(251,191,36)] bg-[rgba(255,255,255,0.06)] px-1.5 py-0.5 rounded text-[0.9em] font-mono border border-[rgba(255,255,255,0.08)]",
             className,
           ]
             .filter(Boolean)
@@ -139,11 +139,19 @@ export default function MarkdownContent({ content }: { content?: string }) {
     },
 
     img: (props) => (
-      <img
-        className="rounded-xl border border-[rgba(255,255,255,0.06)] w-full h-auto object-cover my-8"
-        alt={props.alt ?? ""}
-        {...props}
-      />
+      <div className="relative my-10 group">
+        <div className="absolute -inset-1 rounded-xl bg-gradient-to-r from-[rgb(var(--accent))] to-purple-600 opacity-0 group-hover:opacity-20 blur transition duration-500"></div>
+        <img
+          className="relative rounded-xl border border-[rgba(255,255,255,0.08)] w-full h-auto object-cover shadow-2xl transition-transform duration-300 group-hover:scale-[1.01]"
+          alt={props.alt ?? ""}
+          {...props}
+        />
+        {props.alt && (
+          <div className="mt-3 text-center text-sm text-[rgb(var(--muted))] opacity-70">
+            {props.alt}
+          </div>
+        )}
+      </div>
     ),
 
     table: (props) => (
