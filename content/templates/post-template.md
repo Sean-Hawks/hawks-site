@@ -3,6 +3,9 @@ title: "{{title}}"
 date: "{{date:YYYY-MM-DD}}"
 desc: ""
 banner: ""
-tags: []
+tags:
+  - "#blog"
+relatedTalks: []
+ogImage: ""
+status: draft
 ---
-

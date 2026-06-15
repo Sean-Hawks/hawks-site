@@ -1,0 +1,21 @@
+name: Guestbook
+description: Leave a short message on hawks.tw
+title: "[Guestbook] "
+labels: ["guestbook"]
+body:
+  - type: input
+    id: name
+    attributes:
+      label: Name
+      description: What name should appear with your message?
+      placeholder: Your name
+    validations:
+      required: true
+  - type: textarea
+    id: message
+    attributes:
+      label: Message
+      description: Keep it short and friendly.
+      placeholder: Say hi.
+    validations:
+      required: true

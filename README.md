@@ -1,66 +1,180 @@
-# Hawks Personal Site
+# Hawks Site
 
-這是一個模仿 Discord Profile 風格的個人網站與部落格系統。
+Hawks 的個人網站、Blog 與近況紀錄。整體視覺以 Discord profile 的深色介面為起點，延伸成更適合閱讀與往下瀏覽的個人站。
 
-## 🛠 技術棧
+網站內容以 Markdown 管理，適合搭配 Obsidian 寫草稿，再發布到 `content/posts/` 或 `content/talks/`。
 
-- **Framework**: Next.js 15 (App Router)
-- **Styling**: Tailwind CSS + CSS Variables (Discord Theme)
-- **Language**: TypeScript
-- **Blog Engine**: Markdown files + gray-matter + react-markdown
+## Features
 
-## 🚀 如何開始
+- Scroll-first homepage with profile, latest blog posts, now updates, and projects
+- Markdown blog with frontmatter metadata
+- URL-safe blog slugs, including optional custom `slug`
+- Tag index and tag archive pages sorted by usage count
+- Talk / Now archive for shorter updates and sharing notes
+- Full-site search across posts, talks, tags, and excerpts
+- Blog / Talk related-content links
+- Guestbook entry point powered by GitHub issue templates
+- RSS feed at `/rss.xml`
+- Static Open Graph images generated into `public/og/`
+- Light / dark theme toggle, defaulting to dark mode
+- Static export for GitHub Pages
 
-1. **安裝依賴**：
-   ```bash
-   npm install
-   ```
+## Tech Stack
 
-2. **啟動開發伺服器**：
-   ```bash
-   npm run dev
-   ```
-   開啟 [http://localhost:3000](http://localhost:3000) 查看結果。
+- Next.js 15 App Router
+- React 19
+- TypeScript
+- Tailwind CSS 4
+- Markdown content powered by `gray-matter`, `react-markdown`, `remark-gfm`, and `remark-directive`
+- GitHub Pages deployment through GitHub Actions
 
-## 📝 如何新增文章 (Blog Workflow)
+## Getting Started
 
-不需要修改程式碼，只需要新增 Markdown 檔案。
+Install dependencies:
 
-1. **建立檔案**：
-   前往 `content/posts/` 資料夾，建立一個新的 `.md` 檔案。檔名將成為網址的一部分 (Slug)。
-   例如：`my-awesome-post.md` -> `/blog/my-awesome-post`
+```bash
+npm install
+```
 
-2. **加入 Frontmatter**：
-   在檔案的最上方加入以下設定區塊：
+Start the local dev server:
 
-   ```yaml
-   ---
-   title: "文章標題"
-   date: "2025-01-01"
-   desc: "這是一段簡短的描述，會顯示在文章列表中。"
-   tags: ["#Tag1", "#Tag2"]
-   banner: "/images/banner-name.jpg" # (選填) 圖片請放在 public/images/
-   ---
-   ```
+```bash
+npm run dev
+```
 
-3. **撰寫內容**：
-   在 `---` 下方開始撰寫標準 Markdown。
-   - 支援圖片：`![Alt](/images/pic.jpg)`
-   - 支援程式碼區塊
-   - 支援引用與列表
+Open [http://localhost:3000](http://localhost:3000).
 
-## 📂 專案結構說明
+## Scripts
 
-- **`app/`**: 應用程式主邏輯
-  - **`blog/`**: 部落格頁面 (`page.tsx` 為列表, `[slug]/page.tsx` 為內文)
-  - **`components/`**: 共用元件 (Header, Sidebar, ThemeStyles)
-  - **`data/`**: 靜態資料 (如左側的角色身分 `roles.ts`)
-  - **`lib/`**: 後端工具 (如 `posts.ts` 負責讀取 Markdown 檔案)
-  - **`types/`**: TypeScript 型別定義
-- **`content/posts/`**: **文章存放處** (Markdown 檔案)
-- **`public/`**: 靜態資源 (圖片請放這裡)
+```bash
+npm run dev
+```
 
-## 🎨 風格系統
+Run the Next.js development server.
 
-全站樣式變數定義在 `app/components/ThemeStyles.tsx` 中。
-主要使用 CSS Variables (`--bg`, `--panel`, `--accent`) 來維持 Discord 風格的一致性。
+```bash
+npm run lint
+```
+
+Run ESLint.
+
+```bash
+npm run build
+```
+
+Build the static site export.
+
+```bash
+npm run og
+```
+
+Generate Open Graph images into `public/og/`.
+
+## Content Workflow
+
+### Blog Posts
+
+Published blog posts live in `content/posts/`.
+
+Example:
+
+```yaml
+---
+title: "文章標題"
+date: "2026-06-16"
+desc: "一句話說完這篇文章在講什麼"
+slug: "optional-custom-slug"
+tags:
+  - "#blog"
+  - "#web"
+relatedTalks:
+  - "0223"
+ogImage: ""
+status: published
+---
+```
+
+Notes:
+
+- `slug` is optional. If omitted, the filename is slugified.
+- `tags` are the main index system. More frequently used tags appear earlier on `/tags/`.
+- `status: draft` and `status: private` are excluded from public pages.
+- Old posts without `status` are treated as public.
+
+### Talks / Now
+
+Shorter updates live in `content/talks/`.
+
+Example:
+
+```yaml
+---
+title: "雜談"
+date: "2026-06-16"
+event: ""
+banner: ""
+slides: ""
+video: ""
+relatedPosts:
+  - "first-web"
+ogImage: ""
+status: published
+---
+```
+
+The `/now/` page is generated from recent posts, recent talks, and projects, so it does not need separate status text.
+
+## Project Structure
+
+```text
+app/
+  blog/          Blog list, detail pages, and tag archive routes
+  components/    Shared UI components
+  data/          Small static data sets
+  guestbook/     Guestbook page
+  lib/           Content loaders, search, related-content helpers
+  now/           Now page
+  project/       Projects page
+  rss.xml/       RSS route
+  search/        Search page
+  tags/          Tag index page
+  talk/          Talk archive and detail pages
+content/
+  posts/         Published blog posts
+  talks/         Talk / now archive entries
+  templates/     Obsidian-friendly content templates
+docs/            Writing and publishing workflow notes
+public/
+  images/        Static images
+  og/            Generated Open Graph images
+scripts/
+  generate-og-images.mjs
+```
+
+## Obsidian Workflow
+
+This repo includes templates and a publishing workflow for writing in Obsidian:
+
+- Start loose notes in `Inbox/` or `Journal/`
+- Move stronger ideas into `Drafts/`
+- Publish final posts into `content/posts/`
+- Publish shorter updates into `content/talks/`
+
+See [docs/OBSIDIAN_WORKFLOW.md](docs/OBSIDIAN_WORKFLOW.md) for the full workflow.
+
+## Deployment
+
+The site is configured for static export and GitHub Pages. Pushing to `main` triggers the GitHub Actions Pages workflow.
+
+Before pushing, run:
+
+```bash
+npm run lint
+npm run build
+```
+
+If content changed, regenerate OG images:
+
+```bash
+npm run og
+```

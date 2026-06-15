@@ -13,11 +13,11 @@ export const dynamic = "force-static"; // 靜態輸出/部署到 GitHub Pages �
 
 import { getSortedPostsData } from "./lib/posts";
 import { getSortedTalksData } from "./lib/talks";
-import HomeHydrationGate from "./components/HomeHydrationGate";
+import HomeClient from "./components/HomeClient";
 
 export default function Page() {
 	const posts = getSortedPostsData();
 	const talks = getSortedTalksData();
 
-	return <HomeHydrationGate posts={posts} talks={talks} />;
+	return <HomeClient posts={posts} talks={talks} />;
 }

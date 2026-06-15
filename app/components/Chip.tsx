@@ -15,8 +15,8 @@ export default function Chip({
         "inline-flex items-center rounded-full px-2.5 py-1 text-xs",
         "border",
         tone === "accent"
-          ? "border-[rgba(255,255,255,0.12)] bg-[rgba(167,139,250,0.14)] text-[rgb(var(--text))]"
-          : "border-[rgba(255,255,255,0.10)] bg-[rgba(255,255,255,0.04)] text-[rgb(var(--muted))]",
+          ? "border-[rgb(var(--purple)/0.24)] bg-[rgb(var(--purple)/0.11)] text-[rgb(var(--text))]"
+          : "border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.04)] text-[rgb(var(--muted))]",
       ].join(" ")}
     >
       {children}

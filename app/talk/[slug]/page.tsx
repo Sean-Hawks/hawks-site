@@ -1,10 +1,12 @@
 import Link from "next/link";
-import { ArrowLeft, Calendar, Presentation, Video } from "lucide-react";
+import { ArrowLeft, Calendar, FileText, Presentation, Video } from "lucide-react";
 import { getSortedTalksData } from "../../lib/talks";
+import { getSortedPostsData } from "../../lib/posts";
 import ThemeStyles from "../../components/ThemeStyles";
 import Header from "../../components/Header";
 import MarkdownContent from "../../components/MarkdownContent";
 import type { Metadata } from "next";
+import { getRelatedPostsForTalk } from "../../lib/related";
 
 export async function generateStaticParams() {
   const talks = getSortedTalksData();
@@ -18,47 +20,55 @@ type PageProps = { params: Promise<{ slug: string }> };
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const talk = getSortedTalksData().find((t) => t.id === slug);
+  const title = talk ? `${talk.title} | Hawks Talks` : "Talk 未找到 | Hawks";
+  const description = talk?.desc ? talk.desc.replace(/\s+/g, " ").slice(0, 150) : "Hawks 的分享與紀錄";
+  const url = talk ? `https://hawks.tw/talk/${talk.id}/` : "https://hawks.tw/talk/";
+  const image = talk?.ogImage || (talk ? `/og/talk-${talk.id}.png` : "/og/default.png");
+
   return {
     metadataBase: new URL("https://hawks.tw"),
-    title: talk ? `${talk.title} | Hawks Talks` : "Talk 未找到 | Hawks",
+    title,
+    description,
+    alternates: {
+      canonical: url,
+    },
+    openGraph: {
+      type: "article",
+      url,
+      title,
+      description,
+      siteName: "hawks.tw",
+      publishedTime: talk?.date,
+      images: [
+        {
+          url: image,
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [image],
+    },
     icons: [{ rel: "icon", url: "/avatar.jpg" }],
   };
-}
-
-// 加回 buildToc 函式，雖然目前沒用到左側目錄，但保留以防未來需要或避免引用錯誤
-function buildToc(content?: string) {
-  if (!content) return [];
-  const lines = content.split("\n");
-  return lines
-    .map((line) => {
-      const match = /^(#{1,3})\s+(.*)$/.exec(line.trim());
-      if (!match) return null;
-      const level = match[1].length;
-      const title = match[2].trim();
-      const id = title
-        .toLowerCase()
-        .replace(/[^a-z0-9\u4e00-\u9fa5]+/g, "-")
-        .replace(/^-+|-+$/g, "");
-      return { id, title, level };
-    })
-    .filter(Boolean) as { id: string; title: string; level: number }[];
 }
 
 export default async function TalkDetailPage({ params }: PageProps) {
   const { slug } = await params;
   const talks = getSortedTalksData();
+  const posts = getSortedPostsData();
   const talk = talks.find((t) => t.id === slug);
-  
-  // Fix: 使用 unknown 轉型來繞過 ESLint 的 no-explicit-any 檢查
-  const content = (talk as unknown as { content?: string })?.content || talk?.desc;
-  
-  // 雖然目前版面沒用到 toc，但保留變數定義以免報錯
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const toc = buildToc(content);
+  const content = talk?.desc;
+  const relatedPosts = talk ? getRelatedPostsForTalk(talk, posts) : [];
 
   if (!talk) {
     return (
-      <div className="min-h-screen bg-[rgb(var(--bg))] text-[rgb(var(--text))]">
+      <div className="site-shell min-h-screen text-[rgb(var(--text))]">
         <ThemeStyles />
         <Header />
         <main className="p-6 max-w-2xl mx-auto">
@@ -73,7 +83,7 @@ export default async function TalkDetailPage({ params }: PageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-[rgb(var(--bg))] text-[rgb(var(--text))]">
+    <div className="site-shell min-h-screen text-[rgb(var(--text))]">
       <ThemeStyles />
       <Header />
 
@@ -83,16 +93,16 @@ export default async function TalkDetailPage({ params }: PageProps) {
             href="/talk"
             className="group inline-flex items-center gap-2 text-sm text-[rgb(var(--muted))] hover:text-[rgb(var(--accent))] transition-colors mb-6"
           >
-            <div className="grid h-8 w-8 place-items-center rounded-lg bg-[rgba(255,255,255,0.06)] group-hover:bg-[rgba(251,191,36,0.1)] transition-colors">
+            <div className="grid h-8 w-8 place-items-center rounded-lg border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.04)] group-hover:bg-[rgb(var(--accent)/0.10)] transition-colors">
                 <ArrowLeft className="h-4 w-4" />
             </div>
-            <span>回到 Talks</span>
+            <span>回到 Talk Archive</span>
           </Link>
 
-          <article className="rounded-2xl border border-[rgba(255,255,255,0.07)] bg-[rgb(var(--panel))] overflow-hidden shadow-xl">
-            <div className="border-b border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)] p-6 sm:p-10">
+          <article className="rounded-2xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.88)] overflow-hidden shadow-[0_22px_70px_rgba(90,76,55,0.12)]">
+            <div className="border-b border-[rgb(var(--line)/0.08)] bg-[rgb(var(--panel2)/0.58)] p-6 sm:p-10">
                 {talk.banner && (
-                  <div className="-mx-6 -mt-6 mb-8 sm:-mx-10 sm:-mt-10 border-b border-[rgba(255,255,255,0.06)]">
+                  <div className="-mx-6 -mt-6 mb-8 sm:-mx-10 sm:-mt-10 border-b border-[rgb(var(--line)/0.10)]">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={talk.banner}
@@ -107,7 +117,7 @@ export default async function TalkDetailPage({ params }: PageProps) {
                     {talk.date}
                   </span>
                   {talk.event && (
-                    <span className="rounded bg-[rgba(255,255,255,0.06)] px-2.5 py-0.5 text-xs">
+                    <span className="rounded bg-[rgb(var(--line)/0.06)] px-2.5 py-0.5 text-xs">
                       {talk.event}
                     </span>
                   )}
@@ -123,12 +133,12 @@ export default async function TalkDetailPage({ params }: PageProps) {
 
                 <div className="mt-6 flex gap-3">
                   {talk.slides && (
-                    <a href={talk.slides} target="_blank" className="inline-flex items-center gap-2 rounded-lg bg-[rgb(var(--accent))] px-4 py-2 text-sm font-bold text-black hover:opacity-90 transition-opacity">
+                    <a href={talk.slides} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-lg bg-[rgb(var(--accent))] px-4 py-2 text-sm font-bold text-[rgb(var(--accent-foreground))] hover:opacity-90 transition-opacity">
                       <Presentation className="h-4 w-4" /> View Slides
                     </a>
                   )}
                   {talk.video && (
-                    <a href={talk.video} target="_blank" className="inline-flex items-center gap-2 rounded-lg bg-[rgba(255,255,255,0.1)] px-4 py-2 text-sm font-medium text-[rgb(var(--text))] hover:bg-[rgba(255,255,255,0.15)] transition-colors">
+                    <a href={talk.video} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-lg border border-[rgb(var(--line)/0.12)] bg-[rgb(var(--line)/0.05)] px-4 py-2 text-sm font-medium text-[rgb(var(--text))] hover:bg-[rgb(var(--line)/0.08)] transition-colors">
                       <Video className="h-4 w-4" /> Watch Video
                     </a>
                   )}
@@ -139,6 +149,28 @@ export default async function TalkDetailPage({ params }: PageProps) {
                 <MarkdownContent content={content} />
             </div>
           </article>
+
+          {relatedPosts.length > 0 && (
+            <section className="mt-6 rounded-2xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.78)] p-5">
+              <div className="mb-4 flex items-center gap-2">
+                <FileText className="h-4 w-4 text-[rgb(var(--accent))]" />
+                <h2 className="font-bold">Related Blog</h2>
+              </div>
+              <div className="grid gap-3">
+                {relatedPosts.map((post) => (
+                  <Link
+                    key={post.slug}
+                    href={`/blog/${post.slug}`}
+                    className="group rounded-xl border border-[rgb(var(--line)/0.08)] bg-[rgb(var(--line)/0.025)] p-4 transition-colors hover:border-[rgb(var(--accent)/0.24)] hover:bg-[rgb(var(--line)/0.045)]"
+                  >
+                    <div className="text-xs text-[rgb(var(--muted))]">{post.date}</div>
+                    <div className="mt-1 font-bold transition-colors group-hover:text-[rgb(var(--accent))]">{post.title}</div>
+                    <p className="mt-1 line-clamp-2 text-sm leading-6 text-[rgb(var(--muted))]">{post.desc}</p>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
         </main>
 
         <footer className="mx-auto max-w-3xl px-4 pb-10 pt-8 text-xs text-[rgb(var(--muted))] text-center">

@@ -20,6 +20,13 @@
 *.pem
 .obsidian/
 
+# local Obsidian workspace folders
+/Blog/
+/Drafts/
+/Inbox/
+/Journal/
+/Notes/
+
 # debug
 npm-debug.log*
 yarn-debug.log*

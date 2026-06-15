@@ -24,9 +24,9 @@ export const talks: Talk[] = [
     id: "talk-1",
     date: "2025-12-10",
     year: "2025",
-    title: "如何用 Vibe Coding 建構網站",
+    title: "如何把個人網站整理起來",
     event: "Yuxiu Cup Sharing",
-    desc: "分享在郁秀杯中使用 LLM 輔助全端開發的經驗與心得。",
+    desc: "分享在郁秀杯中整理個人網站、前端介面與內容架構的經驗。",
     slides: "#",
   },
   {

@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "og": "node scripts/generate-og-images.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"

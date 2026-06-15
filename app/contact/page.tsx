@@ -19,7 +19,7 @@ export default function ContactPage() {
       value: "@Sean-Hawks", // 請修改為你的 GitHub
       icon: Github,
       link: "https://github.com/Sean-Hawks",
-      color: "text-white",
+      color: "text-[rgb(var(--text))]",
     },
     {
       name: "Discord",
@@ -31,7 +31,7 @@ export default function ContactPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[rgb(var(--bg))] text-[rgb(var(--text))]">
+    <div className="site-shell min-h-screen text-[rgb(var(--text))]">
       <ThemeStyles />
       <Header />
 
@@ -49,11 +49,11 @@ export default function ContactPage() {
               <a
                 key={item.name}
                 href={item.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group flex items-center gap-4 rounded-xl border border-[rgba(255,255,255,0.07)] bg-[rgb(var(--panel))] p-6 transition-all hover:bg-[rgb(var(--panel2))] hover:scale-[1.02]"
+                target={item.link.startsWith("http") ? "_blank" : undefined}
+                rel={item.link.startsWith("http") ? "noopener noreferrer" : undefined}
+                className="group flex items-center gap-4 rounded-xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.86)] p-6 shadow-[0_18px_60px_rgba(90,76,55,0.07)] transition-all hover:border-[rgb(var(--accent)/0.22)] hover:bg-[rgb(var(--panel))] hover:scale-[1.02]"
               >
-                <div className={`rounded-lg bg-[rgba(255,255,255,0.06)] p-3 ${item.color}`}>
+                <div className={`rounded-lg border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.04)] p-3 ${item.color}`}>
                   <item.icon className="h-6 w-6" />
                 </div>
                 <div>

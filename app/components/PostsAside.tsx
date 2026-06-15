@@ -46,12 +46,12 @@ export default function PostsAside({ posts, talks }: PostsAsideProps) {
             // Use the unique key generated above
             key={item.key}
             href={item.url}
-            className="group block rounded-lg p-2 -mx-2 hover:bg-[rgba(255,255,255,0.03)] transition-colors"
+            className="group block rounded-lg p-2 -mx-2 transition-colors hover:bg-[rgb(var(--line)/0.05)]"
           >
             <div className="mb-1.5 flex items-center gap-2 text-[10px] text-[rgb(var(--muted))] opacity-80">
               <item.icon className="h-3 w-3" />
               <span>{item.date}</span>
-              <span className="px-1.5 py-0.5 rounded bg-[rgba(255,255,255,0.06)] text-[9px] uppercase">
+              <span className="px-1.5 py-0.5 rounded bg-[rgb(var(--line)/0.06)] text-[9px] uppercase">
                 {item.type}
               </span>
             </div>
@@ -61,7 +61,7 @@ export default function PostsAside({ posts, talks }: PostsAsideProps) {
             </h3>
 
             {/* 修改：移除 item.type === 'post' 的判斷，讓 talk 也能顯示 desc (內容擷取) */}
-            <p className="mt-1 text-xs text-[rgb(var(--muted))] line-clamp-1 opacity-60">
+            <p className="mt-1 text-xs text-[rgb(var(--muted))] line-clamp-1 opacity-75">
               {item.desc}
             </p>
           </Link>

@@ -1,9 +1,6 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
-  // ...existing code...
-  plugins: [
-    require("@tailwindcss/typography"),
-  ],
+  plugins: [],
 };
 export default config;

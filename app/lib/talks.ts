@@ -5,6 +5,12 @@ import { Talk } from '../types';
 
 const talksDirectory = path.join(process.cwd(), 'content/talks');
 
+function isPublicStatus(value: unknown) {
+  if (typeof value !== 'string') return true;
+  const status = value.trim().toLowerCase();
+  return status !== 'draft' && status !== 'private';
+}
+
 export function getSortedTalksData(): Talk[] {
   // 如果資料夾不存在，回傳空陣列
   if (!fs.existsSync(talksDirectory)) {
@@ -69,7 +75,7 @@ export function getSortedTalksData(): Talk[] {
       date: dateStr,
       banner,
     };
-  });
+  }).filter((talk) => isPublicStatus(talk.status));
 
   // 依日期排序 (最新的在前面)
   return allTalksData.sort((a, b) => (a.date < b.date ? 1 : -1));

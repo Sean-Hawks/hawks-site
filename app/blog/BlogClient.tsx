@@ -14,7 +14,7 @@ export default function BlogClient({ posts }: { posts: Post[] }) {
     : posts;
 
   return (
-    <div className="min-h-screen bg-[rgb(var(--bg))] text-[rgb(var(--text))]">
+    <div className="site-shell min-h-screen text-[rgb(var(--text))]">
       <ThemeStyles />
       <Header />
 
@@ -30,8 +30,8 @@ export default function BlogClient({ posts }: { posts: Post[] }) {
               onClick={() => setSelectedTag(null)}
               className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
                 selectedTag === null
-                  ? "bg-[rgba(251,191,36,0.20)] text-[rgb(var(--text))] border border-[rgba(251,191,36,0.30)]"
-                  : "bg-[rgba(255,255,255,0.06)] text-[rgb(var(--muted))] hover:bg-[rgba(255,255,255,0.12)]"
+                  ? "bg-[rgb(var(--accent)/0.14)] text-[rgb(var(--text))] border border-[rgb(var(--accent)/0.28)]"
+                  : "bg-[rgb(var(--line)/0.05)] text-[rgb(var(--muted))] hover:bg-[rgb(var(--line)/0.08)]"
               }`}
             >
               All
@@ -42,8 +42,8 @@ export default function BlogClient({ posts }: { posts: Post[] }) {
                 onClick={() => setSelectedTag(tag)}
                 className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
                   selectedTag === tag
-                    ? "bg-[rgba(251,191,36,0.20)] text-[rgb(var(--text))] border border-[rgba(251,191,36,0.30)]"
-                    : "bg-[rgba(255,255,255,0.06)] text-[rgb(var(--muted))] hover:bg-[rgba(255,255,255,0.12)]"
+                    ? "bg-[rgb(var(--accent)/0.14)] text-[rgb(var(--text))] border border-[rgb(var(--accent)/0.28)]"
+                    : "bg-[rgb(var(--line)/0.05)] text-[rgb(var(--muted))] hover:bg-[rgb(var(--line)/0.08)]"
                 }`}
               >
                 {tag}
@@ -56,7 +56,7 @@ export default function BlogClient({ posts }: { posts: Post[] }) {
               <Link
                 key={post.slug}
                 href={`/blog/${post.slug}`}
-                className="block p-4 rounded-xl border border-[rgba(255,255,255,0.07)] bg-[rgb(var(--panel))] hover:bg-[rgb(var(--panel2))] transition-colors"
+                className="block p-4 rounded-xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.86)] hover:bg-[rgb(var(--panel))] transition-colors shadow-[0_18px_60px_rgba(90,76,55,0.07)]"
               >
                 <div className="flex justify-between items-start gap-4">
                   <div className="flex-1">
@@ -70,7 +70,7 @@ export default function BlogClient({ posts }: { posts: Post[] }) {
                       {post.tags.map(tag => (
                         <span
                           key={tag}
-                          className="text-xs px-2 py-1 rounded bg-[rgba(255,255,255,0.06)] text-[rgb(var(--muted))]"
+                          className="text-xs px-2 py-1 rounded bg-[rgb(var(--line)/0.06)] text-[rgb(var(--muted))]"
                         >
                           {tag}
                         </span>
