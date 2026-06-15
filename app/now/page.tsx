@@ -40,7 +40,7 @@ export default function NowPage() {
     })),
   ]
     .sort((a, b) => toTimestamp(b.date) - toTimestamp(a.date))
-    .slice(0, 8);
+    .slice(0, 3);
 
   return (
     <div className="site-shell min-h-screen text-[rgb(var(--text))]">
