@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { Menu, MessageCircle, Moon, Sun, X } from "lucide-react";
+import { Menu, Moon, Sun, X } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 type ThemeMode = "light" | "dark";
@@ -65,11 +65,11 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-20 w-full border-b border-[rgb(var(--line)/0.10)] bg-[rgb(var(--bg)/0.88)] backdrop-blur-xl">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-3">
-        <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-          <div className="grid h-9 w-9 place-items-center rounded-xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.04)]">
-            <MessageCircle className="h-5 w-5 opacity-80" />
-          </div>
-          <div className="font-semibold tracking-wide">hawks.tw</div>
+        <Link
+          href="/"
+          className="text-xl font-extrabold tracking-wide text-[rgb(var(--text))] transition-opacity hover:opacity-80 sm:text-2xl"
+        >
+          <div>hawks.tw</div>
         </Link>
 
         <div className="flex items-center gap-2">

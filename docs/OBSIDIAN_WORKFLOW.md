@@ -7,14 +7,14 @@
 - `Inbox/`: 隨手記，不一定會公開。
 - `Notes/`: 長期筆記，整理想法用。
 - `Drafts/`: 已經開始寫成文章，但還沒準備發布。
-- `Journal/`: Daily Notes。每天寫一點，不會被網站發布。
+- `Journal/`: 私人日記或不想公開的 daily note 備用區。
 - `content/posts/`: 會被網站讀取的 Blog 文章。
-- `content/talks/`: 會被網站讀取的 Talk archive。
+- `content/talks/`: 會被網站讀取的 Talk / Now archive。Daily Notes 也會直接建立在這裡。
 
 ## 我幫你設定好的 Obsidian 行為
 
 - 新檔案預設會放進 `Inbox/`。
-- Daily Notes 會放進 `Journal/YYYY-MM-DD.md`。
+- Daily Notes 會放進 `content/talks/YYYY-MM-DD.md`。
 - Daily Notes 會套用 `content/templates/daily-note.md`。
 - Templates 插件的模板資料夾是 `content/templates/`。
 - 附件預設放在 `public/images/`，方便之後文章引用圖片。
@@ -23,7 +23,7 @@
 
 ## 發文章流程
 
-1. 平常先在 `Journal/` 或 `Inbox/` 寫，不要一開始就逼自己寫成文章。
+1. 平常先在 `Inbox/` 寫長想法；如果是短近況，直接開 Daily note 寫進 `content/talks/`。
 2. 有一段想法長出來後，移到 `Drafts/`，用 `content/templates/blog-draft-template.md`。
 3. 先填 `title`、`date`、`desc`。
 4. 加 `tags`，用來做 `/blog/tag/...` 索引。
@@ -32,18 +32,18 @@
 
 如果你已經確定一開始就是正式文章，也可以直接用 `content/templates/post-template.md` 建立。
 
-## 每日最小習慣
+## 每日 Now 習慣
 
 每天只要做這個就好：
 
 1. 開 Obsidian 的 Daily note。
-2. 在「今日先寫一點」寫 1-3 行。
-3. 在「今天想到的題材」丟 1 個 checkbox。
-4. 不整理也沒關係。
+2. 直接在 frontmatter 下方寫今天想公開成 Now 的內容。
+3. 寫完想發布，就把 `status: draft` 改成 `status: published`。
+4. 還沒想公開就維持 `status: draft`。
 
 週末或有空時再做：
 
-1. 從 `Journal/` 挑一段有意思的東西。
+1. 從 `content/talks/` 或 `Inbox/` 挑一段有意思的東西。
 2. 移到 `Drafts/`。
 3. 補成一篇有標題、有開頭、有結尾的文章。
 
@@ -135,6 +135,24 @@ tags:
 ## Now Page
 
 `/now/` 不需要另外維護狀態文字。它會自動抓最新文章、最新 Talk archive 和 Projects。
+
+現在 Obsidian 的 Daily Note 會直接建立一篇 Talk / Now 草稿：
+
+```text
+content/talks/YYYY-MM-DD.md
+```
+
+預設是：
+
+```yaml
+status: draft
+```
+
+寫完要出現在 `/now/` 時改成：
+
+```yaml
+status: published
+```
 
 想讓某篇文章比較像近況，可以加 tag：
 

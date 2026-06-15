@@ -155,10 +155,11 @@ scripts/
 
 This repo includes templates and a publishing workflow for writing in Obsidian:
 
-- Start loose notes in `Inbox/` or `Journal/`
+- Start loose long-form notes in `Inbox/`
+- Open Daily Notes directly as Now / Talk drafts in `content/talks/`
 - Move stronger ideas into `Drafts/`
 - Publish final posts into `content/posts/`
-- Publish shorter updates into `content/talks/`
+- Publish shorter updates by changing `status: draft` to `status: published`
 
 See [docs/OBSIDIAN_WORKFLOW.md](docs/OBSIDIAN_WORKFLOW.md) for the full workflow.
 

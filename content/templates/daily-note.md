@@ -1,19 +1,11 @@
-# {{date:YYYY-MM-DD}}
-
-## 今日先寫一點
-
-- 
-
-## 今天想到的題材
-
-- [ ] 
-
-## 可以變成 Blog 的片段
-
-> 不用完整，先留下一段話就好。
-
-
-## 連結 / 參考
-
-- 
-
+---
+title: "雜談"
+date: "{{date:YYYY-MM-DD}}"
+event: ""
+banner: ""
+slides: ""
+video: ""
+relatedPosts: []
+ogImage: ""
+status: draft
+---
