@@ -9,6 +9,7 @@ tags:
   - "#conference"
   - "#notes"
 relatedTalks: []
+status: draft
 ---
 啊哈，又是一年一度的 SITCON，這次是第二次以會眾的身份降靈在中研院，還記得上次 2025 我還是一個穿著白T的工人在休息區偷懶的工人呢
 
