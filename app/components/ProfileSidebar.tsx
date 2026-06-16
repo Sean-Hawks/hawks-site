@@ -99,14 +99,16 @@ export default function ProfileSidebar({ roles }: { roles: RoleTag[] }) {
             <SectionTitle title="聯絡方式" />
             <div className="grid gap-2">
               <a
-                href="#"
+                href="https://github.com/Sean-Hawks"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="flex items-center gap-2 rounded-xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.035)] px-3 py-2 text-sm text-[rgb(var(--muted))] transition-colors hover:bg-[rgb(var(--line)/0.06)] hover:text-[rgb(var(--text))]"
               >
                 <Github className="h-4 w-4" />
                 @Sean-Hawks
               </a>
               <a
-                href="#"
+                href="mailto:me@hawks.tw"
                 className="flex items-center gap-2 rounded-xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.035)] px-3 py-2 text-sm text-[rgb(var(--muted))] transition-colors hover:bg-[rgb(var(--line)/0.06)] hover:text-[rgb(var(--text))]"
               >
                 <Mail className="h-4 w-4" />
