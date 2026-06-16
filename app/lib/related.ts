@@ -42,22 +42,8 @@ export function getRelatedTalksForPost(post: Post, talks: Talk[], limit = 3) {
 
 export function getRelatedPostsForTalk(talk: Talk, posts: Post[], limit = 3) {
   const manualSlugs = toList(talk.relatedPosts);
-  const manualPosts = manualSlugs
+  return manualSlugs
     .map((slug) => posts.find((post) => post.slug === slug))
-    .filter((post): post is Post => Boolean(post));
-
-  const terms = keywords(`${talk.title} ${talk.event ?? ""} ${talk.desc}`);
-
-  const autoPosts = posts
-    .filter((post) => !manualSlugs.includes(post.slug))
-    .map((post) => {
-      const haystack = stripMarkdown(`${post.title} ${post.desc} ${post.tags.join(" ")} ${post.content ?? ""}`).toLowerCase();
-      const score = terms.reduce((total, term) => total + (haystack.includes(term.toLowerCase()) ? 1 : 0), 0);
-      return { post, score };
-    })
-    .filter((item) => item.score > 0)
-    .sort((a, b) => b.score - a.score || (a.post.date < b.post.date ? 1 : -1))
-    .map((item) => item.post);
-
-  return [...manualPosts, ...autoPosts].slice(0, limit);
+    .filter((post): post is Post => Boolean(post))
+    .slice(0, limit);
 }

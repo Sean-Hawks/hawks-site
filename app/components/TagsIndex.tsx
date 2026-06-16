@@ -2,10 +2,10 @@ import Link from "next/link";
 import { ArrowRight, Hash } from "lucide-react";
 import Header from "./Header";
 import ThemeStyles from "./ThemeStyles";
-import { getAllTags, getPostsByTagSlug } from "../lib/posts";
+import { getAllSiteTags, getSiteItemsByTagSlug } from "../lib/site-tags";
 
 export default function TagsIndex() {
-  const tags = getAllTags();
+  const tags = getAllSiteTags();
 
   return (
     <div className="site-shell min-h-screen text-[rgb(var(--text))]">
@@ -20,13 +20,13 @@ export default function TagsIndex() {
           </div>
           <h1 className="text-3xl font-bold leading-tight sm:text-4xl">Tags</h1>
           <p className="mt-2 max-w-2xl text-sm leading-7 text-[rgb(var(--muted))] sm:text-base">
-            用 tag 當主要索引。使用越多次的 tag 會排越前面，平常只要維護文章 frontmatter 的 tags 就好。
+            用 tag 當主要索引。Blog 和 Library 都會收進來，平常只要維護 Markdown frontmatter 的 tags 就好。
           </p>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {tags.map((tag) => {
-            const posts = getPostsByTagSlug(tag.slug).slice(0, 3);
+            const items = getSiteItemsByTagSlug(tag.slug).slice(0, 3);
 
             return (
               <section
@@ -42,23 +42,58 @@ export default function TagsIndex() {
                       {tag.tag}
                     </h2>
                     <div className="mt-1 text-sm text-[rgb(var(--muted))]">
-                      {tag.count} 篇文章
+                      {tag.count} 個內容
+                    </div>
+                    <div className="mt-2 flex flex-wrap gap-2 text-xs text-[rgb(var(--muted))]">
+                      {tag.postCount > 0 && (
+                        <span className="rounded-md bg-[rgb(var(--line)/0.05)] px-2 py-1">
+                          Blog {tag.postCount}
+                        </span>
+                      )}
+                      {tag.libraryCount > 0 && (
+                        <span className="rounded-md bg-[rgb(var(--accent)/0.10)] px-2 py-1 text-[rgb(var(--accent))]">
+                          Library {tag.libraryCount}
+                        </span>
+                      )}
                     </div>
                   </div>
                   <ArrowRight className="h-5 w-5 text-[rgb(var(--muted))] transition-colors group-hover:text-[rgb(var(--accent))]" />
                 </Link>
 
                 <div className="mt-5 space-y-3">
-                  {posts.map((post) => (
-                    <Link
-                      key={post.slug}
-                      href={`/blog/${post.slug}`}
-                      className="block rounded-xl border border-[rgb(var(--line)/0.08)] bg-[rgb(var(--line)/0.025)] p-4 transition-colors hover:border-[rgb(var(--accent)/0.24)] hover:bg-[rgb(var(--line)/0.045)]"
-                    >
-                      <div className="text-xs text-[rgb(var(--muted))]">{post.date}</div>
-                      <div className="mt-1 line-clamp-1 font-bold">{post.title}</div>
-                    </Link>
-                  ))}
+                  {items.map((item) => {
+                    const body = (
+                      <>
+                        <div className="flex flex-wrap items-center gap-2 text-xs text-[rgb(var(--muted))]">
+                          <span>{item.label}</span>
+                          {item.date && (
+                            <>
+                              <span>·</span>
+                              <time>{item.date}</time>
+                            </>
+                          )}
+                        </div>
+                        <div className="mt-1 line-clamp-1 font-bold">{item.title}</div>
+                      </>
+                    );
+
+                    return item.href ? (
+                      <Link
+                        key={item.id}
+                        href={item.href}
+                        className="block rounded-xl border border-[rgb(var(--line)/0.08)] bg-[rgb(var(--line)/0.025)] p-4 transition-colors hover:border-[rgb(var(--accent)/0.24)] hover:bg-[rgb(var(--line)/0.045)]"
+                      >
+                        {body}
+                      </Link>
+                    ) : (
+                      <div
+                        key={item.id}
+                        className="block rounded-xl border border-[rgb(var(--line)/0.08)] bg-[rgb(var(--line)/0.025)] p-4"
+                      >
+                        {body}
+                      </div>
+                    );
+                  })}
                 </div>
               </section>
             );

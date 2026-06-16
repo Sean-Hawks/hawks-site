@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { ArrowRight, FileText, Mic2, Sparkles } from "lucide-react";
+import { ArrowRight, BookOpenText, FileText, Mic2, Sparkles } from "lucide-react";
 import Header from "../components/Header";
 import ThemeStyles from "../components/ThemeStyles";
 import { getSortedPostsData } from "../lib/posts";
 import { getSortedTalksData } from "../lib/talks";
+import { getAllLibraryItems } from "../lib/library";
 import { excerpt } from "../lib/content";
 
 export const metadata = {
@@ -19,6 +20,7 @@ function toTimestamp(date: string) {
 export default function NowPage() {
   const posts = getSortedPostsData();
   const talks = getSortedTalksData();
+  const libraryItems = getAllLibraryItems();
   const latestItems = [
     ...posts.map((post) => ({
       id: `post-${post.slug}`,
@@ -38,9 +40,20 @@ export default function NowPage() {
       desc: excerpt(talk.desc, 140),
       Icon: Mic2,
     })),
+    ...libraryItems
+      .filter((item) => item.hasReview)
+      .map((item) => ({
+        id: `library-${item.slug}`,
+        type: "Library Review",
+        href: `/library/${item.category}/${item.slug}`,
+        title: `評論：${item.title}`,
+        date: item.date,
+        desc: item.note,
+        Icon: BookOpenText,
+      })),
   ]
     .sort((a, b) => toTimestamp(b.date) - toTimestamp(a.date))
-    .slice(0, 3);
+    .slice(0, 6);
 
   return (
     <div className="site-shell min-h-screen text-[rgb(var(--text))]">
@@ -70,6 +83,10 @@ export default function NowPage() {
             <div className="flex gap-4 text-sm">
               <Link href="/blog" className="inline-flex items-center gap-1.5 text-[rgb(var(--muted))] transition-colors hover:text-[rgb(var(--accent))]">
                 Blog
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link href="/library" className="inline-flex items-center gap-1.5 text-[rgb(var(--muted))] transition-colors hover:text-[rgb(var(--accent))]">
+                Library
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link href="/talk" className="inline-flex items-center gap-1.5 text-[rgb(var(--muted))] transition-colors hover:text-[rgb(var(--accent))]">

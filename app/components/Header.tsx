@@ -16,6 +16,7 @@ export default function Header() {
     { label: "README", href: "/" },
     { label: "Blog", href: "/blog" },
     { label: "Now", href: "/now" },
+    { label: "Library", href: "/library" },
     { label: "Tags", href: "/tags" },
     { label: "Project", href: "/project" },
     { label: "Search", href: "/search" },
@@ -73,7 +74,7 @@ export default function Header() {
         </Link>
 
         <div className="flex items-center gap-2">
-          <nav className="hidden items-center gap-2 md:flex">
+          <nav className="hidden items-center gap-2 lg:flex">
             {navItems.map((item) => {
               // 簡單的路由匹配邏輯
               const isActive = 
@@ -104,7 +105,7 @@ export default function Header() {
             aria-expanded={isOpen}
             aria-label={isOpen ? "Close navigation" : "Open navigation"}
             onClick={() => setIsOpen((value) => !value)}
-            className="grid h-10 w-10 place-items-center rounded-xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.04)] text-[rgb(var(--text))] transition-colors hover:bg-[rgb(var(--line)/0.07)] md:hidden"
+            className="grid h-10 w-10 place-items-center rounded-xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.04)] text-[rgb(var(--text))] transition-colors hover:bg-[rgb(var(--line)/0.07)] lg:hidden"
           >
             {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
@@ -114,7 +115,7 @@ export default function Header() {
       <nav
         id="mobile-nav"
         className={[
-          "mx-auto grid max-w-6xl gap-2 px-4 pb-4 transition-[grid-template-rows,opacity] md:hidden",
+          "mx-auto grid max-w-6xl gap-2 px-4 pb-4 transition-[grid-template-rows,opacity] lg:hidden",
           isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0",
         ].join(" ")}
       >

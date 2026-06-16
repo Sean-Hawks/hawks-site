@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, FileText, Hash, NotebookText, Search } from "lucide-react";
+import { ArrowRight, Clapperboard, FileText, Hash, NotebookText, Search } from "lucide-react";
 import { rolesTop } from "../data/roles";
 import ProfileSidebar from "./ProfileSidebar";
 import ReadmeSection from "./ReadmeSection";
@@ -82,7 +82,7 @@ export default function HomeClient({ posts, talks }: HomeClientProps) {
         </section>
 
         <section className="mx-auto max-w-6xl px-4 pb-4 pt-6 sm:px-3">
-          <div className="mb-8 grid gap-3 md:grid-cols-2">
+          <div className="mb-8 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
             <Link
               href="/search"
               className="group flex items-center gap-4 rounded-2xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.78)] p-5 shadow-[0_18px_60px_rgb(var(--line)/0.06)] transition-colors hover:border-[rgb(var(--accent)/0.28)] hover:bg-[rgb(var(--panel))]"
@@ -93,6 +93,18 @@ export default function HomeClient({ posts, talks }: HomeClientProps) {
               <div>
                 <div className="font-bold transition-colors group-hover:text-[rgb(var(--accent))]">搜尋全站</div>
                 <div className="text-sm leading-6 text-[rgb(var(--muted))]">文章、Talk、tag 和內文都可以搜尋。</div>
+              </div>
+            </Link>
+            <Link
+              href="/library"
+              className="group flex items-center gap-4 rounded-2xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.78)] p-5 shadow-[0_18px_60px_rgb(var(--line)/0.06)] transition-colors hover:border-[rgb(var(--accent)/0.28)] hover:bg-[rgb(var(--panel))]"
+            >
+              <div className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.04)] text-[rgb(var(--accent))]">
+                <Clapperboard className="h-5 w-5" />
+              </div>
+              <div>
+                <div className="font-bold transition-colors group-hover:text-[rgb(var(--accent))]">Library</div>
+                <div className="text-sm leading-6 text-[rgb(var(--muted))]">動畫、電影和音樂推薦收藏。</div>
               </div>
             </Link>
             <Link
