@@ -1,9 +1,10 @@
 import { Post, Talk } from "../types";
+import type { LibraryItem } from "../data/library";
 import { excerpt, stripMarkdown } from "./content";
 
 export type SearchItem = {
   id: string;
-  type: "post" | "talk";
+  type: "post" | "talk" | "library";
   title: string;
   desc: string;
   date: string;
@@ -12,7 +13,16 @@ export type SearchItem = {
   haystack: string;
 };
 
-export function buildSearchIndex(posts: Post[], talks: Talk[]): SearchItem[] {
+function displayTag(tag: string) {
+  const value = tag.trim().replace(/^#+/, "");
+  return value ? `#${value}` : "";
+}
+
+export function buildSearchIndex(
+  posts: Post[],
+  talks: Talk[],
+  libraryItems: LibraryItem[] = []
+): SearchItem[] {
   const postItems = posts.map((post) => {
     const desc = post.desc || excerpt(post.content);
     return {
@@ -42,5 +52,36 @@ export function buildSearchIndex(posts: Post[], talks: Talk[]): SearchItem[] {
     };
   });
 
-  return [...postItems, ...talkItems].sort((a, b) => (a.date < b.date ? 1 : -1));
+  const librarySearchItems = libraryItems.map((item) => {
+    const desc = item.note || excerpt(item.content);
+    const tags = item.tags.map(displayTag).filter(Boolean);
+    return {
+      id: `library-${item.slug}`,
+      type: "library" as const,
+      title: item.hasReview ? `評論：${item.title}` : item.title,
+      desc,
+      date: item.date,
+      href: item.hasReview ? `/library/${item.category}/${item.slug}` : `/library/${item.category}`,
+      tags,
+      haystack: stripMarkdown(
+        [
+          item.title,
+          item.subtitle,
+          item.category,
+          item.year,
+          item.status,
+          item.recommendation,
+          item.rating.toString(),
+          desc,
+          item.tags.join(" "),
+          tags.join(" "),
+          item.content ?? "",
+        ].join(" ")
+      ).toLowerCase(),
+    };
+  });
+
+  return [...postItems, ...talkItems, ...librarySearchItems].sort((a, b) =>
+    a.date < b.date ? 1 : -1
+  );
 }

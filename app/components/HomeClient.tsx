@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Clapperboard, FileText, Hash, NotebookText, Search } from "lucide-react";
+import { ArrowRight, Clapperboard, FileText, NotebookText, Search } from "lucide-react";
 import { rolesTop } from "../data/roles";
 import ProfileSidebar from "./ProfileSidebar";
 import ReadmeSection from "./ReadmeSection";
@@ -92,7 +92,7 @@ export default function HomeClient({ posts, talks }: HomeClientProps) {
               </div>
               <div>
                 <div className="font-bold transition-colors group-hover:text-[rgb(var(--accent))]">搜尋全站</div>
-                <div className="text-sm leading-6 text-[rgb(var(--muted))]">文章、Talk、tag 和內文都可以搜尋。</div>
+                <div className="text-sm leading-6 text-[rgb(var(--muted))]">文章、Talk、Library、tag 和內文都可以搜尋。</div>
               </div>
             </Link>
             <Link
@@ -108,15 +108,15 @@ export default function HomeClient({ posts, talks }: HomeClientProps) {
               </div>
             </Link>
             <Link
-              href="/tags"
+              href="/now"
               className="group flex items-center gap-4 rounded-2xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.78)] p-5 shadow-[0_18px_60px_rgb(var(--line)/0.06)] transition-colors hover:border-[rgb(var(--accent)/0.28)] hover:bg-[rgb(var(--panel))]"
             >
               <div className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.04)] text-[rgb(var(--accent))]">
-                <Hash className="h-5 w-5" />
+                <NotebookText className="h-5 w-5" />
               </div>
               <div>
-                <div className="font-bold transition-colors group-hover:text-[rgb(var(--accent))]">Tags</div>
-                <div className="text-sm leading-6 text-[rgb(var(--muted))]">用 tag 當索引，越常用的 tag 會排越前面。</div>
+                <div className="font-bold transition-colors group-hover:text-[rgb(var(--accent))]">Now</div>
+                <div className="text-sm leading-6 text-[rgb(var(--muted))]">最近更新、短筆記和一些分享紀錄。</div>
               </div>
             </Link>
           </div>

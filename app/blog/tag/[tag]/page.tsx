@@ -39,11 +39,11 @@ export default async function BlogTagPage({ params }: PageProps) {
 
       <main className="mx-auto max-w-6xl px-4 py-10 sm:px-3">
         <Link
-          href="/tags"
+          href="/search"
           className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-[rgb(var(--muted))] transition-colors hover:text-[rgb(var(--accent))]"
         >
           <ArrowLeft className="h-4 w-4" />
-          Back to Tags
+          Back to Search
         </Link>
 
         <div className="mb-8 rounded-2xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.86)] p-5 shadow-[0_18px_60px_rgba(90,76,55,0.10)] sm:p-6">

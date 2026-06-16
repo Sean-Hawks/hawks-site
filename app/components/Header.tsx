@@ -17,10 +17,8 @@ export default function Header() {
     { label: "Blog", href: "/blog" },
     { label: "Now", href: "/now" },
     { label: "Library", href: "/library" },
-    { label: "Tags", href: "/tags" },
     { label: "Project", href: "/project" },
     { label: "Search", href: "/search" },
-    { label: "Guestbook", href: "/guestbook" },
     { label: "Contact", href: "/contact" },
   ];
 

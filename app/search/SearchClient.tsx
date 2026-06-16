@@ -4,10 +4,19 @@ import React from "react";
 import Link from "next/link";
 import { ArrowRight, Search, X } from "lucide-react";
 import { SearchItem } from "../lib/search";
+import type { SiteTag } from "../lib/site-tags";
 
-export default function SearchClient({ items }: { items: SearchItem[] }) {
+type SearchType = "all" | SearchItem["type"];
+
+export default function SearchClient({
+  items,
+  tags,
+}: {
+  items: SearchItem[];
+  tags: SiteTag[];
+}) {
   const [query, setQuery] = React.useState("");
-  const [type, setType] = React.useState<"all" | "post" | "talk">("all");
+  const [type, setType] = React.useState<SearchType>("all");
 
   const filteredItems = React.useMemo(() => {
     const terms = query
@@ -30,7 +39,7 @@ export default function SearchClient({ items }: { items: SearchItem[] }) {
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="搜尋文章、Talk、tag、內文..."
+            placeholder="搜尋文章、Talk、Library、tag、內文..."
             className="w-full bg-transparent text-base text-[rgb(var(--text))] outline-none placeholder:text-[rgb(var(--muted))]"
             autoFocus
           />
@@ -51,11 +60,12 @@ export default function SearchClient({ items }: { items: SearchItem[] }) {
             { label: "All", value: "all" },
             { label: "Blog", value: "post" },
             { label: "Talk", value: "talk" },
+            { label: "Library", value: "library" },
           ].map((option) => (
             <button
               key={option.value}
               type="button"
-              onClick={() => setType(option.value as "all" | "post" | "talk")}
+              onClick={() => setType(option.value as SearchType)}
               className={[
                 "rounded-full border px-3 py-1.5 text-sm transition-colors",
                 type === option.value
@@ -66,6 +76,33 @@ export default function SearchClient({ items }: { items: SearchItem[] }) {
               {option.label}
             </button>
           ))}
+        </div>
+
+        <div className="mt-5 border-t border-[rgb(var(--line)/0.08)] pt-4">
+          <div className="mb-2 text-xs font-bold uppercase tracking-[0.16em] text-[rgb(var(--muted))]">
+            Tags
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {tags.slice(0, 28).map((tag) => (
+              <button
+                key={tag.slug}
+                type="button"
+                onClick={() => {
+                  setQuery(tag.tag);
+                  setType("all");
+                }}
+                className={[
+                  "rounded-full border px-3 py-1.5 text-sm transition-colors",
+                  query.trim().toLowerCase() === tag.tag.toLowerCase()
+                    ? "border-[rgb(var(--accent)/0.28)] bg-[rgb(var(--accent)/0.14)] text-[rgb(var(--accent))]"
+                    : "border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.04)] text-[rgb(var(--muted))] hover:text-[rgb(var(--text))]",
+                ].join(" ")}
+              >
+                {tag.tag}
+                <span className="ml-1 opacity-60">{tag.count}</span>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 

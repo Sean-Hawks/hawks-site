@@ -117,7 +117,7 @@ ogImage: "/og/my-custom-image.png"
 
 ## Tags
 
-`tags` 是這個站的主要索引，適合很多、短、可搜尋。使用越多次的 tag 會在 `/tags/` 越靠前。
+`tags` 會收進 `/search/`，適合很多、短、可搜尋。使用越多次的 tag 會在 Search 的 tag chips 越靠前。
 
 ```yaml
 tags:
