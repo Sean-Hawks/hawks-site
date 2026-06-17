@@ -27,6 +27,12 @@
 /Journal/
 /Notes/
 
+# Obsidian scratch files
+Untitled.*
+未命名*
+**/Untitled.*
+**/未命名*
+
 # debug
 npm-debug.log*
 yarn-debug.log*
