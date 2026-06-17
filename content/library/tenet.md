@@ -13,10 +13,9 @@ tags:
 note: 時間逆行的概念和動作設計很有野心，觀看體驗偏冷但很有記憶點。
 link: https://en.wikipedia.org/wiki/Tenet_(film)
 image:
-  src: /images/library/tenet.png
-  alt: Tenet logo
-  credit: Wikimedia Commons / Warner Bros.
-  source: https://commons.wikimedia.org/wiki/File:Tenet_logo.svg
-  fit: contain
+  src: /images/library/tenet-poster.jpg
+  alt: Tenet film poster
+  credit: Wikipedia / Warner Bros.
+  source: https://en.wikipedia.org/wiki/File:Tenet_movie_poster.jpg
 statusVisibility: published
 ---

@@ -13,10 +13,9 @@ tags:
 note: 用碎片化敘事把記憶和真相拆開重組，結構感很強。
 link: https://en.wikipedia.org/wiki/Memento_(film)
 image:
-  src: /images/library/memento.png
-  alt: Memento logo
-  credit: Wikimedia Commons / Newmarket Films
-  source: https://commons.wikimedia.org/wiki/File:Memento.svg
-  fit: contain
+  src: /images/library/memento-poster.jpg
+  alt: Memento film poster
+  credit: Wikipedia / Newmarket Films
+  source: https://en.wikipedia.org/wiki/File:Memento_poster.jpg
 statusVisibility: published
 ---
