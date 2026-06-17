@@ -23,6 +23,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/library/",
     "/project/",
     "/search/",
+    "/subscribe/",
     "/contact/",
     "/talk/",
   ].map((route) => ({

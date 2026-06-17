@@ -19,6 +19,7 @@ export default function Header() {
     { label: "Library", href: "/library" },
     { label: "Project", href: "/project" },
     { label: "Search", href: "/search" },
+    { label: "Subscribe", href: "/subscribe" },
     { label: "Contact", href: "/contact" },
   ];
 
