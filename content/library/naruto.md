@@ -1,6 +1,6 @@
 ---
-title: Naruto
-subtitle: NARUTO
+title: 火影忍者
+subtitle: NARUTO -ナルト-
 category: anime
 year: "2002"
 date: "2026-06-17"
@@ -14,7 +14,7 @@ note: 經典少年漫代表，情緒和角色記憶點都很強。
 link: https://naruto-official.com/
 image:
   src: /images/library/naruto.jpg
-  alt: Naruto volume 1 cover
+  alt: NARUTO volume 1 cover
   credit: Wikipedia / Shueisha
   source: https://en.wikipedia.org/wiki/File:NarutoCoverTankobon1.jpg
 statusVisibility: published

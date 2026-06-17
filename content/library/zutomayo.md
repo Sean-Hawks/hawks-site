@@ -1,7 +1,7 @@
 ---
-title: ZUTOMAYO
-subtitle: ずっと真夜中でいいのに。
-category: music
+title: ずっと真夜中でいいのに。
+subtitle: ZUTOMAYO
+category: artist
 date: 2026-06-16
 status: listened
 rating: 9.1

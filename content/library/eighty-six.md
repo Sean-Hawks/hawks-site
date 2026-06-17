@@ -1,6 +1,6 @@
 ---
-title: "86"
-subtitle: Eighty Six
+title: "86－不存在的戰區－"
+subtitle: 86 Eighty-Six
 category: anime
 year: "2021"
 date: "2026-06-17"

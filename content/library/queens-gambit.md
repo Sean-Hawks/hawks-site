@@ -1,6 +1,6 @@
 ---
 title: "The Queen's Gambit"
-subtitle: Queen's Gambit
+subtitle: 后翼棄兵
 category: movie
 year: "2020"
 date: "2026-06-17"

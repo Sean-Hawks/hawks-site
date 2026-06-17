@@ -1,5 +1,5 @@
 ---
-title: Mobius Final Fantasy
+title: MOBIUS FINAL FANTASY
 category: game
 year: "2015"
 date: "2026-06-17"

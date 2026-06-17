@@ -1,6 +1,6 @@
 ---
-title: FF14 繁中版
-subtitle: Final Fantasy XIV
+title: Final Fantasy XIV
+subtitle: 繁體中文版
 category: game
 date: 2026-06-16
 status: played

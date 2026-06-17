@@ -1,6 +1,6 @@
 ---
-title: SPY×FAMILY
-subtitle: SPYXFAMILY
+title: SPY×FAMILY 間諜家家酒
+subtitle: SPY×FAMILY
 category: anime
 year: "2022"
 date: "2026-06-17"

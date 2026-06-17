@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, Calendar, FileText, Presentation, Video } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, Calendar, FileText, Presentation, Rss, Video } from "lucide-react";
 import { getSortedTalksData } from "../../lib/talks";
 import { getSortedPostsData } from "../../lib/posts";
 import ThemeStyles from "../../components/ThemeStyles";
@@ -16,6 +16,30 @@ export async function generateStaticParams() {
 }
 
 type PageProps = { params: Promise<{ slug: string }> };
+
+function splitTalkContent(content = "") {
+  const trimmed = content.trim();
+  if (!trimmed) return { lead: "", body: "" };
+
+  const blocks = trimmed.split(/\n{2,}/).map((block) => block.trim()).filter(Boolean);
+  const firstBlock = blocks[0] ?? "";
+  const canUseLead =
+    blocks.length > 1 &&
+    !firstBlock.startsWith("#") &&
+    !firstBlock.startsWith("!") &&
+    !firstBlock.startsWith("```") &&
+    firstBlock.length >= 20 &&
+    firstBlock.length <= 220;
+
+  if (!canUseLead) {
+    return { lead: "", body: trimmed };
+  }
+
+  return {
+    lead: firstBlock,
+    body: blocks.slice(1).join("\n\n"),
+  };
+}
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
@@ -65,6 +89,7 @@ export default async function TalkDetailPage({ params }: PageProps) {
   const talk = talks.find((t) => t.id === slug);
   const content = talk?.desc;
   const relatedPosts = talk ? getRelatedPostsForTalk(talk, posts) : [];
+  const { lead, body } = splitTalkContent(content);
 
   if (!talk) {
     return (
@@ -99,7 +124,7 @@ export default async function TalkDetailPage({ params }: PageProps) {
             <span>回到 Talk Archive</span>
           </Link>
 
-          <article className="rounded-2xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.88)] overflow-hidden shadow-[0_22px_70px_rgba(90,76,55,0.12)]">
+          <article className="overflow-hidden rounded-2xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.88)] shadow-[0_22px_70px_rgba(90,76,55,0.12)]">
             <div className="border-b border-[rgb(var(--line)/0.08)] bg-[rgb(var(--panel2)/0.58)] p-6 sm:p-10">
                 {talk.banner && (
                   <div className="-mx-6 -mt-6 mb-8 sm:-mx-10 sm:-mt-10 border-b border-[rgb(var(--line)/0.10)]">
@@ -111,7 +136,10 @@ export default async function TalkDetailPage({ params }: PageProps) {
                     />
                   </div>
                 )}
-                <div className="flex flex-wrap items-center gap-4 text-sm text-[rgb(var(--muted))] mb-4">
+                <div className="mb-4 flex flex-wrap items-center gap-3 text-sm text-[rgb(var(--muted))]">
+                  <span className="rounded-full border border-[rgb(var(--accent)/0.20)] bg-[rgb(var(--accent)/0.08)] px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-[rgb(var(--accent))]">
+                    Talk
+                  </span>
                   <span className="flex items-center gap-1.5">
                     <Calendar className="h-4 w-4" />
                     {talk.date}
@@ -123,13 +151,18 @@ export default async function TalkDetailPage({ params }: PageProps) {
                   )}
                 </div>
 
-                <div className="text-xs uppercase tracking-[0.12em] text-[rgb(var(--muted))] mb-1">
-                  {talk.date}
-                </div>
-
                 <h1 className="text-3xl sm:text-4xl font-bold leading-tight text-[rgb(var(--text))]">
                     {talk.title}
                 </h1>
+
+                {lead && (
+                  <div className="mt-6 rounded-2xl border border-[rgb(var(--accent)/0.18)] bg-[rgb(var(--accent)/0.08)] p-5">
+                    <div className="mb-2 text-xs font-bold uppercase tracking-[0.16em] text-[rgb(var(--accent))]">
+                      Opening Note
+                    </div>
+                    <MarkdownContent content={lead} variant="talkLead" />
+                  </div>
+                )}
 
                 <div className="mt-6 flex gap-3">
                   {talk.slides && (
@@ -146,7 +179,13 @@ export default async function TalkDetailPage({ params }: PageProps) {
             </div>
 
             <div className="p-6 sm:p-10">
-                <MarkdownContent content={content} />
+              <div className="mx-auto max-w-3xl">
+                <div className="mb-6 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[rgb(var(--muted))]">
+                  <span className="h-px w-8 bg-[rgb(var(--accent)/0.45)]" />
+                  Note
+                </div>
+                <MarkdownContent content={body || content} variant="talk" />
+              </div>
             </div>
           </article>
 
@@ -171,6 +210,35 @@ export default async function TalkDetailPage({ params }: PageProps) {
               </div>
             </section>
           )}
+
+          <section className="mt-6 grid gap-3 sm:grid-cols-2">
+            <Link
+              href="/talk"
+              className="group rounded-2xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.70)] p-5 transition-colors hover:border-[rgb(var(--accent)/0.24)] hover:bg-[rgb(var(--panel)/0.90)]"
+            >
+              <div className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[rgb(var(--muted))]">
+                <FileText className="h-3.5 w-3.5 text-[rgb(var(--accent))]" />
+                Archive
+              </div>
+              <div className="flex items-center justify-between gap-4">
+                <span className="font-bold transition-colors group-hover:text-[rgb(var(--accent))]">看其他 Talk</span>
+                <ArrowUpRight className="h-4 w-4 text-[rgb(var(--muted))]" />
+              </div>
+            </Link>
+            <Link
+              href="/subscribe"
+              className="group rounded-2xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.70)] p-5 transition-colors hover:border-[rgb(var(--accent)/0.24)] hover:bg-[rgb(var(--panel)/0.90)]"
+            >
+              <div className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[rgb(var(--muted))]">
+                <Rss className="h-3.5 w-3.5 text-[rgb(var(--accent))]" />
+                Subscribe
+              </div>
+              <div className="flex items-center justify-between gap-4">
+                <span className="font-bold transition-colors group-hover:text-[rgb(var(--accent))]">收到之後的更新</span>
+                <ArrowUpRight className="h-4 w-4 text-[rgb(var(--muted))]" />
+              </div>
+            </Link>
+          </section>
         </main>
 
         <footer className="mx-auto max-w-3xl px-4 pb-10 pt-8 text-xs text-[rgb(var(--muted))] text-center">

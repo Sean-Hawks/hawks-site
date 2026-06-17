@@ -7,6 +7,7 @@ import {
   type LibraryImage,
   type LibraryItem,
   type LibraryRecommendation,
+  type LibraryRecommendedWork,
   type LibraryStatus,
 } from "../data/library";
 
@@ -59,10 +60,49 @@ function normalizeTags(value: unknown) {
     .filter(Boolean);
 }
 
+function normalizeRecommendations(value: unknown) {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((item): LibraryRecommendedWork | null => {
+      if (typeof item === "string") {
+        const title = item.trim();
+        return title ? { title } : null;
+      }
+
+      if (item && typeof item === "object" && "title" in item) {
+        const work = item as Record<string, unknown>;
+        const title = normalizeString(work.title).trim();
+        if (!title) return null;
+
+        return {
+          title,
+          image: normalizeString(work.image) || undefined,
+          link: normalizeString(work.link) || undefined,
+          source: normalizeString(work.source) || undefined,
+          note: normalizeString(work.note) || undefined,
+        };
+      }
+      return null;
+    })
+    .filter((item): item is LibraryRecommendedWork => Boolean(item));
+}
+
 function normalizeRating(value: unknown) {
+  if (value === null || value === undefined) return null;
+  if (typeof value === "string") {
+    const normalized = value.trim().toLowerCase();
+    if (!normalized || normalized === "n/a" || normalized === "na") {
+      return null;
+    }
+  }
+
   const rating = typeof value === "number" ? value : Number(value);
-  if (Number.isNaN(rating)) return 0;
+  if (Number.isNaN(rating)) return null;
   return Math.max(0, Math.min(10, rating));
+}
+
+function ratingValue(rating: number | null) {
+  return rating ?? -1;
 }
 
 function normalizeImage(value: unknown, title: string): LibraryImage {
@@ -88,7 +128,10 @@ function normalizeImage(value: unknown, title: string): LibraryImage {
 
 function normalizeCategory(value: unknown): LibraryCategory {
   const category = normalizeString(value);
-  if (category === "movie" || category === "music" || category === "game") {
+  if (category === "music" || category === "artist") {
+    return "artist";
+  }
+  if (category === "movie" || category === "game") {
     return category;
   }
   return "anime";
@@ -109,7 +152,8 @@ function normalizeStatus(value: unknown): LibraryStatus {
   return "watched";
 }
 
-function recommendationFromRating(rating: number): LibraryRecommendation {
+function recommendationFromRating(rating: number | null): LibraryRecommendation {
+  if (rating === null) return "casual";
   if (rating >= 9.5) return "brilliant";
   if (rating >= 9.0) return "favorite";
   if (rating >= 8.5) return "recommended";
@@ -143,6 +187,7 @@ function readLibraryItem(fileName: string): LibraryItem {
     tags: normalizeTags(data.tags),
     note: normalizeString(data.note),
     link: normalizeString(data.link) || undefined,
+    recommendedWorks: normalizeRecommendations(data.recommendations),
     image: normalizeImage(data.image, title),
     content,
     hasReview,
@@ -160,7 +205,11 @@ export function getAllLibraryItems() {
     .filter((fileName) => fileName.endsWith(".md"))
     .map(readLibraryItem)
     .filter((item) => isPublicStatus(item.statusVisibility))
-    .sort((a, b) => b.rating - a.rating || a.title.localeCompare(b.title));
+    .sort(
+      (a, b) =>
+        ratingValue(b.rating) - ratingValue(a.rating) ||
+        a.title.localeCompare(b.title)
+    );
 }
 
 export function getLibraryItemsByCategory(category: LibraryCategory) {

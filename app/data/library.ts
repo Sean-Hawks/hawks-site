@@ -1,4 +1,4 @@
-export type LibraryCategory = "anime" | "movie" | "music" | "game";
+export type LibraryCategory = "anime" | "movie" | "artist" | "game";
 
 export type LibraryStatus =
   | "watched"
@@ -23,6 +23,14 @@ export type LibraryImage = {
   fit?: "cover" | "contain";
 };
 
+export type LibraryRecommendedWork = {
+  title: string;
+  image?: string;
+  link?: string;
+  source?: string;
+  note?: string;
+};
+
 export type LibraryItem = {
   id: string;
   slug: string;
@@ -34,10 +42,11 @@ export type LibraryItem = {
   date: string;
   status: LibraryStatus;
   recommendation: LibraryRecommendation;
-  rating: number; // Personal score from 0 to 10.
+  rating: number | null; // Personal score from 0 to 10, or null when unrated.
   tags: string[];
   note: string;
   link?: string;
+  recommendedWorks: LibraryRecommendedWork[];
   image: LibraryImage;
   content?: string;
   hasReview: boolean;
@@ -68,11 +77,11 @@ export const libraryCategories: LibraryCategoryInfo[] = [
     href: "/library/movie",
   },
   {
-    id: "music",
-    label: "Music",
-    title: "音樂推薦",
-    description: "適合循環播放，也能代表一段時間心情的音樂。",
-    href: "/library/music",
+    id: "artist",
+    label: "Artist",
+    title: "藝人收藏",
+    description: "喜歡的歌手、樂團、作曲家，以及想推薦給別人的幾首作品。",
+    href: "/library/artist",
   },
   {
     id: "game",

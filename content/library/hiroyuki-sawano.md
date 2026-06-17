@@ -1,7 +1,7 @@
 ---
 title: 澤野弘之
 subtitle: Hiroyuki Sawano
-category: music
+category: artist
 date: "2026-06-16"
 status: listened
 rating: 9.2

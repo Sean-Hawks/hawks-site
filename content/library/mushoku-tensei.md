@@ -1,6 +1,6 @@
 ---
-title: 無職轉生
-subtitle: Mushoku Tensei
+title: 無職轉生～到了異世界就拿出真本事～
+subtitle: "Mushoku Tensei: Jobless Reincarnation"
 category: anime
 year: "2021"
 date: "2026-06-16"

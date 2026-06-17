@@ -1,6 +1,6 @@
 ---
-title: 鋼之煉金術師
-subtitle: Fullmetal Alchemist
+title: 鋼之鍊金術師 FULLMETAL ALCHEMIST
+subtitle: "Fullmetal Alchemist: Brotherhood"
 category: anime
 year: "2009"
 date: "2026-06-16"

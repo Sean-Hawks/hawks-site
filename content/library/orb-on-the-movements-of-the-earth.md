@@ -1,5 +1,5 @@
 ---
-title: 地。關於地球的運動
+title: 地。-關於地球的運動-
 subtitle: "Orb: On the Movements of the Earth"
 category: anime
 year: "2024"

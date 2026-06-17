@@ -23,13 +23,13 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Library",
-  description: "Hawks 的動畫、電影、音樂和遊戲推薦收藏入口。",
+  description: "Hawks 的動畫、電影、藝人和遊戲推薦收藏入口。",
   alternates: {
     canonical: "https://hawks.tw/library/",
   },
   openGraph: {
     title: "Library",
-    description: "Hawks 的動畫、電影、音樂和遊戲推薦收藏入口。",
+    description: "Hawks 的動畫、電影、藝人和遊戲推薦收藏入口。",
     url: "https://hawks.tw/library/",
     images: ["/og/default.png"],
   },
@@ -38,14 +38,14 @@ export const metadata: Metadata = {
 const categoryIcons: Record<LibraryCategory, typeof Tv> = {
   anime: Tv,
   movie: Film,
-  music: Disc3,
+  artist: Disc3,
   game: Gamepad2,
 };
 
 const categoryLabels: Record<LibraryCategory, string> = {
   anime: "Anime",
   movie: "Movie",
-  music: "Music",
+  artist: "Artist",
   game: "Game",
 };
 
@@ -59,22 +59,33 @@ const statusLabels: Record<LibraryItem["status"], string> = {
   recommended: "Recommended",
 };
 
+function ratingValue(item: LibraryItem) {
+  return item.rating ?? -1;
+}
+
+function formatRating(rating: LibraryItem["rating"]) {
+  return rating === null ? "N/A" : rating.toFixed(1);
+}
+
 function getItemHref(item: LibraryItem) {
-  return item.hasReview ? `/library/${item.category}/${item.slug}` : undefined;
+  return item.hasReview || item.category === "artist"
+    ? `/library/${item.category}/${item.slug}`
+    : undefined;
 }
 
 function getCategoryStats(items: LibraryItem[], category: LibraryCategory) {
   const categoryItems = items.filter((item) => item.category === category);
+  const ratedItems = categoryItems.filter((item) => item.rating !== null);
   const average =
-    categoryItems.length > 0
-      ? categoryItems.reduce((sum, item) => sum + item.rating, 0) /
-        categoryItems.length
-      : 0;
+    ratedItems.length > 0
+      ? ratedItems.reduce((sum, item) => sum + (item.rating ?? 0), 0) /
+        ratedItems.length
+      : null;
 
   return {
     count: categoryItems.length,
     average,
-    top: [...categoryItems].sort((a, b) => b.rating - a.rating)[0],
+    top: [...categoryItems].sort((a, b) => ratingValue(b) - ratingValue(a))[0],
   };
 }
 
@@ -82,7 +93,7 @@ function getTopPicks(items: LibraryItem[]) {
   return [...items]
     .sort(
       (a, b) =>
-        b.rating - a.rating ||
+        ratingValue(b) - ratingValue(a) ||
         (b.year ?? "").localeCompare(a.year ?? "") ||
         a.title.localeCompare(b.title)
     )
@@ -94,7 +105,7 @@ function getCategoryTopPicks(items: LibraryItem[], category: LibraryCategory) {
     .filter((item) => item.category === category)
     .sort(
       (a, b) =>
-        b.rating - a.rating ||
+        ratingValue(b) - ratingValue(a) ||
         (b.year ?? "").localeCompare(a.year ?? "") ||
         a.title.localeCompare(b.title)
     )
@@ -106,14 +117,15 @@ function getLibraryStats(items: LibraryItem[]) {
   const active = items.filter((item) =>
     ["watching", "playing"].includes(item.status)
   ).length;
+  const ratedItems = items.filter((item) => item.rating !== null);
   const topScore =
-    items.length > 0 ? Math.max(...items.map((item) => item.rating)) : 0;
+    ratedItems.length > 0 ? Math.max(...ratedItems.map((item) => item.rating ?? 0)) : null;
 
   return [
     { label: "Collections", value: items.length.toString() },
     { label: "Reviews", value: reviews.toString() },
     { label: "Watching / Playing", value: active.toString() },
-    { label: "TOP SCORE", value: topScore.toFixed(1) },
+    { label: "TOP SCORE", value: formatRating(topScore) },
   ];
 }
 
@@ -152,7 +164,8 @@ function ItemImage({
   return (
     <div
       className={[
-        "relative overflow-hidden bg-[rgb(var(--line)/0.05)]",
+        "relative overflow-hidden",
+        item.image.fit === "contain" ? "bg-white" : "bg-[rgb(var(--line)/0.05)]",
         className ?? "",
       ].join(" ")}
     >
@@ -164,7 +177,7 @@ function ItemImage({
           sizes={sizes}
           className={[
             "transition-transform duration-300 group-hover:scale-[1.03]",
-            item.image.fit === "contain" ? "object-contain p-4" : "object-cover",
+            item.image.fit === "contain" ? "object-contain" : "object-cover",
           ].join(" ")}
         />
       ) : (
@@ -213,7 +226,7 @@ function SpotlightCard({ item }: { item: LibraryItem }) {
         <div className="mt-auto flex items-center justify-between gap-3 pt-5">
           <span className="inline-flex items-center gap-1.5 rounded-lg bg-[rgb(var(--accent)/0.12)] px-3 py-2 text-sm font-bold text-[rgb(var(--accent))]">
             <Star className="h-4 w-4 fill-[rgb(var(--accent))]" />
-            {item.rating.toFixed(1)}
+            {formatRating(item.rating)}
           </span>
           {href && (
             <span className="inline-flex items-center gap-2 rounded-full border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.04)] px-3 py-2 text-sm font-medium text-[rgb(var(--muted))] transition-colors group-hover:border-[rgb(var(--accent)/0.28)] group-hover:text-[rgb(var(--accent))]">
@@ -273,7 +286,7 @@ function CategoryPickCard({ item, index }: { item: LibraryItem; index: number })
         <div className="mt-auto flex items-center justify-between gap-3 pt-4">
           <span className="inline-flex items-center gap-1.5 rounded-md bg-[rgb(var(--accent)/0.12)] px-2 py-1 text-sm font-bold text-[rgb(var(--accent))]">
             <Star className="h-4 w-4 fill-[rgb(var(--accent))]" />
-            {item.rating.toFixed(1)}
+            {formatRating(item.rating)}
           </span>
           {href && (
             <span className="grid h-9 w-9 place-items-center rounded-lg border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.04)] text-[rgb(var(--muted))] transition-colors group-hover:border-[rgb(var(--accent)/0.28)] group-hover:text-[rgb(var(--accent))]">
@@ -328,7 +341,7 @@ function WatchingCard({ item }: { item: LibraryItem }) {
       </div>
       <div className="col-start-2 inline-flex flex-shrink-0 items-center gap-1.5 self-start rounded-lg bg-[rgb(var(--accent)/0.12)] px-3 py-2 text-sm font-bold text-[rgb(var(--accent))] sm:col-start-auto sm:self-auto">
         <Star className="h-4 w-4 fill-[rgb(var(--accent))]" />
-        {item.rating.toFixed(1)}
+        {formatRating(item.rating)}
       </div>
     </Link>
   );
@@ -382,7 +395,7 @@ export default function LibraryPage() {
   }));
   const activeItems = libraryItems
     .filter((item) => item.status === "watching" || item.status === "playing")
-    .sort((a, b) => b.rating - a.rating || a.title.localeCompare(b.title));
+    .sort((a, b) => ratingValue(b) - ratingValue(a) || a.title.localeCompare(b.title));
   const stats = getLibraryStats(libraryItems);
 
   return (
@@ -532,7 +545,7 @@ export default function LibraryPage() {
                       </span>
                       <span className="inline-flex items-center gap-1 rounded-md bg-[rgb(var(--accent)/0.10)] px-2 py-1 text-[rgb(var(--accent))]">
                         <Star className="h-3 w-3 fill-[rgb(var(--accent))]" />
-                        {stats.average.toFixed(1)} avg
+                        {formatRating(stats.average)} avg
                       </span>
                     </div>
                     {stats.top && (

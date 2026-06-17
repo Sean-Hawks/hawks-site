@@ -55,13 +55,14 @@ export function buildSearchIndex(
   const librarySearchItems = libraryItems.map((item) => {
     const desc = item.note || excerpt(item.content);
     const tags = item.tags.map(displayTag).filter(Boolean);
+    const hasDetail = item.hasReview || item.category === "artist";
     return {
       id: `library-${item.slug}`,
       type: "library" as const,
       title: item.hasReview ? `評論：${item.title}` : item.title,
       desc,
       date: item.date,
-      href: item.hasReview ? `/library/${item.category}/${item.slug}` : `/library/${item.category}`,
+      href: hasDetail ? `/library/${item.category}/${item.slug}` : `/library/${item.category}`,
       tags,
       haystack: stripMarkdown(
         [
@@ -71,9 +72,10 @@ export function buildSearchIndex(
           item.year,
           item.status,
           item.recommendation,
-          item.rating.toString(),
+          item.rating === null ? "n/a unrated" : item.rating?.toString() ?? "",
           desc,
           item.tags.join(" "),
+          item.recommendedWorks.map((work) => work.title).join(" "),
           tags.join(" "),
           item.content ?? "",
         ].join(" ")

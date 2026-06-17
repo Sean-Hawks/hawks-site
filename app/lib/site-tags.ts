@@ -58,17 +58,21 @@ function getTaggedItems(): TaggedSiteItem[] {
     source: post,
   }));
 
-  const libraryItems = getAllLibraryItems().map((item) => ({
-    id: `library-${item.slug}`,
-    type: "library" as const,
-    label: item.hasReview ? ("Library Review" as const) : ("Library" as const),
-    href: item.hasReview ? `/library/${item.category}/${item.slug}` : undefined,
-    title: item.hasReview ? `評論：${item.title}` : item.title,
-    desc: item.note,
-    date: item.date,
-    tags: item.tags.map(normalizeDisplayTag).filter(Boolean),
-    source: item,
-  }));
+  const libraryItems = getAllLibraryItems().map((item) => {
+    const hasDetail = item.hasReview || item.category === "artist";
+
+    return {
+      id: `library-${item.slug}`,
+      type: "library" as const,
+      label: item.hasReview ? ("Library Review" as const) : ("Library" as const),
+      href: hasDetail ? `/library/${item.category}/${item.slug}` : undefined,
+      title: item.hasReview ? `評論：${item.title}` : item.title,
+      desc: item.note,
+      date: item.date,
+      tags: item.tags.map(normalizeDisplayTag).filter(Boolean),
+      source: item,
+    };
+  });
 
   return [...posts, ...libraryItems].sort(
     (a, b) => toTimestamp(b.date) - toTimestamp(a.date)

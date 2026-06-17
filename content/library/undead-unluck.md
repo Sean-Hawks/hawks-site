@@ -1,6 +1,6 @@
 ---
-title: Undead Unluck
-subtitle: UNDEAD UNLUCK
+title: 不死不運
+subtitle: Undead Unluck
 category: anime
 year: "2023"
 date: "2026-06-17"

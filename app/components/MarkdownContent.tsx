@@ -73,7 +73,20 @@ export function headingId(value: string) {
     .replace(/^-+|-+$/g, "");
 }
 
-export default function MarkdownContent({ content }: { content?: string }) {
+type MarkdownVariant = "default" | "talk" | "talkLead";
+
+export default function MarkdownContent({
+  content,
+  variant = "default",
+  className,
+}: {
+  content?: string;
+  variant?: MarkdownVariant;
+  className?: string;
+}) {
+  const isTalk = variant === "talk";
+  const isTalkLead = variant === "talkLead";
+
   const components: Components = {
     pre: ({ node, className, children, ...props }: PreProps & { node?: unknown }) => {
       void node;
@@ -114,9 +127,15 @@ export default function MarkdownContent({ content }: { content?: string }) {
     ),
 
     // 避免 p 內塞進 block element（admonition/pre 等）造成 DOM repair
-    p: (props) => (
-      <div className="my-5 leading-8 text-[rgb(var(--muted))] text-base sm:text-lg tracking-wide" {...props} />
-    ),
+    p: (props) => {
+      const paragraphClass = isTalkLead
+        ? "my-0 text-base leading-8 text-[rgb(var(--text))] sm:text-lg sm:leading-9"
+        : isTalk
+          ? "my-6 text-base leading-8 text-[rgb(var(--muted))] sm:text-[1.05rem] sm:leading-9"
+          : "my-5 leading-8 text-[rgb(var(--muted))] text-base sm:text-lg tracking-wide";
+
+      return <div className={paragraphClass} {...props} />;
+    },
 
     ul: (props) => (
       <ul className="list-disc list-inside my-6 space-y-2 text-[rgb(var(--muted))] marker:text-[rgb(var(--accent))]" {...props} />
@@ -198,7 +217,16 @@ export default function MarkdownContent({ content }: { content?: string }) {
   };
 
   return (
-    <div className="max-w-none text-[rgb(var(--text))]">
+    <div
+      className={[
+        "max-w-none text-[rgb(var(--text))]",
+        isTalk ? "talk-prose" : "",
+        isTalkLead ? "talk-lead" : "",
+        className,
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
       {content ? (
         <ReactMarkdown remarkPlugins={[remarkGfm, remarkDirective, remarkAdmonitions]} components={components}>
           {content}

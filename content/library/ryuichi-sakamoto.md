@@ -1,7 +1,7 @@
 ---
 title: 坂本龍一
 subtitle: Ryuichi Sakamoto
-category: music
+category: artist
 date: "2026-06-16"
 status: listened
 rating: 9.0

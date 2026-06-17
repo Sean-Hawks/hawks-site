@@ -1,6 +1,5 @@
 ---
-title: FF7 Remake
-subtitle: Final Fantasy VII Remake
+title: Final Fantasy VII Remake
 category: game
 year: "2020"
 date: "2026-06-16"

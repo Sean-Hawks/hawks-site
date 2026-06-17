@@ -1,6 +1,6 @@
 ---
 title: Loki
-subtitle: LOKI
+subtitle: 洛基
 category: movie
 year: "2021"
 date: "2026-06-17"

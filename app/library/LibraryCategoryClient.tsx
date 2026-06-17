@@ -74,8 +74,8 @@ const categoryMeta: Record<
     Icon: Film,
     tone: "border-sky-400/25 bg-sky-400/10",
   },
-  music: {
-    label: "Music",
+  artist: {
+    label: "Artist",
     Icon: Disc3,
     tone: "border-emerald-400/25 bg-emerald-400/10",
   },
@@ -146,15 +146,20 @@ function includesTerm(item: LibraryItem, terms: string[]) {
     item.year,
     item.status,
     item.recommendation,
-    item.rating.toString(),
+    item.rating === null ? "n/a unrated" : item.rating.toString(),
     item.note,
     item.tags.join(" "),
+    item.recommendedWorks.map((work) => work.title).join(" "),
   ]
     .filter(Boolean)
     .join(" ")
     .toLowerCase();
 
   return terms.every((term) => haystack.includes(term));
+}
+
+function ratingValue(item: LibraryItem) {
+  return item.rating ?? -1;
 }
 
 function FilterGroup<T extends string>({
@@ -194,12 +199,20 @@ function FilterGroup<T extends string>({
   );
 }
 
-function Rating({ rating }: { rating: number }) {
-  const filledStars = Math.max(0, Math.min(5, Math.round(rating / 2)));
+function Rating({ rating }: { rating: LibraryItem["rating"] }) {
+  const filledStars =
+    rating === null ? 0 : Math.max(0, Math.min(5, Math.round(rating / 2)));
 
   return (
     <div className="flex items-center gap-2">
-      <div className="flex" aria-label={`Rating ${rating.toFixed(1)} out of 10`}>
+      <div
+        className="flex"
+        aria-label={
+          rating === null
+            ? "Rating not available"
+            : `Rating ${rating.toFixed(1)} out of 10`
+        }
+      >
         {Array.from({ length: 5 }).map((_, index) => (
           <Star
             key={index}
@@ -213,7 +226,7 @@ function Rating({ rating }: { rating: number }) {
         ))}
       </div>
       <span className="rounded-md bg-[rgb(var(--accent)/0.12)] px-2 py-1 text-xs font-bold text-[rgb(var(--accent))]">
-        {rating.toFixed(1)}
+        {rating === null ? "N/A" : rating.toFixed(1)}
       </span>
     </div>
   );
@@ -224,7 +237,7 @@ function LibraryCard({ item }: { item: LibraryItem }) {
   const recommendation = recommendationMeta[item.recommendation];
   const CategoryIcon = category.Icon;
   const RecommendationIcon = recommendation.Icon;
-  const hasReview = item.hasReview;
+  const hasDetail = item.hasReview || item.category === "artist";
   const status = statusMeta[item.status];
   const StatusIcon = status.Icon;
   const imageBlock = (
@@ -237,7 +250,11 @@ function LibraryCard({ item }: { item: LibraryItem }) {
           sizes="(min-width: 640px) 180px, calc(100vw - 32px)"
           className={[
             "transition-transform duration-300 group-hover:scale-[1.03]",
-            item.image.fit === "contain" ? "object-contain p-4" : "object-cover",
+            item.category === "artist"
+              ? "object-cover"
+              : item.image.fit === "contain"
+                ? "object-contain p-4"
+                : "object-cover",
           ].join(" ")}
           referrerPolicy="no-referrer"
         />
@@ -265,7 +282,7 @@ function LibraryCard({ item }: { item: LibraryItem }) {
   );
   const contentClassName = [
     "flex min-h-full flex-col p-5",
-    hasReview ? "group/review" : "",
+    hasDetail ? "group/review" : "",
   ]
     .filter(Boolean)
     .join(" ");
@@ -299,7 +316,7 @@ function LibraryCard({ item }: { item: LibraryItem }) {
 
       <div className="flex items-start justify-between gap-4">
         <div>
-          {hasReview && (
+          {item.hasReview && (
             <div className="mb-2 inline-flex rounded-md bg-[rgb(var(--accent)/0.10)] px-2 py-1 text-xs font-bold text-[rgb(var(--accent))]">
               評論
             </div>
@@ -307,10 +324,10 @@ function LibraryCard({ item }: { item: LibraryItem }) {
           <h2
             className={[
               "text-xl font-bold leading-snug text-[rgb(var(--text))] transition-colors",
-              hasReview ? "group-hover/review:text-[rgb(var(--accent))]" : "",
+              hasDetail ? "group-hover/review:text-[rgb(var(--accent))]" : "",
             ].join(" ")}
           >
-            {hasReview ? `評論：${item.title}` : item.title}
+            {item.hasReview ? `評論：${item.title}` : item.title}
           </h2>
           {item.subtitle && (
             <p className="mt-1 text-sm text-[rgb(var(--muted))]">
@@ -318,7 +335,7 @@ function LibraryCard({ item }: { item: LibraryItem }) {
             </p>
           )}
         </div>
-        {hasReview && (
+        {hasDetail && (
           <div
             aria-hidden="true"
             className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.04)] text-[rgb(var(--muted))] transition-colors group-hover/review:border-[rgb(var(--accent)/0.28)] group-hover/review:text-[rgb(var(--accent))]"
@@ -330,15 +347,40 @@ function LibraryCard({ item }: { item: LibraryItem }) {
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
         <Rating rating={item.rating} />
-        <div className="inline-flex items-center gap-1.5 text-sm font-medium text-[rgb(var(--accent))]">
-          <RecommendationIcon className="h-4 w-4" />
-          {recommendation.label}
-        </div>
+        {item.rating !== null && (
+          <div className="inline-flex items-center gap-1.5 text-sm font-medium text-[rgb(var(--accent))]">
+            <RecommendationIcon className="h-4 w-4" />
+            {recommendation.label}
+          </div>
+        )}
       </div>
 
       <p className="mt-4 text-sm leading-7 text-[rgb(var(--muted))]">
         {item.note}
       </p>
+
+      {item.recommendedWorks.length > 0 && (
+        <div className="mt-4">
+          <div className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-[rgb(var(--muted))]">
+            Recommended
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {item.recommendedWorks.slice(0, 4).map((work) => (
+              <span
+                key={work.title}
+                className="rounded-md border border-[rgb(var(--accent)/0.16)] bg-[rgb(var(--accent)/0.08)] px-2 py-1 text-xs text-[rgb(var(--accent))]"
+              >
+                {work.title}
+              </span>
+            ))}
+            {item.recommendedWorks.length > 4 && (
+              <span className="rounded-md border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.04)] px-2 py-1 text-xs text-[rgb(var(--muted))]">
+                +{item.recommendedWorks.length - 4}
+              </span>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className="mt-auto flex flex-wrap gap-2 pt-4">
         {item.tags.map((tag) => (
@@ -358,7 +400,7 @@ function LibraryCard({ item }: { item: LibraryItem }) {
     <article
       className={[
         "overflow-hidden rounded-2xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.84)] shadow-[0_18px_60px_rgba(90,76,55,0.07)] transition-colors",
-        hasReview
+        hasDetail
           ? "hover:border-[rgb(var(--accent)/0.28)] hover:bg-[rgb(var(--panel))]"
           : "",
       ].join(" ")}
@@ -377,7 +419,7 @@ function LibraryCard({ item }: { item: LibraryItem }) {
           imageBlock
         )}
 
-        {hasReview ? (
+        {hasDetail ? (
           <Link
             href={`/library/${item.category}/${item.slug}`}
             className={contentClassName}
@@ -422,7 +464,7 @@ export default function LibraryCategoryClient({
         return includesTerm(item, terms);
       })
       .sort((a, b) => {
-        if (sort === "rating") return b.rating - a.rating;
+        if (sort === "rating") return ratingValue(b) - ratingValue(a);
         if (sort === "year") return (b.year ?? "").localeCompare(a.year ?? "");
         return a.title.localeCompare(b.title);
       });
