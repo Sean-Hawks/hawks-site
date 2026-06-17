@@ -171,9 +171,6 @@ export default async function PostPage({ params }: PageProps) {
                   ))}
                 </div>
                 
-                <div className="text-xs uppercase tracking-[0.12em] text-[rgb(var(--muted))] mb-1">
-                  {post.date}
-                </div>
                 <h1 className="text-3xl sm:text-4xl font-bold leading-tight text-[rgb(var(--text))]">
                   {post.title}
                 </h1>

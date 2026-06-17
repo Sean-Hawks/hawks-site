@@ -13,8 +13,8 @@ import ThemeStyles from "../components/ThemeStyles";
 
 const siteUrl = "https://hawks.tw";
 const feedUrl = `${siteUrl}/rss.xml`;
-const emailHref =
-  "mailto:me@hawks.tw?subject=Subscribe%20to%20hawks.tw&body=Hi%20Hawks%2C%0A%0AI%20want%20to%20receive%20email%20updates%20from%20hawks.tw.%0A%0AEmail%3A%20";
+const followItAction =
+  "https://api.follow.it/subscription-form/Vi81UUVRZnlrNys0RTZCcTZyTExTVHBwRUZjOXVxZCtVN2ZQYm9vcE1yZ2ttYjVWcWthekk1SUMzaE5qYm5lUXpWaXdLYmtKY09VaXdxVWxJVGN0OFhmRC9XMU1mbFZjenNyRU9pNmUvWGZ1K2dIYWJGQjJkYW4rY2h2bXlCRjF8M0VCWXY1c294cE5uN3N3V0FZVHdlWlovNVNSNXltRGRzRVRsMGRxejIyaz0=/8";
 
 export const metadata: Metadata = {
   title: "Subscribe",
@@ -57,8 +57,8 @@ export default function SubscribePage() {
             訂閱 hawks.tw
           </h1>
           <p className="mt-3 max-w-2xl text-base leading-8 text-[rgb(var(--muted))]">
-            用 RSS reader 追蹤 Blog、Talk 和 Library Review。想收到 email 也可以先寄信給我，
-            我會把你加到之後的更新名單。
+            用 RSS reader 追蹤 Blog、Talk 和 Library Review。想收到 email 的話，
+            也可以直接訂閱更新信。
           </p>
 
           <div className="mt-6 grid gap-3 md:grid-cols-2">
@@ -83,23 +83,49 @@ export default function SubscribePage() {
               </code>
             </a>
 
-            <a
-              href={emailHref}
-              className="group rounded-2xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.035)] p-5 transition-colors hover:border-[rgb(var(--accent)/0.28)] hover:bg-[rgb(var(--line)/0.055)]"
-            >
+            <div className="rounded-2xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.035)] p-5">
               <div className="mb-4 grid h-11 w-11 place-items-center rounded-xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.62)] text-[rgb(var(--accent))]">
                 <Mail className="h-5 w-5" />
               </div>
               <div className="flex items-center justify-between gap-4">
-                <h2 className="text-lg font-bold transition-colors group-hover:text-[rgb(var(--accent))]">
+                <h2 className="text-lg font-bold">
                   Email Updates
                 </h2>
-                <ArrowUpRight className="h-4 w-4 text-[rgb(var(--muted))]" />
               </div>
               <p className="mt-2 text-sm leading-7 text-[rgb(var(--muted))]">
-                靜態網站不能直接保存 email 名單，所以先用寄信方式登記。之後可以改接 Buttondown 或 Follow.it。
+                輸入 email 後會交給 Follow.it 處理確認信與之後的更新通知。
               </p>
-            </a>
+              <form
+                action={followItAction}
+                method="post"
+                target="_blank"
+                className="mt-4 grid gap-2"
+              >
+                <input
+                  type="email"
+                  name="email"
+                  required
+                  placeholder="Enter your email"
+                  spellCheck={false}
+                  className="h-11 w-full rounded-xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--bg)/0.55)] px-3 text-center text-sm text-[rgb(var(--text))] outline-none transition-colors placeholder:text-[rgb(var(--muted))] focus:border-[rgb(var(--accent)/0.36)]"
+                />
+                <button
+                  type="submit"
+                  className="h-11 rounded-xl bg-[rgb(var(--accent))] px-4 text-sm font-bold text-[#111114] transition-opacity hover:opacity-90"
+                >
+                  Subscribe
+                </button>
+              </form>
+              <a
+                href="https://follow.it"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3 inline-flex items-center gap-1 text-xs text-[rgb(var(--muted))] transition-colors hover:text-[rgb(var(--text))]"
+              >
+                Powered by follow.it
+                <ArrowUpRight className="h-3 w-3" />
+              </a>
+            </div>
           </div>
         </section>
 

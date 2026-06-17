@@ -243,7 +243,7 @@
             </p>
             <div class="actions">
               <a class="button primary" href="/subscribe/">訂閱說明</a>
-              <a class="button" href="mailto:me@hawks.tw?subject=Subscribe%20to%20hawks.tw&amp;body=Hi%20Hawks%2C%0A%0AI%20want%20to%20receive%20email%20updates%20from%20hawks.tw.%0A">Email 訂閱</a>
+              <a class="button" href="/subscribe/">Email 訂閱</a>
             </div>
             <div class="feed-url">
               <xsl:value-of select="/rss/channel/atom:link/@href" />
