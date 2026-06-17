@@ -38,6 +38,8 @@ jobs:
         run: npm install
 
       - name: Build (Next export -> out/)
+        env:
+          PRESERVE_LIVE_STATIC_ORIGIN: https://hawks.tw
         run: npm run build
 
       - name: Upload artifact
