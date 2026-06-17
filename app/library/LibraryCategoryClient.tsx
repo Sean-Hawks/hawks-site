@@ -36,7 +36,7 @@ const recommendationOptions: Array<{
   label: string;
   value: RecommendationFilter;
 }> = [
-  { label: "All", value: "all" },
+  { label: "全部", value: "all" },
   { label: "Brilliant", value: "brilliant" },
   { label: "Favorite", value: "favorite" },
   { label: "Recommended", value: "recommended" },
@@ -44,7 +44,7 @@ const recommendationOptions: Array<{
 ];
 
 const statusOptions: Array<{ label: string; value: StatusFilter }> = [
-  { label: "All", value: "all" },
+  { label: "全部", value: "all" },
   { label: "Watched", value: "watched" },
   { label: "Listened", value: "listened" },
   { label: "Watching", value: "watching" },
@@ -55,9 +55,9 @@ const statusOptions: Array<{ label: string; value: StatusFilter }> = [
 ];
 
 const sortOptions: Array<{ label: string; value: SortMode }> = [
-  { label: "Rating", value: "rating" },
-  { label: "Year", value: "year" },
-  { label: "Title", value: "title" },
+  { label: "評分", value: "rating" },
+  { label: "年份", value: "year" },
+  { label: "標題", value: "title" },
 ];
 
 const categoryMeta: Record<
@@ -248,7 +248,7 @@ function LibraryCard({ item }: { item: LibraryItem }) {
           </div>
           <div>
             <div className="text-xs font-bold uppercase tracking-[0.16em] text-[rgb(var(--accent))]">
-              No cover yet
+              尚無封面
             </div>
             <div className="mt-1 text-sm text-[rgb(var(--muted))]">
               {item.title}
@@ -448,7 +448,7 @@ export default function LibraryCategoryClient({
           className="mb-5 inline-flex items-center gap-2 text-sm text-[rgb(var(--muted))] transition-colors hover:text-[rgb(var(--accent))]"
         >
           <ArrowLeft className="h-4 w-4" />
-          Back to Library
+          Library
         </Link>
         <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-[rgb(var(--accent)/0.22)] bg-[rgb(var(--accent)/0.10)] px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-[rgb(var(--accent))]">
           <CategoryIcon className="h-3.5 w-3.5" />
@@ -468,7 +468,7 @@ export default function LibraryCategoryClient({
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="搜尋標題、tag 或一句心得..."
+            placeholder="搜尋標題、標籤或一句心得..."
             className="w-full bg-transparent text-base text-[rgb(var(--text))] outline-none placeholder:text-[rgb(var(--muted))]"
           />
           {query && (
@@ -485,19 +485,19 @@ export default function LibraryCategoryClient({
 
         <div className="mt-5 grid gap-4 lg:grid-cols-3">
           <FilterGroup
-            label="Recommendation"
+            label="推薦"
             options={recommendationOptions}
             value={recommendation}
             onChange={setRecommendation}
           />
           <FilterGroup
-            label="Status"
+            label="狀態"
             options={statusOptions}
             value={status}
             onChange={setStatus}
           />
           <FilterGroup
-            label="Sort"
+            label="排序"
             options={sortOptions}
             value={sort}
             onChange={setSort}
@@ -507,7 +507,7 @@ export default function LibraryCategoryClient({
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="text-sm text-[rgb(var(--muted))]">
-          {filteredItems.length} item{filteredItems.length === 1 ? "" : "s"}
+          {filteredItems.length} 件收藏
         </div>
         {hasActiveFilters && (
           <button
@@ -534,7 +534,7 @@ export default function LibraryCategoryClient({
           </div>
           <h2 className="mt-4 text-xl font-bold">沒有符合的收藏</h2>
           <p className="mx-auto mt-2 max-w-md text-sm leading-7 text-[rgb(var(--muted))]">
-            換個關鍵字或清除篩選，就能重新看到這個分類的清單。
+            目前沒有符合條件的收藏。
           </p>
           <button
             type="button"
@@ -542,7 +542,7 @@ export default function LibraryCategoryClient({
             className="mt-5 inline-flex items-center gap-2 rounded-full border border-[rgb(var(--accent)/0.24)] bg-[rgb(var(--accent)/0.12)] px-4 py-2 text-sm font-medium text-[rgb(var(--accent))] transition-colors hover:bg-[rgb(var(--accent)/0.16)]"
           >
             <RotateCcw className="h-4 w-4" />
-            Clear filters
+            清除篩選
           </button>
         </section>
       )}

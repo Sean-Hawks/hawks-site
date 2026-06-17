@@ -173,7 +173,7 @@ export default async function LibraryReviewPage({ params }: PageProps) {
                   ) : (
                     <div className="flex h-full flex-col items-center justify-center gap-3 bg-[rgb(var(--line)/0.025)] p-6 text-center">
                       <div className="text-xs font-bold uppercase tracking-[0.16em] text-[rgb(var(--accent))]">
-                        No cover yet
+                        尚無封面
                       </div>
                       <div className="text-sm leading-6 text-[rgb(var(--muted))]">
                         {item.title}

@@ -100,10 +100,10 @@ function getLibraryStats(items: LibraryItem[]) {
     items.length > 0 ? Math.max(...items.map((item) => item.rating)) : 0;
 
   return [
-    { label: "Items", value: items.length.toString() },
-    { label: "Reviews", value: reviews.toString() },
-    { label: "Watching / Playing", value: active.toString() },
-    { label: "Top score", value: topScore.toFixed(1) },
+    { label: "收藏", value: items.length.toString() },
+    { label: "評論", value: reviews.toString() },
+    { label: "進行中", value: active.toString() },
+    { label: "最高分", value: topScore.toFixed(1) },
   ];
 }
 
@@ -186,7 +186,7 @@ function SpotlightCard({ item }: { item: LibraryItem }) {
         </div>
 
         <p className="text-xs font-bold uppercase tracking-[0.16em] text-[rgb(var(--accent))]">
-          Spotlight
+          精選
         </p>
         <h2 className="mt-2 text-2xl font-bold leading-tight text-[rgb(var(--text))] transition-colors group-hover:text-[rgb(var(--accent))]">
           {item.hasReview ? `評論：${item.title}` : item.title}
@@ -207,7 +207,7 @@ function SpotlightCard({ item }: { item: LibraryItem }) {
           </span>
           {href && (
             <span className="inline-flex items-center gap-2 rounded-full border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.04)] px-3 py-2 text-sm font-medium text-[rgb(var(--muted))] transition-colors group-hover:border-[rgb(var(--accent)/0.28)] group-hover:text-[rgb(var(--accent))]">
-              Read
+              閱讀
               <ArrowUpRight className="h-4 w-4" />
             </span>
           )}
@@ -410,7 +410,7 @@ export default function LibraryPage() {
                 href="/library/anime"
                 className="inline-flex items-center gap-2 rounded-full border border-[rgb(var(--accent)/0.28)] bg-[rgb(var(--accent)/0.12)] px-4 py-2 text-sm font-medium text-[rgb(var(--accent))] transition-colors hover:bg-[rgb(var(--accent)/0.16)]"
               >
-                Browse Anime
+                動畫
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
@@ -418,7 +418,7 @@ export default function LibraryPage() {
                 className="inline-flex items-center gap-2 rounded-full border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.04)] px-4 py-2 text-sm font-medium text-[rgb(var(--muted))] transition-colors hover:text-[rgb(var(--text))]"
               >
                 <PlayCircle className="h-4 w-4" />
-                Watching and Playing
+                進行中
               </Link>
             </div>
           </div>
@@ -432,15 +432,12 @@ export default function LibraryPage() {
               <div>
                 <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-amber-700 dark:text-amber-200">
                   <PlayCircle className="h-3.5 w-3.5" />
-                  Watching and Playing
+                  Now
                 </div>
                 <h2 className="mt-1 text-2xl font-bold leading-tight">
-                  正在追與正在玩的清單
+                  進行中
                 </h2>
               </div>
-              <p className="max-w-xl text-sm leading-6 text-[rgb(var(--muted))]">
-                動畫用 Watching，遊戲用 Playing，放在首頁當作現在式的收藏狀態。
-              </p>
             </div>
             <div className="grid gap-4 lg:grid-cols-2">
               {activeItems.map((item) => (
@@ -454,15 +451,12 @@ export default function LibraryPage() {
           <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <div className="text-xs font-bold uppercase tracking-[0.16em] text-[rgb(var(--accent))]">
-                Top picks by category
+                Picks
               </div>
               <h2 className="mt-1 text-2xl font-bold leading-tight">
-                分類代表收藏
+                分類精選
               </h2>
             </div>
-            <p className="max-w-xl text-sm leading-6 text-[rgb(var(--muted))]">
-              每個分類各自選出前三名，避免音樂、電影和動畫擠在同一個排行榜裡互相打架。
-            </p>
           </div>
           <div className="grid gap-4 lg:grid-cols-2">
             {categoryTopPicks.map(({ category, items }) => (
@@ -479,10 +473,10 @@ export default function LibraryPage() {
           <div className="mb-3 flex items-end justify-between gap-3">
             <div>
               <div className="text-xs font-bold uppercase tracking-[0.16em] text-[rgb(var(--accent))]">
-                Browse
+                Library
               </div>
               <h2 className="mt-1 text-2xl font-bold leading-tight">
-                分類入口
+                分類
               </h2>
             </div>
           </div>
@@ -519,16 +513,16 @@ export default function LibraryPage() {
                   <div className="mt-auto pt-5">
                     <div className="flex flex-wrap gap-2 text-xs text-[rgb(var(--muted))]">
                       <span className="rounded-md bg-[rgb(var(--line)/0.06)] px-2 py-1">
-                        {stats.count} item{stats.count === 1 ? "" : "s"}
+                        {stats.count} 件收藏
                       </span>
                       <span className="inline-flex items-center gap-1 rounded-md bg-[rgb(var(--accent)/0.10)] px-2 py-1 text-[rgb(var(--accent))]">
                         <Star className="h-3 w-3 fill-[rgb(var(--accent))]" />
-                        {stats.average.toFixed(1)} avg
+                        平均 {stats.average.toFixed(1)}
                       </span>
                     </div>
                     {stats.top && (
                       <div className="mt-3 text-sm text-[rgb(var(--muted))]">
-                        Top pick:{" "}
+                        最高分：{" "}
                         <span className="font-medium text-[rgb(var(--text))]">
                           {stats.top.title}
                         </span>

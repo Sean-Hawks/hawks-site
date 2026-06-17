@@ -69,7 +69,7 @@ export default function NowPage() {
           <div>
             <h1 className="text-3xl font-bold leading-tight sm:text-5xl">最近更新</h1>
             <p className="mt-3 max-w-2xl text-base leading-8 text-[rgb(var(--muted))]">
-              自動整理最近公開的文章與分享紀錄。這頁不用特別維護，寫新內容就會跟著更新。
+              最近公開的文章、評論與分享紀錄。
             </p>
           </div>
         </section>
