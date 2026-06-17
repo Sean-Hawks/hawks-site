@@ -2,6 +2,21 @@ import { ExternalLink, FolderGit2 } from "lucide-react";
 import Header from "../components/Header";
 import ThemeStyles from "../components/ThemeStyles";
 import { projects } from "../data/projects";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Project",
+  description: "Hawks 做過、正在做，或之後想慢慢補完的專案紀錄。",
+  alternates: {
+    canonical: "https://hawks.tw/project/",
+  },
+  openGraph: {
+    title: "Project",
+    description: "Hawks 做過、正在做，或之後想慢慢補完的專案紀錄。",
+    url: "https://hawks.tw/project/",
+    images: ["/og/default.png"],
+  },
+};
 
 export default function ProjectPage() {
   return (

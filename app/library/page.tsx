@@ -19,10 +19,20 @@ import {
   type LibraryItem,
 } from "../data/library";
 import { getAllLibraryItems } from "../lib/library";
+import type { Metadata } from "next";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Library",
   description: "Hawks 的動畫、電影、音樂和遊戲推薦收藏入口。",
+  alternates: {
+    canonical: "https://hawks.tw/library/",
+  },
+  openGraph: {
+    title: "Library",
+    description: "Hawks 的動畫、電影、音樂和遊戲推薦收藏入口。",
+    url: "https://hawks.tw/library/",
+    images: ["/og/default.png"],
+  },
 };
 
 const categoryIcons: Record<LibraryCategory, typeof Tv> = {
@@ -100,10 +110,10 @@ function getLibraryStats(items: LibraryItem[]) {
     items.length > 0 ? Math.max(...items.map((item) => item.rating)) : 0;
 
   return [
-    { label: "收藏", value: items.length.toString() },
-    { label: "評論", value: reviews.toString() },
-    { label: "進行中", value: active.toString() },
-    { label: "最高分", value: topScore.toFixed(1) },
+    { label: "Collections", value: items.length.toString() },
+    { label: "Reviews", value: reviews.toString() },
+    { label: "Watching / Playing", value: active.toString() },
+    { label: "TOP SCORE", value: topScore.toFixed(1) },
   ];
 }
 
@@ -294,8 +304,13 @@ function WatchingCard({ item }: { item: LibraryItem }) {
   return (
     <Link
       href={href}
-      className="group flex flex-col gap-3 rounded-2xl border border-amber-300/28 bg-amber-300/8 p-4 shadow-[0_18px_60px_rgba(251,191,36,0.08)] transition-colors hover:border-amber-300/50 sm:flex-row sm:items-center sm:justify-between"
+      className="group grid grid-cols-[72px_minmax(0,1fr)] gap-3 rounded-2xl border border-amber-300/28 bg-amber-300/8 p-3 shadow-[0_18px_60px_rgba(251,191,36,0.08)] transition-colors hover:border-amber-300/50 sm:grid-cols-[88px_minmax(0,1fr)_auto] sm:items-center"
     >
+      <ItemImage
+        item={item}
+        className="aspect-[3/4] rounded-xl"
+        sizes="(min-width: 640px) 88px, 72px"
+      />
       <div className="min-w-0">
         <div className="mb-2 flex flex-wrap items-center gap-2">
           <StatusBadge item={item} />
@@ -311,9 +326,9 @@ function WatchingCard({ item }: { item: LibraryItem }) {
           {item.note}
         </p>
       </div>
-      <div className="inline-flex flex-shrink-0 items-center gap-1.5 self-start rounded-lg bg-[rgb(var(--accent)/0.12)] px-3 py-2 text-sm font-bold text-[rgb(var(--accent))] sm:self-auto">
-          <Star className="h-4 w-4 fill-[rgb(var(--accent))]" />
-          {item.rating.toFixed(1)}
+      <div className="col-start-2 inline-flex flex-shrink-0 items-center gap-1.5 self-start rounded-lg bg-[rgb(var(--accent)/0.12)] px-3 py-2 text-sm font-bold text-[rgb(var(--accent))] sm:col-start-auto sm:self-auto">
+        <Star className="h-4 w-4 fill-[rgb(var(--accent))]" />
+        {item.rating.toFixed(1)}
       </div>
     </Link>
   );
@@ -418,7 +433,7 @@ export default function LibraryPage() {
                 className="inline-flex items-center gap-2 rounded-full border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.04)] px-4 py-2 text-sm font-medium text-[rgb(var(--muted))] transition-colors hover:text-[rgb(var(--text))]"
               >
                 <PlayCircle className="h-4 w-4" />
-                進行中
+                Watching / Playing
               </Link>
             </div>
           </div>
@@ -435,7 +450,7 @@ export default function LibraryPage() {
                   Now
                 </div>
                 <h2 className="mt-1 text-2xl font-bold leading-tight">
-                  進行中
+                  Watching / Playing
                 </h2>
               </div>
             </div>
@@ -513,11 +528,11 @@ export default function LibraryPage() {
                   <div className="mt-auto pt-5">
                     <div className="flex flex-wrap gap-2 text-xs text-[rgb(var(--muted))]">
                       <span className="rounded-md bg-[rgb(var(--line)/0.06)] px-2 py-1">
-                        {stats.count} 件收藏
+                        {stats.count} collections
                       </span>
                       <span className="inline-flex items-center gap-1 rounded-md bg-[rgb(var(--accent)/0.10)] px-2 py-1 text-[rgb(var(--accent))]">
                         <Star className="h-3 w-3 fill-[rgb(var(--accent))]" />
-                        平均 {stats.average.toFixed(1)}
+                        {stats.average.toFixed(1)} avg
                       </span>
                     </div>
                     {stats.top && (

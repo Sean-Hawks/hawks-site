@@ -7,6 +7,7 @@ import {
 } from "../../data/library";
 import { getLibraryCategory, getLibraryItemsByCategory } from "../../lib/library";
 import LibraryCategoryClient from "../LibraryCategoryClient";
+import type { Metadata } from "next";
 
 export function generateStaticParams() {
   return libraryCategories.map((category) => ({ category: category.id }));
@@ -16,7 +17,7 @@ export async function generateMetadata({
   params,
 }: {
   params: Promise<{ category: string }>;
-}) {
+}): Promise<Metadata> {
   const { category } = await params;
   const currentCategory = getLibraryCategory(category);
 
@@ -29,6 +30,15 @@ export async function generateMetadata({
   return {
     title: currentCategory.title,
     description: currentCategory.description,
+    alternates: {
+      canonical: `https://hawks.tw${currentCategory.href}/`,
+    },
+    openGraph: {
+      title: currentCategory.title,
+      description: currentCategory.description,
+      url: `https://hawks.tw${currentCategory.href}/`,
+      images: ["/og/default.png"],
+    },
   };
 }
 

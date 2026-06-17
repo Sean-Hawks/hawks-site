@@ -2,7 +2,33 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "hawks.tw",
-  description: "Hawks 的個人網站與部落格",
+  description:
+    "Hawks 的個人網站：Blog、Talk、Library、Project，以及關於程式、音樂、ACGM 和生活的筆記。",
+  alternates: {
+    canonical: "https://hawks.tw",
+  },
+  openGraph: {
+    type: "website",
+    url: "https://hawks.tw",
+    title: "hawks.tw",
+    description:
+      "Hawks 的個人網站：Blog、Talk、Library、Project，以及關於程式、音樂、ACGM 和生活的筆記。",
+    images: [
+      {
+        url: "/og/default.png",
+        width: 1200,
+        height: 630,
+        alt: "hawks.tw",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "hawks.tw",
+    description:
+      "Hawks 的個人網站：Blog、Talk、Library、Project，以及關於程式、音樂、ACGM 和生活的筆記。",
+    images: ["/og/default.png"],
+  },
 };
 
 export const dynamic = "force-static"; // 靜態輸出/部署到 GitHub Pages 時維持穩定
@@ -13,11 +39,13 @@ export const dynamic = "force-static"; // 靜態輸出/部署到 GitHub Pages �
 
 import { getSortedPostsData } from "./lib/posts";
 import { getSortedTalksData } from "./lib/talks";
+import { getAllLibraryItems } from "./lib/library";
 import HomeClient from "./components/HomeClient";
 
 export default function Page() {
 	const posts = getSortedPostsData();
 	const talks = getSortedTalksData();
+	const libraryItems = getAllLibraryItems();
 
-	return <HomeClient posts={posts} talks={talks} />;
+	return <HomeClient posts={posts} talks={talks} libraryItems={libraryItems} />;
 }

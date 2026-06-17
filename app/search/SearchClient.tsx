@@ -8,6 +8,18 @@ import type { SiteTag } from "../lib/site-tags";
 
 type SearchType = "all" | SearchItem["type"];
 
+function tagSlug(value: string) {
+  return value
+    .trim()
+    .replace(/^#+/, "")
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/&/g, " and ")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 export default function SearchClient({
   items,
   tags,
@@ -17,19 +29,26 @@ export default function SearchClient({
 }) {
   const [query, setQuery] = React.useState("");
   const [type, setType] = React.useState<SearchType>("all");
+  const [selectedTag, setSelectedTag] = React.useState<string | null>(null);
 
   const filteredItems = React.useMemo(() => {
     const terms = query
       .trim()
       .toLowerCase()
       .split(/\s+/)
+      .map((term) => term.replace(/^#+/, ""))
       .filter(Boolean);
 
     return items
       .filter((item) => type === "all" || item.type === type)
+      .filter(
+        (item) =>
+          !selectedTag ||
+          item.tags.some((tag) => tagSlug(tag) === selectedTag)
+      )
       .filter((item) => terms.every((term) => item.haystack.includes(term)))
       .slice(0, 24);
-  }, [items, query, type]);
+  }, [items, query, selectedTag, type]);
 
   return (
     <div className="space-y-5">
@@ -38,7 +57,10 @@ export default function SearchClient({
           <Search className="h-5 w-5 flex-shrink-0 text-[rgb(var(--muted))]" />
           <input
             value={query}
-            onChange={(event) => setQuery(event.target.value)}
+            onChange={(event) => {
+              setQuery(event.target.value);
+              setSelectedTag(null);
+            }}
             placeholder="搜尋文章、Talk、Library、tag、內文..."
             className="w-full bg-transparent text-base text-[rgb(var(--text))] outline-none placeholder:text-[rgb(var(--muted))]"
             autoFocus
@@ -47,7 +69,10 @@ export default function SearchClient({
             <button
               type="button"
               aria-label="清除搜尋"
-              onClick={() => setQuery("")}
+              onClick={() => {
+                setQuery("");
+                setSelectedTag(null);
+              }}
               className="grid h-8 w-8 flex-shrink-0 place-items-center rounded-lg text-[rgb(var(--muted))] transition-colors hover:bg-[rgb(var(--line)/0.06)] hover:text-[rgb(var(--text))]"
             >
               <X className="h-4 w-4" />
@@ -89,11 +114,12 @@ export default function SearchClient({
                 type="button"
                 onClick={() => {
                   setQuery(tag.tag);
+                  setSelectedTag(tag.slug);
                   setType("all");
                 }}
                 className={[
                   "rounded-full border px-3 py-1.5 text-sm transition-colors",
-                  query.trim().toLowerCase() === tag.tag.toLowerCase()
+                  selectedTag === tag.slug
                     ? "border-[rgb(var(--accent)/0.28)] bg-[rgb(var(--accent)/0.14)] text-[rgb(var(--accent))]"
                     : "border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.04)] text-[rgb(var(--muted))] hover:text-[rgb(var(--text))]",
                 ].join(" ")}

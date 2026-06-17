@@ -6,10 +6,20 @@ import { getSortedPostsData } from "../lib/posts";
 import { getSortedTalksData } from "../lib/talks";
 import { getAllLibraryItems } from "../lib/library";
 import { excerpt } from "../lib/content";
+import type { Metadata } from "next";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Now",
-  description: "Hawks 最近更新的文章與分享紀錄。",
+  description: "Hawks 最近公開的文章、Library 評論、短筆記與分享紀錄。",
+  alternates: {
+    canonical: "https://hawks.tw/now/",
+  },
+  openGraph: {
+    title: "Now",
+    description: "Hawks 最近公開的文章、Library 評論、短筆記與分享紀錄。",
+    url: "https://hawks.tw/now/",
+    images: ["/og/default.png"],
+  },
 };
 
 function toTimestamp(date: string) {

@@ -3,6 +3,21 @@ import { ArrowRight, CalendarDays, FileText } from "lucide-react";
 import { getAllTags, getSortedPostsData, tagToSlug } from "../lib/posts";
 import ThemeStyles from "../components/ThemeStyles";
 import Header from "../components/Header";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Blog",
+  description: "Hawks 的文章、學習筆記、近況和一些有興趣才會寫下來的東西。",
+  alternates: {
+    canonical: "https://hawks.tw/blog/",
+  },
+  openGraph: {
+    title: "Blog",
+    description: "Hawks 的文章、學習筆記、近況和一些有興趣才會寫下來的東西。",
+    url: "https://hawks.tw/blog/",
+    images: ["/og/default.png"],
+  },
+};
 
 export default function BlogPage() {
   const posts = getSortedPostsData();

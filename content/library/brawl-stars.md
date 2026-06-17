@@ -2,9 +2,9 @@
 title: Brawl Stars
 category: game
 year: "2018"
-date: "2026-06-17"
+date: 2026-06-17
 status: played
-rating: 7.0
+rating: 6.5
 tags:
   - mobile game
   - multiplayer

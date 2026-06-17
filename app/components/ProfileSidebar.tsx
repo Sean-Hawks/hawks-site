@@ -14,6 +14,17 @@ const TRANSPARENT_PIXEL = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAA
 export default function ProfileSidebar({ roles }: { roles: RoleTag[] }) {
   const [avatarError, setAvatarError] = React.useState(false);
   const [bannerError, setBannerError] = React.useState(false);
+  const roleGroups = React.useMemo(() => {
+    const groups = new Map<string, RoleTag[]>();
+
+    roles.forEach((role) => {
+      const group = groups.get(role.color) ?? [];
+      group.push(role);
+      groups.set(role.color, group);
+    });
+
+    return Array.from(groups, ([color, items]) => ({ color, items }));
+  }, [roles]);
 
   return (
     <>
@@ -68,7 +79,7 @@ export default function ProfileSidebar({ roles }: { roles: RoleTag[] }) {
 
           <div className="mt-2 flex items-center gap-2 text-xs text-[rgb(var(--muted))]">
             <Sparkles className="h-4 w-4" />
-            <span>正在玩 FINAL FANTASY XIV</span>
+            <span>正在玩 Chess.com</span>
           </div>
         </div>
 
@@ -76,21 +87,37 @@ export default function ProfileSidebar({ roles }: { roles: RoleTag[] }) {
           <div className="space-y-2">
             <SectionTitle icon={<BadgeCheck className="h-4 w-4" />} title="關於我" />
             <div className="rounded-xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.04)] p-3 text-sm leading-relaxed text-[rgb(var(--muted))]">
-               我可能正在思考人生，又或許只是想找點事做。
+               Coding helps me survive, music makes me feel alive.
             </div>
           </div>
 
           <div className="space-y-2">
             <SectionTitle icon={<Pin className="h-4 w-4" />} title="身分組" />
-            <div className="flex flex-wrap gap-2">
-              {roles.map((r) => (
-                <span
-                  key={r.label}
-                  className="inline-flex items-center gap-2 rounded-full border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.035)] px-3 py-1.5 text-xs"
+            <div className="grid gap-2">
+              {roleGroups.map((group) => (
+                <div
+                  key={group.color}
+                  className="flex gap-3 rounded-xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.03)] p-3"
                 >
-                  <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: r.color }} />
-                  <span className="text-[rgb(var(--text))]">{r.label}</span>
-                </span>
+                  <span
+                    className="mt-1 h-auto min-h-8 w-1 shrink-0 rounded-full opacity-90"
+                    style={{ backgroundColor: group.color }}
+                  />
+                  <div className="flex min-w-0 flex-1 flex-wrap gap-1.5">
+                    {group.items.map((role) => (
+                      <span
+                        key={role.label}
+                        className="inline-flex max-w-full items-center gap-2 rounded-lg border border-[rgb(var(--line)/0.08)] bg-[rgb(var(--panel)/0.52)] px-2.5 py-1.5 text-xs font-medium text-[rgb(var(--text))]"
+                      >
+                        <span
+                          className="h-2 w-2 shrink-0 rounded-full"
+                          style={{ backgroundColor: role.color }}
+                        />
+                        <span className="truncate">{role.label}</span>
+                      </span>
+                    ))}
+                  </div>
+                </div>
               ))}
             </div>
           </div>

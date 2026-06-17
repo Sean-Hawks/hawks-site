@@ -6,10 +6,20 @@ import { getAllLibraryItems } from "../lib/library";
 import { buildSearchIndex } from "../lib/search";
 import { getAllSiteTags } from "../lib/site-tags";
 import SearchClient from "./SearchClient";
+import type { Metadata } from "next";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Search",
   description: "搜尋 Hawks 的文章、Talk、Library 與標籤。",
+  alternates: {
+    canonical: "https://hawks.tw/search/",
+  },
+  openGraph: {
+    title: "Search",
+    description: "搜尋 Hawks 的文章、Talk、Library 與標籤。",
+    url: "https://hawks.tw/search/",
+    images: ["/og/default.png"],
+  },
 };
 
 export default function SearchPage() {

@@ -4,6 +4,21 @@ import { getSortedTalksData } from "../lib/talks";
 import ThemeStyles from "../components/ThemeStyles";
 import Header from "../components/Header";
 import MarkdownContent from "../components/MarkdownContent";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Talk Archive",
+  description: "Hawks 的分享、演講、教學記錄和短篇近況存檔。",
+  alternates: {
+    canonical: "https://hawks.tw/talk/",
+  },
+  openGraph: {
+    title: "Talk Archive",
+    description: "Hawks 的分享、演講、教學記錄和短篇近況存檔。",
+    url: "https://hawks.tw/talk/",
+    images: ["/og/default.png"],
+  },
+};
 
 export default function TalkPage() {
   const talks = getSortedTalksData();

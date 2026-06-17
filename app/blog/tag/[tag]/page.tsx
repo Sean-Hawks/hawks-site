@@ -19,10 +19,22 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { tag } = await params;
   const tagInfo = getSiteTagBySlug(tag);
+  const title = tagInfo ? `${tagInfo.tag} 內容索引` : "Tag 未找到";
+  const description = tagInfo ? `所有標籤為 ${tagInfo.tag} 的內容，包含 Blog 和 Library。` : "Hawks tag index";
+  const url = `https://hawks.tw/blog/tag/${tag}/`;
 
   return {
-    title: tagInfo ? `${tagInfo.tag} 內容索引` : "Tag 未找到",
-    description: tagInfo ? `所有標籤為 ${tagInfo.tag} 的內容。` : "Hawks tag index",
+    title,
+    description,
+    alternates: {
+      canonical: url,
+    },
+    openGraph: {
+      title,
+      description,
+      url,
+      images: ["/og/default.png"],
+    },
   };
 }
 

@@ -1,46 +1,106 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
+const siteUrl = "https://hawks.tw";
+const siteTitle = "hawks.tw";
+const siteDescription =
+  "Hawks 的個人網站，收集 Blog、Talk、Library、Project，以及一些關於程式、音樂、ACGM 和生活的筆記。";
+const defaultImage = "/og/default.png";
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://hawks.tw"),
+  metadataBase: new URL(siteUrl),
   title: {
-    default: "hawks.tw",
+    default: siteTitle,
     template: "%s | hawks.tw",
   },
-  description: "Hawks' Blog",
+  description: siteDescription,
+  applicationName: siteTitle,
+  authors: [{ name: "Hawks", url: siteUrl }],
+  creator: "Hawks",
+  publisher: "Hawks",
+  keywords: [
+    "Hawks",
+    "hawks.tw",
+    "Blog",
+    "Programming",
+    "Music",
+    "ACGM",
+    "Library",
+    "Personal Website",
+  ],
+  category: "personal website",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
   openGraph: {
     type: "website",
-    url: "https://hawks.tw",
-    title: "hawks.tw",
-    description: "Hawks 的個人網站與部落格",
-    siteName: "hawks.tw",
+    locale: "zh_TW",
+    url: siteUrl,
+    title: siteTitle,
+    description: siteDescription,
+    siteName: siteTitle,
     images: [
       {
-        url: "/og/default.png",
+        url: defaultImage,
         width: 1200,
         height: 630,
-        alt: "Hawks",
+        alt: siteTitle,
       },
     ],
   },
   twitter: {
-    card: "summary",
-    title: "hawks.tw",
-    description: "Hawks 的個人網站與部落格",
-    images: ["/og/default.png"],
+    card: "summary_large_image",
+    title: siteTitle,
+    description: siteDescription,
+    images: [defaultImage],
   },
   alternates: {
-    canonical: "https://hawks.tw",
+    canonical: siteUrl,
     types: {
       "application/rss+xml": "/rss.xml",
     },
   },
   icons: {
-    icon: "/avatar.jpg",
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/avatar.jpg", type: "image/png" },
+    ],
     shortcut: "/avatar.jpg",
     apple: "/avatar.jpg",
   },
 };
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: siteTitle,
+    url: siteUrl,
+    inLanguage: "zh-TW",
+    description: siteDescription,
+    publisher: {
+      "@type": "Person",
+      name: "Hawks",
+      url: siteUrl,
+    },
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: "Hawks",
+    url: siteUrl,
+    sameAs: ["https://github.com/Sean-Hawks"],
+  },
+];
+
 export default function RootLayout({
   children,
 }: {
@@ -59,6 +119,12 @@ export default function RootLayout({
                 document.documentElement.dataset.theme = "dark";
               }
             `,
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(structuredData),
           }}
         />
       </head>

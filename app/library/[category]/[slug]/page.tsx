@@ -10,7 +10,7 @@ import {
   getLibraryCategory,
   getLibraryItemBySlug,
 } from "../../../lib/library";
-import { stripMarkdown } from "../../../lib/content";
+import { excerpt, stripMarkdown } from "../../../lib/content";
 import type { Metadata } from "next";
 
 type PageProps = { params: Promise<{ category: string; slug: string }> };
@@ -35,18 +35,37 @@ export async function generateMetadata({
     };
   }
 
+  const title = `評論：${item.title}`;
+  const description = item.note || excerpt(item.content, 150);
+  const url = `https://hawks.tw/library/${item.category}/${item.slug}/`;
+
   return {
-    title: `評論：${item.title}`,
-    description: item.note,
+    title,
+    description,
+    keywords: item.tags,
+    alternates: {
+      canonical: url,
+    },
     openGraph: {
-      title: `評論：${item.title}`,
-      description: item.note,
+      type: "article",
+      title,
+      description,
+      url,
+      siteName: "hawks.tw",
+      publishedTime: item.date,
+      tags: item.tags,
       images: [
         {
           url: item.image.src,
           alt: item.image.alt,
         },
       ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [item.image.src],
     },
   };
 }

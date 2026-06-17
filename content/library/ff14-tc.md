@@ -2,9 +2,9 @@
 title: FF14 繁中版
 subtitle: Final Fantasy XIV
 category: game
-date: "2026-06-16"
+date: 2026-06-16
 status: played
-rating: 8.5
+rating: 8.6
 tags:
   - final fantasy
   - mmorpg
