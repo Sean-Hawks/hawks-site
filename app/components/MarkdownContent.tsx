@@ -111,7 +111,7 @@ export default function MarkdownContent({
       </h1>
     ),
     h2: ({ children, ...props }) => (
-      <h2 id={headingId(textFromChildren(children))} className="scroll-mt-24 text-2xl sm:text-3xl font-bold mt-10 mb-4 text-[rgb(var(--text))] tracking-tight" {...props}>
+      <h2 id={headingId(textFromChildren(children))} className="scroll-mt-24 border-l-4 border-[rgb(var(--accent))] pl-4 text-2xl sm:text-3xl font-bold mt-12 mb-5 text-[rgb(var(--text))] tracking-tight" {...props}>
         {children}
       </h2>
     ),
@@ -132,7 +132,7 @@ export default function MarkdownContent({
         ? "my-0 text-base leading-8 text-[rgb(var(--text))] sm:text-lg sm:leading-9"
         : isTalk
           ? "my-6 text-base leading-8 text-[rgb(var(--muted))] sm:text-[1.05rem] sm:leading-9"
-          : "my-5 leading-8 text-[rgb(var(--muted))] text-base sm:text-lg tracking-wide";
+          : "my-5 leading-8 text-[rgb(var(--text)/0.84)] text-base sm:text-[1.05rem]";
 
       return <div className={paragraphClass} {...props} />;
     },
@@ -187,21 +187,31 @@ export default function MarkdownContent({
       );
     },
 
-    img: (props) => (
-      <div className="relative my-10 group">
-        <div className="absolute -inset-1 rounded-xl bg-gradient-to-r from-[rgb(var(--accent))] to-purple-600 opacity-0 group-hover:opacity-20 blur transition duration-500"></div>
-        <img
-          className="relative rounded-xl border border-[rgb(var(--line)/0.12)] w-full h-auto object-cover shadow-2xl transition-transform duration-300 group-hover:scale-[1.01]"
-          alt={props.alt ?? ""}
-          {...props}
-        />
-        {props.alt && (
-          <div className="mt-3 text-center text-sm text-[rgb(var(--muted))] opacity-70">
-            {props.alt}
-          </div>
-        )}
-      </div>
-    ),
+    img: ({ title, alt, ...props }) => {
+      const imageTitle = typeof title === "string" ? title : "";
+      const size = /(?:^|\s)size=(small|medium|wide)(?:\s|$)/.exec(imageTitle)?.[1];
+      const widthClass =
+        size === "small"
+          ? "max-w-[560px]"
+          : size === "wide"
+            ? "max-w-none"
+            : "max-w-[760px]";
+
+      return (
+        <figure className={["my-10 mx-auto", widthClass].join(" ")}>
+          <img
+            className="rounded-xl border border-[rgb(var(--line)/0.12)] w-full h-auto object-contain shadow-lg"
+            alt={alt ?? ""}
+            {...props}
+          />
+          {alt && (
+            <figcaption className="mt-3 text-center text-sm text-[rgb(var(--muted))] opacity-70">
+              {alt}
+            </figcaption>
+          )}
+        </figure>
+      );
+    },
 
     table: (props) => (
       <div className="overflow-x-auto my-6">

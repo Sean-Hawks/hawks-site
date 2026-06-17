@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, Mic2 } from "lucide-react";
+import { ArrowLeft, FileText, Mic2 } from "lucide-react";
 import { getSortedPostsData, getPostBySlug, tagToSlug } from "../../lib/posts";
 import { getSortedTalksData } from "../../lib/talks";
 import ThemeStyles from "../../components/ThemeStyles";
@@ -146,8 +146,8 @@ export default async function PostPage({ params }: PageProps) {
               <span>回到列表</span>
             </Link>
 
-            <article className="overflow-hidden rounded-2xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.88)] shadow-[0_22px_70px_rgba(90,76,55,0.12)]">
-              <div className="border-b border-[rgb(var(--line)/0.08)] bg-[rgb(var(--panel2)/0.58)] p-6 sm:p-10">
+            <article className="overflow-hidden rounded-2xl border border-[rgb(var(--accent)/0.16)] bg-[rgb(var(--panel)/0.90)] shadow-[0_24px_80px_rgba(90,76,55,0.16)]">
+              <div className="border-b border-[rgb(var(--accent)/0.12)] bg-gradient-to-br from-[rgb(var(--panel2)/0.92)] via-[rgb(var(--panel)/0.72)] to-[rgb(var(--accent)/0.06)] p-6 sm:p-10">
                 {post.banner && (
                   <div className="-mx-6 -mt-6 mb-8 sm:-mx-10 sm:-mt-10 border-b border-[rgb(var(--line)/0.10)]">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -158,6 +158,11 @@ export default async function PostPage({ params }: PageProps) {
                     />
                   </div>
                 )}
+
+                <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[rgb(var(--accent)/0.24)] bg-[rgb(var(--accent)/0.12)] px-3 py-1.5 text-xs font-bold uppercase tracking-[0.18em] text-[rgb(var(--accent))]">
+                  <FileText className="h-3.5 w-3.5" />
+                  Blog
+                </div>
 
                 <div className="flex flex-wrap gap-2 mb-4">
                   {post.tags.map((tag) => (
@@ -184,7 +189,9 @@ export default async function PostPage({ params }: PageProps) {
               </div>
 
               <div className="p-6 sm:p-10">
-                <MarkdownContent content={post.content} />
+                <div className="mx-auto max-w-[760px]">
+                  <MarkdownContent content={post.content} />
+                </div>
               </div>
             </article>
 

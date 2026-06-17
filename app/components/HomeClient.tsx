@@ -106,9 +106,9 @@ export default function HomeClient({ posts, talks, libraryItems }: HomeClientPro
             </Link>
             <Link
               href="/now"
-              className="group flex items-center gap-4 rounded-2xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.78)] p-5 shadow-[0_18px_60px_rgb(var(--line)/0.06)] transition-colors hover:border-[rgb(var(--accent)/0.28)] hover:bg-[rgb(var(--panel))]"
+              className="group flex items-center gap-4 rounded-2xl border border-[rgb(var(--accent)/0.16)] bg-[rgb(var(--panel)/0.82)] p-5 shadow-[0_18px_60px_rgba(90,76,55,0.10)] transition-colors hover:border-[rgb(var(--accent)/0.30)] hover:bg-[rgb(var(--panel))]"
             >
-              <div className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.04)] text-[rgb(var(--accent))]">
+              <div className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-xl border border-[rgb(var(--accent)/0.20)] bg-[rgb(var(--accent)/0.09)] text-[rgb(var(--accent))]">
                 <NotebookText className="h-5 w-5" />
               </div>
               <div>
@@ -168,10 +168,13 @@ export default function HomeClient({ posts, talks, libraryItems }: HomeClientPro
               <Link
                 key={talk.id}
                 href={`/talk/${talk.id}`}
-                className="group block rounded-2xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.82)] p-5 shadow-[0_18px_60px_rgba(90,76,55,0.07)] transition-colors hover:border-[rgb(var(--accent)/0.28)] hover:bg-[rgb(var(--panel))]"
+                className="group block rounded-2xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.86)] p-5 shadow-[0_18px_60px_rgba(90,76,55,0.08)] transition-colors hover:border-[rgb(var(--accent)/0.30)] hover:bg-[rgb(var(--panel))]"
               >
                 <div className="mb-3 flex items-center gap-2 text-xs text-[rgb(var(--muted))]">
-                  <NotebookText className="h-3.5 w-3.5" />
+                  <span className="inline-flex items-center gap-1.5 rounded-md border border-[rgb(var(--accent)/0.16)] bg-[rgb(var(--accent)/0.08)] px-2 py-1 font-bold text-[rgb(var(--accent))]">
+                    <NotebookText className="h-3.5 w-3.5" />
+                    Now
+                  </span>
                   <time>{talk.date}</time>
                 </div>
                 <h3 className="text-lg font-bold leading-snug text-[rgb(var(--text))] transition-colors group-hover:text-[rgb(var(--accent))]">

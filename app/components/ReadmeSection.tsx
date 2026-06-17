@@ -96,7 +96,7 @@ export default function ReadmeSection({ posts, talks, libraryItems }: ReadmeSect
       <section className="border-t border-[rgb(var(--line)/0.08)] pt-5">
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <div className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[rgb(var(--muted))]">
+            <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-[rgb(var(--accent)/0.22)] bg-[rgb(var(--accent)/0.10)] px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-[rgb(var(--accent))]">
               <Radio className="h-3.5 w-3.5 text-[rgb(var(--accent))]" />
               Activity
             </div>
@@ -106,13 +106,13 @@ export default function ReadmeSection({ posts, talks, libraryItems }: ReadmeSect
           </div>
           <Link
             href="/now"
-            className="inline-flex items-center text-sm font-medium text-[rgb(var(--muted))] transition-colors hover:text-[rgb(var(--accent))]"
+            className="inline-flex items-center rounded-lg border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.035)] px-3 py-2 text-sm font-medium text-[rgb(var(--muted))] transition-colors hover:border-[rgb(var(--accent)/0.22)] hover:text-[rgb(var(--accent))]"
           >
             View all
           </Link>
         </div>
 
-        <div className="relative space-y-2 before:absolute before:left-[0.45rem] before:top-3 before:h-[calc(100%-1.5rem)] before:w-px before:bg-[rgb(var(--line)/0.10)]">
+        <div className="relative space-y-2 before:absolute before:left-[0.45rem] before:top-3 before:h-[calc(100%-1.5rem)] before:w-px before:bg-[rgb(var(--accent)/0.22)]">
           {activityItems.map((item) => {
             const Icon = item.icon;
             const visibleTags = item.tags.slice(0, 3);
@@ -122,16 +122,18 @@ export default function ReadmeSection({ posts, talks, libraryItems }: ReadmeSect
               <Link
                 key={item.key}
                 href={item.url}
-                className="group relative grid grid-cols-[1.1rem_minmax(0,1fr)] gap-3 rounded-xl px-1 py-2.5 transition-colors hover:bg-[rgb(var(--line)/0.045)]"
+                className="group relative grid grid-cols-[1.1rem_minmax(0,1fr)] gap-3 rounded-xl px-1 py-2.5 transition-colors hover:bg-[rgb(var(--accent)/0.035)]"
               >
-                <div className="relative z-10 mt-1 grid h-4 w-4 place-items-center rounded-full border border-[rgb(var(--line)/0.14)] bg-[rgb(var(--panel))]">
+                <div className="relative z-10 mt-1 grid h-4 w-4 place-items-center rounded-full border border-[rgb(var(--accent)/0.34)] bg-[rgb(var(--panel))] shadow-[0_0_0_4px_rgb(var(--accent)/0.06)]">
                   <span className="h-1.5 w-1.5 rounded-full bg-[rgb(var(--accent))]" />
                 </div>
 
-                <div className="rounded-xl border border-[rgb(var(--line)/0.08)] bg-[rgb(var(--line)/0.025)] p-4 transition-colors group-hover:border-[rgb(var(--accent)/0.24)] group-hover:bg-[rgb(var(--line)/0.045)]">
+                <div className="rounded-xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel2)/0.34)] p-4 shadow-[0_12px_36px_rgba(90,76,55,0.08)] transition-colors group-hover:border-[rgb(var(--accent)/0.28)] group-hover:bg-[rgb(var(--panel2)/0.50)]">
                   <div className="mb-2 flex flex-wrap items-center gap-2 text-[10px] uppercase tracking-[0.08em] text-[rgb(var(--muted))]">
-                    <Icon className="h-3 w-3" />
-                    <span>{item.type}</span>
+                    <span className="inline-flex items-center gap-1.5 rounded-md border border-[rgb(var(--accent)/0.18)] bg-[rgb(var(--accent)/0.08)] px-2 py-1 font-bold text-[rgb(var(--accent))]">
+                      <Icon className="h-3 w-3" />
+                      {item.type}
+                    </span>
                     <span className="opacity-40">/</span>
                     <time>{item.date}</time>
                   </div>
