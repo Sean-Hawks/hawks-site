@@ -11,6 +11,34 @@ function isPublicStatus(value: unknown) {
   return status !== 'draft' && status !== 'private';
 }
 
+function normalizeTag(tag: unknown) {
+  if (typeof tag !== 'string') return '';
+  const value = tag.trim().replace(/^#+/, '');
+  return value ? `#${value}` : '';
+}
+
+function normalizeTags(value: unknown) {
+  if (!Array.isArray(value)) return [];
+  return value.map(normalizeTag).filter(Boolean);
+}
+
+function extractSubtitleDirective(content: string) {
+  const subtitlePattern = /(^|\n):::\s*subtitle\s*\n([\s\S]*?)\n:::\s*(?=\n|$)/;
+  const match = content.match(subtitlePattern);
+
+  if (!match) {
+    return { subtitle: '', content };
+  }
+
+  const before = content.slice(0, match.index);
+  const after = content.slice((match.index ?? 0) + match[0].length);
+
+  return {
+    subtitle: match[2].trim(),
+    content: `${before}${match[1] ?? ''}${after}`.replace(/^\n+/, '').trimStart(),
+  };
+}
+
 export function getSortedTalksData(): Talk[] {
   // 如果資料夾不存在，回傳空陣列
   if (!fs.existsSync(talksDirectory)) {
@@ -28,6 +56,7 @@ export function getSortedTalksData(): Talk[] {
 
     // 使用 gray-matter 解析 metadata
     const { data, content } = matter(fileContents);
+    const { subtitle, content: bodyContent } = extractSubtitleDirective(content);
 
     // 處理 Obsidian 格式的 banner 圖片連結
     let banner = data.banner;
@@ -69,9 +98,11 @@ export function getSortedTalksData(): Talk[] {
 
     return {
       id,
-      desc: content, // 內文作為描述
+      desc: bodyContent, // 內文作為描述
+      subtitle,
       year: dateStr ? dateStr.split('-')[0] : 'Unknown', // 自動從日期提取年份
       ...(data as Omit<Talk, 'id' | 'desc' | 'year' | 'date'>),
+      tags: normalizeTags(data.tags),
       date: dateStr,
       banner,
     };

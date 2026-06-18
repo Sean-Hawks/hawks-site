@@ -18,6 +18,24 @@ function displayTag(tag: string) {
   return value ? `#${value}` : "";
 }
 
+function compactSearchTerm(value: string) {
+  return stripMarkdown(value)
+    .toLowerCase()
+    .replace(/\s+/g, "");
+}
+
+function compactHyphenatedTerms(value: string) {
+  return Array.from(value.matchAll(/[#\p{L}\p{N}]+(?:-[#\p{L}\p{N}]+)+/gu))
+    .map((match) => compactSearchTerm(match[0].replace(/^#+/, "")))
+    .filter(Boolean)
+    .join(" ");
+}
+
+function searchHaystack(parts: Array<string | number | null | undefined>) {
+  const raw = parts.filter((part) => part !== null && part !== undefined).join(" ");
+  return `${stripMarkdown(raw).toLowerCase()} ${compactHyphenatedTerms(raw)}`;
+}
+
 export function buildSearchIndex(
   posts: Post[],
   talks: Talk[],
@@ -33,7 +51,7 @@ export function buildSearchIndex(
       date: post.date,
       href: `/blog/${post.slug}`,
       tags: post.tags,
-      haystack: stripMarkdown(`${post.title} ${desc} ${post.tags.join(" ")} ${post.content ?? ""}`).toLowerCase(),
+      haystack: searchHaystack([post.title, desc, post.tags.join(" "), post.content ?? ""]),
     };
   });
 
@@ -48,7 +66,7 @@ export function buildSearchIndex(
       date: talk.date,
       href: `/talk/${talk.id}`,
       tags,
-      haystack: stripMarkdown(`${talk.title} ${desc} ${tags.join(" ")} ${talk.desc}`).toLowerCase(),
+      haystack: searchHaystack([talk.title, desc, tags.join(" "), talk.desc]),
     };
   });
 
@@ -64,22 +82,20 @@ export function buildSearchIndex(
       date: item.date,
       href: hasDetail ? `/library/${item.category}/${item.slug}` : `/library/${item.category}`,
       tags,
-      haystack: stripMarkdown(
-        [
-          item.title,
-          item.subtitle,
-          item.category,
-          item.year,
-          item.status,
-          item.recommendation,
-          item.rating === null ? "n/a unrated" : item.rating?.toString() ?? "",
-          desc,
-          item.tags.join(" "),
-          item.recommendedWorks.map((work) => work.title).join(" "),
-          tags.join(" "),
-          item.content ?? "",
-        ].join(" ")
-      ).toLowerCase(),
+      haystack: searchHaystack([
+        item.title,
+        item.subtitle,
+        item.category,
+        item.year,
+        item.status,
+        item.recommendation,
+        item.rating === null ? "n/a unrated" : item.rating?.toString() ?? "",
+        desc,
+        item.tags.join(" "),
+        item.recommendedWorks.map((work) => work.title).join(" "),
+        tags.join(" "),
+        item.content ?? "",
+      ]),
     };
   });
 

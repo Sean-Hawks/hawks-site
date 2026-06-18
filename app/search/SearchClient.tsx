@@ -5,8 +5,15 @@ import Link from "next/link";
 import { ArrowRight, Search, X } from "lucide-react";
 import { SearchItem } from "../lib/search";
 import type { SiteTag } from "../lib/site-tags";
+import { stripMarkdown } from "../lib/content";
 
 type SearchType = "all" | SearchItem["type"];
+
+function searchTerm(value: string) {
+  return stripMarkdown(value)
+    .toLowerCase()
+    .replace(/\s+/g, "");
+}
 
 function tagSlug(value: string) {
   return value
@@ -34,9 +41,8 @@ export default function SearchClient({
   const filteredItems = React.useMemo(() => {
     const terms = query
       .trim()
-      .toLowerCase()
       .split(/\s+/)
-      .map((term) => term.replace(/^#+/, ""))
+      .map((term) => searchTerm(term.replace(/^#+/, "")))
       .filter(Boolean);
 
     return items

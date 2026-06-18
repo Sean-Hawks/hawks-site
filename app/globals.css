@@ -145,3 +145,65 @@ html {
 .admonition > *:last-child {
   margin-bottom: 0;
 }
+
+.talk-prose {
+  counter-reset: talk-section;
+}
+
+.talk-article-shell {
+  background-color: rgba(24, 26, 32, 0.88);
+  border-color: rgba(251, 191, 36, 0.16);
+}
+
+.talk-article-header {
+  background-color: rgba(30, 33, 40, 0.42);
+  background-image: linear-gradient(135deg, rgba(30, 33, 40, 0.92), rgba(24, 26, 32, 0.72), rgba(251, 191, 36, 0.06));
+}
+
+:root[data-theme="light"] .talk-article-shell {
+  background-color: rgba(255, 253, 248, 0.9);
+  border-color: rgba(180, 119, 22, 0.18);
+}
+
+:root[data-theme="light"] .talk-article-header {
+  background-color: rgba(246, 241, 231, 0.7);
+  background-image: linear-gradient(135deg, rgba(246, 241, 231, 0.92), rgba(255, 253, 248, 0.72), rgba(180, 119, 22, 0.08));
+}
+
+.talk-section-block {
+  margin: 2.75rem 0;
+  padding: 1.25rem 1rem 1.35rem;
+  border: 1px solid rgb(var(--line) / 0.1);
+  border-radius: 1rem;
+  background:
+    linear-gradient(135deg, rgb(var(--line) / 0.035), transparent 12rem),
+    rgb(var(--panel) / 0.18);
+}
+
+.talk-section-block > .talk-section-heading {
+  margin-top: 0;
+}
+
+.talk-section-block > :last-child {
+  margin-bottom: 0;
+}
+
+.talk-section-heading {
+  counter-increment: talk-section;
+}
+
+.talk-section-heading::before {
+  content: counter(talk-section, decimal-leading-zero);
+  color: rgb(var(--accent));
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+@media (min-width: 640px) {
+  .talk-section-block {
+    margin: 3rem 0;
+    padding: 1.5rem 1.35rem 1.6rem;
+  }
+}

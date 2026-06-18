@@ -25,6 +25,8 @@ export interface Talk {
   event?: string;  // 改為選填
   status?: string;
   desc: string;    // 對應 Markdown 的內文
+  subtitle?: string;
+  tags?: string[];
   slides?: string;
   video?: string;
   banner?: string; // 新增：Talk 封面圖片路徑

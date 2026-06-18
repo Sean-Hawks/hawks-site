@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, ArrowUpRight, Calendar, FileText, Presentation, Rss, Video } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, FileText, Presentation, Rss, Video } from "lucide-react";
 import { getSortedTalksData } from "../../lib/talks";
 import { getSortedPostsData } from "../../lib/posts";
 import ThemeStyles from "../../components/ThemeStyles";
@@ -17,35 +17,12 @@ export async function generateStaticParams() {
 
 type PageProps = { params: Promise<{ slug: string }> };
 
-function splitTalkContent(content = "") {
-  const trimmed = content.trim();
-  if (!trimmed) return { lead: "", body: "" };
-
-  const blocks = trimmed.split(/\n{2,}/).map((block) => block.trim()).filter(Boolean);
-  const firstBlock = blocks[0] ?? "";
-  const canUseLead =
-    blocks.length > 1 &&
-    !firstBlock.startsWith("#") &&
-    !firstBlock.startsWith("!") &&
-    !firstBlock.startsWith("```") &&
-    firstBlock.length >= 20 &&
-    firstBlock.length <= 220;
-
-  if (!canUseLead) {
-    return { lead: "", body: trimmed };
-  }
-
-  return {
-    lead: firstBlock,
-    body: blocks.slice(1).join("\n\n"),
-  };
-}
-
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const talk = getSortedTalksData().find((t) => t.id === slug);
   const title = talk ? `${talk.title} | Hawks Talks` : "Talk 未找到 | Hawks";
-  const description = talk?.desc ? talk.desc.replace(/\s+/g, " ").slice(0, 150) : "Hawks 的分享與紀錄";
+  const descriptionSource = talk?.subtitle || talk?.desc;
+  const description = descriptionSource ? descriptionSource.replace(/\s+/g, " ").slice(0, 150) : "Hawks 的分享與紀錄";
   const url = talk ? `https://hawks.tw/talk/${talk.id}/` : "https://hawks.tw/talk/";
   const image = talk?.ogImage || (talk ? `/og/talk-${talk.id}.png` : "/og/default.png");
 
@@ -89,7 +66,6 @@ export default async function TalkDetailPage({ params }: PageProps) {
   const talk = talks.find((t) => t.id === slug);
   const content = talk?.desc;
   const relatedPosts = talk ? getRelatedPostsForTalk(talk, posts) : [];
-  const { lead, body } = splitTalkContent(content);
 
   if (!talk) {
     return (
@@ -112,85 +88,98 @@ export default async function TalkDetailPage({ params }: PageProps) {
       <ThemeStyles />
       <Header />
 
-      <div className="w-full px-4 sm:px-3">
-        <main className="max-w-4xl mx-auto py-8">
+      <div className="w-full px-4 sm:px-6">
+        <main className="mx-auto max-w-[900px] py-10 sm:py-16">
           <Link 
             href="/talk"
-            className="group inline-flex items-center gap-2 text-sm text-[rgb(var(--muted))] hover:text-[rgb(var(--accent))] transition-colors mb-6"
+            className="group mb-10 inline-flex items-center gap-2 text-sm text-[rgb(var(--muted))] transition-colors hover:text-[rgb(var(--accent))]"
           >
-            <div className="grid h-8 w-8 place-items-center rounded-lg border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.04)] group-hover:bg-[rgb(var(--accent)/0.10)] transition-colors">
-                <ArrowLeft className="h-4 w-4" />
+            <div className="grid h-8 w-8 place-items-center rounded-full border border-[rgb(var(--line)/0.12)] bg-[rgb(var(--line)/0.035)] transition-colors group-hover:border-[rgb(var(--accent)/0.32)] group-hover:bg-[rgb(var(--accent)/0.08)]">
+              <ArrowLeft className="h-4 w-4" />
             </div>
             <span>回到 Talk Archive</span>
           </Link>
 
-          <article className="overflow-hidden rounded-2xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.88)] shadow-[0_22px_70px_rgba(90,76,55,0.12)]">
-            <div className="border-b border-[rgb(var(--line)/0.08)] bg-[rgb(var(--panel2)/0.58)] p-6 sm:p-10">
-                {talk.banner && (
-                  <div className="-mx-6 -mt-6 mb-8 sm:-mx-10 sm:-mt-10 border-b border-[rgb(var(--line)/0.10)]">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={talk.banner}
-                      alt={talk.title}
-                      className="w-full h-auto max-h-[500px] object-cover"
-                    />
-                  </div>
-                )}
-                <div className="mb-4 flex flex-wrap items-center gap-3 text-sm text-[rgb(var(--muted))]">
-                  <span className="rounded-full border border-[rgb(var(--accent)/0.20)] bg-[rgb(var(--accent)/0.08)] px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-[rgb(var(--accent))]">
-                    Talk
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <Calendar className="h-4 w-4" />
-                    {talk.date}
-                  </span>
-                  {talk.event && (
-                    <span className="rounded bg-[rgb(var(--line)/0.06)] px-2.5 py-0.5 text-xs">
-                      {talk.event}
+          <article className="talk-article-shell overflow-hidden rounded-2xl border shadow-[0_24px_80px_rgba(90,76,55,0.16)]">
+            {talk.banner && (
+              <div className="overflow-hidden border-b border-[rgb(var(--line)/0.10)]">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={talk.banner}
+                  alt={talk.title}
+                  className="max-h-[500px] w-full object-cover"
+                />
+              </div>
+            )}
+
+            <header className="talk-article-header border-b border-[rgb(var(--line)/0.10)] p-6 sm:p-10">
+              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[rgb(var(--accent)/0.24)] bg-[rgb(var(--accent)/0.12)] px-3 py-1.5 text-xs font-bold uppercase tracking-[0.18em] text-[rgb(var(--accent))]">
+                <FileText className="h-3.5 w-3.5" />
+                Note
+              </div>
+
+              {talk.tags && talk.tags.length > 0 && (
+                <div className="mb-4 flex flex-wrap gap-2">
+                  {talk.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="rounded-md bg-[rgb(var(--accent)/0.10)] px-2.5 py-1 text-xs font-medium text-[rgb(var(--accent))]"
+                    >
+                      {tag}
                     </span>
-                  )}
+                  ))}
                 </div>
+              )}
 
-                <h1 className="text-3xl sm:text-4xl font-bold leading-tight text-[rgb(var(--text))]">
-                    {talk.title}
-                </h1>
+              <h1 className="text-3xl font-bold leading-tight text-[rgb(var(--text))] sm:text-4xl">
+                {talk.title}
+              </h1>
 
-                {lead && (
-                  <div className="mt-6 rounded-2xl border border-[rgb(var(--accent)/0.18)] bg-[rgb(var(--accent)/0.08)] p-5">
-                    <div className="mb-2 text-xs font-bold uppercase tracking-[0.16em] text-[rgb(var(--accent))]">
-                      Opening Note
-                    </div>
-                    <MarkdownContent content={lead} variant="talkLead" />
-                  </div>
+              <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-[rgb(var(--muted))]">
+                <time className="flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[rgb(var(--muted))] opacity-50" />
+                  {talk.date}
+                </time>
+                {talk.event && (
+                  <span>{talk.event}</span>
                 )}
+              </div>
 
-                <div className="mt-6 flex gap-3">
+              {talk.subtitle && (
+                <MarkdownContent
+                  content={talk.subtitle}
+                  variant="talk"
+                  className="mt-7 [&>div]:my-0 [&>div]:text-xl [&>div]:font-medium [&>div]:leading-10 [&>div]:text-[rgb(var(--text)/0.92)] sm:[&>div]:text-2xl sm:[&>div]:leading-[2.8rem]"
+                />
+              )}
+
+              {(talk.slides || talk.video) && (
+                <div className="mt-8 flex flex-wrap gap-3">
                   {talk.slides && (
-                    <a href={talk.slides} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-lg bg-[rgb(var(--accent))] px-4 py-2 text-sm font-bold text-[rgb(var(--accent-foreground))] hover:opacity-90 transition-opacity">
-                      <Presentation className="h-4 w-4" /> View Slides
+                    <a href={talk.slides} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full border border-[rgb(var(--accent)/0.26)] bg-[rgb(var(--accent)/0.10)] px-4 py-2 text-sm font-bold text-[rgb(var(--accent))] transition-colors hover:bg-[rgb(var(--accent)/0.15)]">
+                      <Presentation className="h-4 w-4" /> Slides
                     </a>
                   )}
                   {talk.video && (
-                    <a href={talk.video} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-lg border border-[rgb(var(--line)/0.12)] bg-[rgb(var(--line)/0.05)] px-4 py-2 text-sm font-medium text-[rgb(var(--text))] hover:bg-[rgb(var(--line)/0.08)] transition-colors">
-                      <Video className="h-4 w-4" /> Watch Video
+                    <a href={talk.video} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full border border-[rgb(var(--line)/0.14)] bg-[rgb(var(--line)/0.04)] px-4 py-2 text-sm font-bold text-[rgb(var(--text))] transition-colors hover:bg-[rgb(var(--line)/0.07)]">
+                      <Video className="h-4 w-4" /> Video
                     </a>
                   )}
                 </div>
-            </div>
+              )}
+            </header>
 
             <div className="p-6 sm:p-10">
-              <div className="mx-auto max-w-3xl">
-                <div className="mb-6 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[rgb(var(--muted))]">
-                  <span className="h-px w-8 bg-[rgb(var(--accent)/0.45)]" />
-                  Note
-                </div>
-                <MarkdownContent content={body || content} variant="talk" />
+              <div className="mb-6 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[rgb(var(--muted))]">
+                <span className="h-px w-8 bg-[rgb(var(--accent)/0.45)]" />
+                Note
               </div>
+              <MarkdownContent content={content} variant="talk" />
             </div>
           </article>
 
           {relatedPosts.length > 0 && (
-            <section className="mt-6 rounded-2xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.78)] p-5">
+            <section className="mt-14 border-t border-[rgb(var(--line)/0.10)] pt-7">
               <div className="mb-4 flex items-center gap-2">
                 <FileText className="h-4 w-4 text-[rgb(var(--accent))]" />
                 <h2 className="font-bold">Related Blog</h2>
@@ -211,10 +200,10 @@ export default async function TalkDetailPage({ params }: PageProps) {
             </section>
           )}
 
-          <section className="mt-6 grid gap-3 sm:grid-cols-2">
+          <section className="mt-10 grid gap-3 border-t border-[rgb(var(--line)/0.10)] pt-7 sm:grid-cols-2">
             <Link
               href="/talk"
-              className="group rounded-2xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.70)] p-5 transition-colors hover:border-[rgb(var(--accent)/0.24)] hover:bg-[rgb(var(--panel)/0.90)]"
+              className="group rounded-xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.025)] p-5 transition-colors hover:border-[rgb(var(--accent)/0.24)] hover:bg-[rgb(var(--line)/0.045)]"
             >
               <div className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[rgb(var(--muted))]">
                 <FileText className="h-3.5 w-3.5 text-[rgb(var(--accent))]" />
@@ -227,7 +216,7 @@ export default async function TalkDetailPage({ params }: PageProps) {
             </Link>
             <Link
               href="/subscribe"
-              className="group rounded-2xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.70)] p-5 transition-colors hover:border-[rgb(var(--accent)/0.24)] hover:bg-[rgb(var(--panel)/0.90)]"
+              className="group rounded-xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.025)] p-5 transition-colors hover:border-[rgb(var(--accent)/0.24)] hover:bg-[rgb(var(--line)/0.045)]"
             >
               <div className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[rgb(var(--muted))]">
                 <Rss className="h-3.5 w-3.5 text-[rgb(var(--accent))]" />
