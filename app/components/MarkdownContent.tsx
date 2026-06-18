@@ -73,7 +73,7 @@ export function headingId(value: string) {
     .replace(/^-+|-+$/g, "");
 }
 
-type MarkdownVariant = "default" | "talk" | "talkLead";
+type MarkdownVariant = "default" | "talk" | "talkLead" | "libraryReview";
 
 export default function MarkdownContent({
   content,
@@ -86,6 +86,7 @@ export default function MarkdownContent({
 }) {
   const isTalk = variant === "talk";
   const isTalkLead = variant === "talkLead";
+  const isLibraryReview = variant === "libraryReview";
 
   const components: Components = {
     pre: ({ node, className, children, ...props }: PreProps & { node?: unknown }) => {
@@ -132,7 +133,9 @@ export default function MarkdownContent({
         ? "my-0 text-base leading-8 text-[rgb(var(--text))] sm:text-lg sm:leading-9"
         : isTalk
           ? "my-6 text-base leading-8 text-[rgb(var(--muted))] sm:text-[1.05rem] sm:leading-9"
-          : "my-5 leading-8 text-[rgb(var(--text)/0.84)] text-base sm:text-[1.05rem]";
+          : isLibraryReview
+            ? "my-4 rounded-xl border border-[rgb(var(--line)/0.08)] bg-[rgb(var(--panel2)/0.34)] px-4 py-3 text-base leading-8 text-[rgb(var(--text)/0.92)] shadow-[0_10px_30px_rgba(90,76,55,0.06)] sm:px-5 sm:py-4 sm:text-[1.06rem]"
+            : "my-5 leading-8 text-[rgb(var(--text)/0.84)] text-base sm:text-[1.05rem]";
 
       return <div className={paragraphClass} {...props} />;
     },
@@ -232,6 +235,7 @@ export default function MarkdownContent({
         "max-w-none text-[rgb(var(--text))]",
         isTalk ? "talk-prose" : "",
         isTalkLead ? "talk-lead" : "",
+        isLibraryReview ? "library-review-prose" : "",
         className,
       ]
         .filter(Boolean)

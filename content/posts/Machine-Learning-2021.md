@@ -60,7 +60,7 @@ HW01 一開始我是透過 Google Colab 直接 call Github 上的作業抓下來
 
 再來是 HW02，透過題目上給的音訊做分類，共計每幀輸入 39 種音素類別。不過其實他的 input 是一直都是固定在加上前五幀和後五幀，所以總共是 39 * 11 = 429 個 Feature，本質上是一個分類問題，跟 HW01 的連續函數不太依樣。我最後因為發現 HW02 的範例 code 在 Google Colab 上面跑可以高達二十分鐘，所以決定回家研究一下怎麼從外面透過 Tailscale 直接連到內網透過我的 NVIDIA Geforce RTX 4070 Ti SUPER 做運算，很懶人的透過 Codex 幫我弄 VPN 和 WSL 的部分，所以過程中其實沒有那麼複雜。不過第一次真的實際用到自己的顯示卡開始有歸屬感？
 
-透過教授上課的內容大概有一些技術路線應該就可以過 Medium Baseline，實際上也沒有那麼難，預設的 Accrate 是 0.688，Simple Baseline 為 0.68，Strong Baseline 為 0.76。我一開始大概就決定要從加深網路 + 補上 Batch Normalization + 補上 Dropout + 使用 LR Scheduler 開始走起，也過的蠻順的加上這些和一點 Hyperparameter 的煉丹大概就可以到達 0.72，殊不知後面才是惡夢的開始，一直在 Overfitting 和 Underfitting 中徘徊，但發現怎麼通靈大概成績也只到 0.73，最後約經歷了兩三天才慢慢透過 Residual Network (殘差網路) 和 Ensemble 突破了 0.75，也就是達到了 Strong Baseline 含金量大概是前 5% 到 10%，不過也不知道那時候的台大生有多卷就是了，甚至用到的方法是老師上課根本沒有出現過的技巧，我真的不知道上課的方法真的有辦法過 Strong Baseline 嗎....
+透過教授上課的內容大概有一些技術路線應該就可以過 Medium Baseline，實際上也沒有那麼難，預設的 Accrate 是 0.688，Simple Baseline 為 0.68，Strong Baseline 為 0.76。我一開始大概就決定要從加深網路 + 補上 Batch Normalization + 補上 Dropout + 使用 LR Scheduler 開始走起，也過的蠻順的加上這些和一點 Hyperparameter 的煉丹大概就可以到達 0.72，殊不知後面才是惡夢的開始，一直在 Overfitting 和 Underfitting 中徘徊，但發現怎麼通靈大成績也只到 0.73，最後約經歷了兩三天才慢慢透過 Residual Network (殘差網路) 和 Ensemble 突破了 0.75，也就是達到了 Strong Baseline 含金量大概是前 5% 到 10%，不過也不知道那時候的台大生有多卷就是了，甚至用到的方法是老師上課根本沒有出現過的技巧，我真的不知道上課的方法真的有辦法過 Strong Baseline 嗎....
 
 [HW02 筆記](https://hackmd.io/@sean8321/HJ112YcZze)
 

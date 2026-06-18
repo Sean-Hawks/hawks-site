@@ -297,6 +297,7 @@ export default async function LibraryReviewPage({ params }: PageProps) {
                           ? "(min-width: 1024px) 360px, calc(100vw - 32px)"
                           : "(min-width: 1024px) 260px, calc(100vw - 32px)"
                       }
+                      priority
                       className={
                         item.image.fit === "contain" ? "object-contain object-center" : "object-cover"
                       }
@@ -385,7 +386,23 @@ export default async function LibraryReviewPage({ params }: PageProps) {
 
               <div className="space-y-8 p-6 sm:p-10">
                 {item.hasReview ? (
-                  <MarkdownContent content={item.content} />
+                  <section className="rounded-2xl border border-[rgb(var(--accent)/0.16)] bg-gradient-to-br from-[rgb(var(--panel2)/0.62)] via-[rgb(var(--panel)/0.58)] to-[rgb(var(--accent)/0.06)] p-5 shadow-[0_18px_56px_rgba(90,76,55,0.10)] sm:p-7">
+                    <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                      <div>
+                        <div className="inline-flex items-center gap-2 rounded-full border border-[rgb(var(--accent)/0.24)] bg-[rgb(var(--accent)/0.10)] px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-[rgb(var(--accent))]">
+                          <Sparkles className="h-3.5 w-3.5" />
+                          Review
+                        </div>
+                        <h2 className="mt-3 text-2xl font-bold leading-tight text-[rgb(var(--text))]">
+                          個人評論
+                        </h2>
+                      </div>
+                      <div className="text-xs text-[rgb(var(--muted))]">
+                        {item.title}
+                      </div>
+                    </div>
+                    <MarkdownContent content={item.content} variant="libraryReview" />
+                  </section>
                 ) : (
                   <div className="rounded-2xl border border-[rgb(var(--line)/0.08)] bg-[rgb(var(--line)/0.025)] p-5 text-sm leading-7 text-[rgb(var(--muted))]">
                     這個頁面目前先放基本資料與推薦作品，之後可以直接在 Obsidian 補上正文評論。
