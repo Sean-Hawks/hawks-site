@@ -30,7 +30,7 @@ export default function ReadmeSection({
       <section className="max-w-3xl">
         <div className="mb-2 text-sm text-[rgb(var(--muted))]">{`>_ $ whoami`}</div>
         <h1 className="text-3xl font-bold leading-tight sm:text-4xl">
-          Oh Hi, I&apos;m <span className="text-[rgb(var(--purple))]">Hawks</span> :D 👋
+          Oh Hi, I&apos;m <span className="text-[rgb(var(--purple))]">Hawks</span> :D 
         </h1>
         <p className="mt-3 max-w-2xl text-base leading-8 text-[rgb(var(--muted))]">
           學生、管樂人、半個寫 code 的人。這個網站現在最想做好的事，是把我喜歡的作品、
