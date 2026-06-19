@@ -147,7 +147,6 @@ export default function MarkdownContent({
             ]
               .filter(Boolean)
               .join(" ")}
-            {...props}
           >
             {children}
           </div>
@@ -249,7 +248,6 @@ export default function MarkdownContent({
               ]
                 .filter(Boolean)
                 .join(" ")}
-              {...props}
             >
               {children}
             </span>
