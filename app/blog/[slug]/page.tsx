@@ -190,7 +190,10 @@ export default async function PostPage({ params }: PageProps) {
 
               <div className="p-6 sm:p-10">
                 <div className="mx-auto max-w-[760px]">
-                  <MarkdownContent content={post.content} />
+                  <MarkdownContent
+                    content={post.content}
+                    assetBasePath={`/images/posts/${post.slug}`}
+                  />
                 </div>
               </div>
             </article>

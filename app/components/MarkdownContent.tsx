@@ -1,4 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
+import fs from "fs";
+import path from "path";
 import React from "react";
 import ReactMarkdown from "react-markdown";
 import type { Components } from "react-markdown";
@@ -123,17 +125,62 @@ export function headingId(value: string) {
 
 type MarkdownVariant = "default" | "talk" | "libraryReview";
 
+function encodeAssetPath(value: string) {
+  return value
+    .split("/")
+    .map((part) => encodeURIComponent(part))
+    .join("/");
+}
+
+function joinPublicPath(basePath: string, fileName: string) {
+  const cleanBase = basePath.replace(/\/+$/, "");
+  return `${cleanBase}/${encodeAssetPath(fileName)}`;
+}
+
+function publicAssetExists(publicPath: string) {
+  if (!publicPath.startsWith("/")) return false;
+  return fs.existsSync(path.join(process.cwd(), "public", publicPath));
+}
+
+function resolveObsidianAsset(fileName: string, assetBasePath?: string) {
+  const candidates = [
+    assetBasePath ? joinPublicPath(assetBasePath, fileName) : "",
+    joinPublicPath("/images", fileName),
+  ].filter(Boolean);
+
+  return candidates.find(publicAssetExists) ?? candidates[0] ?? fileName;
+}
+
+function transformObsidianEmbeds(content: string, assetBasePath?: string) {
+  return content.replace(/!\[\[([^\]]+)\]\]/g, (_match, rawValue: string) => {
+    const [rawFileName, rawLabel] = rawValue.split("|");
+    const fileName = rawFileName.trim();
+    if (!fileName) return _match;
+
+    const label = rawLabel?.trim();
+    const alt = label && !/^\d+(x\d+)?$/.test(label) ? label : fileName;
+    const src = resolveObsidianAsset(fileName, assetBasePath);
+
+    return `![${alt}](${src})`;
+  });
+}
+
 export default function MarkdownContent({
   content,
   variant = "default",
+  assetBasePath,
   className,
 }: {
   content?: string;
   variant?: MarkdownVariant;
+  assetBasePath?: string;
   className?: string;
 }) {
   const isTalk = variant === "talk";
   const isLibraryReview = variant === "libraryReview";
+  const transformedContent = content
+    ? transformObsidianEmbeds(content, assetBasePath)
+    : "";
 
   const components: Components = {
     pre: ({ node, className, children, ...props }: PreProps & { node?: unknown }) => {
@@ -329,7 +376,7 @@ export default function MarkdownContent({
         .filter(Boolean)
         .join(" ")}
     >
-      {content ? (
+      {transformedContent ? (
         <ReactMarkdown
           remarkPlugins={[
             remarkGfm,
@@ -339,7 +386,7 @@ export default function MarkdownContent({
           ]}
           components={components}
         >
-          {content}
+          {transformedContent}
         </ReactMarkdown>
       ) : (
         <div className="text-[rgb(var(--muted))]">內容待補充...</div>

@@ -19,7 +19,7 @@ status: published
 
 基本上就是[李宏毅教授在 2021 的機器學習課程](https://www.youtube.com/watch?v=Ye018rCVvOo&list=PLJV_el3uVTsMhtt7_Y6sgTHGHp1Vb2P2J)，包含系列影片以及在 Github 上的作業，以下是當初想要的進度，不過看完就會發現實際上根本沒辦法完整的把一個專案搞出來。
 
-![Machine Learning 2021 自主學習進度](/images/Pasted%20image%2020260618024046.png "size=small")
+![Machine Learning 2021 自主學習進度](/images/posts/machine-learning-2021/study-plan.png "size=small")
 
 ### 補充筆記
 
@@ -69,3 +69,9 @@ HW01 一開始我是透過 Google Colab 直接 call Github 上的作業抓下來
 老實說透過這一次的自主學習真的是有一個推力讓我有一隻腳趾頭碰到了 ML 的領域，也很慶幸很認真的做自主學習，雖然過程一波三折，但是認真覺得 Machine Learning 領域真的是一個水很深而且深人勿近的領域，不過對我來說真的有學到東西的感覺，很可惜的是 ML 比賽像是 AI CUP 大多數都是給大學生參加的，不知道有沒有什麼教授或老師看到這一篇文中希望可以有給高中生的比賽，不然特選幾乎只能靠資訊安全跟演算法真的不是每個人都想要走這兩個領域就是了。
 
 再來是下幾週會有自主學習的報告所以未完待續．．．．．
+
+### 照片紀錄
+
+![[ml-study-20260610.jpg|Machine Learning 2021 自主學習照片 2026-06-10]]
+
+![[ml-study-20260613.jpg|Machine Learning 2021 自主學習照片 2026-06-13]]
