@@ -6,6 +6,8 @@ year: "2024"
 date: "2026-06-16"
 status: watched
 rating: 9.4
+featured: true
+featuredOrder: 6
 tags:
   - historical
   - astronomy

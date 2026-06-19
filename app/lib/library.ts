@@ -87,6 +87,122 @@ function normalizeRecommendations(value: unknown) {
     .filter((item): item is LibraryRecommendedWork => Boolean(item));
 }
 
+function getYouTubeVideoId(link?: string) {
+  if (!link) return "";
+
+  try {
+    const url = new URL(link);
+    if (url.hostname === "youtu.be") {
+      return url.pathname.replace(/^\//, "");
+    }
+    if (url.hostname.endsWith("youtube.com")) {
+      return url.searchParams.get("v") ?? "";
+    }
+  } catch {
+    return "";
+  }
+
+  return "";
+}
+
+function withFallbackRecommendationImage(work: LibraryRecommendedWork) {
+  if (work.image) return work;
+
+  const videoId = getYouTubeVideoId(work.link);
+  if (!videoId) return work;
+
+  return {
+    ...work,
+    image: `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
+  };
+}
+
+function splitRecommendationSection(content: string) {
+  const lines = content.split(/\r?\n/);
+  const startIndex = lines.findIndex((line) =>
+    /^##\s+(推薦作品|Recommended Works|Recommendations)\s*$/i.test(line.trim())
+  );
+
+  if (startIndex < 0) {
+    return { body: content, recommendationBlock: "" };
+  }
+
+  let endIndex = lines.length;
+  for (let index = startIndex + 1; index < lines.length; index += 1) {
+    if (/^##\s+/.test(lines[index].trim())) {
+      endIndex = index;
+      break;
+    }
+  }
+
+  const body = [
+    ...lines.slice(0, startIndex),
+    ...lines.slice(endIndex),
+  ].join("\n").trim();
+  const recommendationBlock = lines.slice(startIndex + 1, endIndex).join("\n");
+
+  return { body, recommendationBlock };
+}
+
+function parseInlineRecommendation(line: string): LibraryRecommendedWork | null {
+  const value = line.replace(/^[-*]\s+/, "").trim();
+  if (!value) return null;
+
+  const linkMatch = /^\[([^\]]+)\]\(([^)]+)\)(.*)$/.exec(value);
+  if (linkMatch) {
+    const [, title, link, rest] = linkMatch;
+    const parts = rest
+      .replace(/^\s*[—–-]\s*/, "")
+      .split(/\s+[—–]\s+|\s*\|\s*/)
+      .map((part) => part.trim())
+      .filter(Boolean);
+    const image = parts.find((part) => part.startsWith("/images/"));
+    const textParts = parts.filter((part) => part !== image);
+
+    return {
+      title: title.trim(),
+      link: link.trim(),
+      source: textParts[0],
+      note: textParts[1],
+      image,
+    };
+  }
+
+  const parts = value
+    .split(/\s+[—–]\s+|\s*\|\s*/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+
+  const [title, source, linkOrNote, maybeNote] = parts;
+  if (!title) return null;
+
+  const image = parts.find((part) => part.startsWith("/images/"));
+  const link =
+    linkOrNote && /^https?:\/\//.test(linkOrNote) ? linkOrNote : undefined;
+  const noteCandidate = link ? maybeNote : linkOrNote;
+  const note = noteCandidate === image ? undefined : noteCandidate;
+
+  return {
+    title,
+    source,
+    link,
+    note,
+    image,
+  };
+}
+
+function parseMarkdownRecommendations(content: string) {
+  const { body, recommendationBlock } = splitRecommendationSection(content);
+  const recommendations = recommendationBlock
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => /^[-*]\s+/.test(line))
+    .map(parseInlineRecommendation)
+    .filter((item): item is LibraryRecommendedWork => Boolean(item));
+
+  return { body, recommendations };
+}
+
 function normalizeRating(value: unknown) {
   if (value === null || value === undefined) return null;
   if (typeof value === "string") {
@@ -99,6 +215,19 @@ function normalizeRating(value: unknown) {
   const rating = typeof value === "number" ? value : Number(value);
   if (Number.isNaN(rating)) return null;
   return Math.max(0, Math.min(10, rating));
+}
+
+function normalizeBoolean(value: unknown) {
+  if (typeof value === "boolean") return value;
+  if (typeof value === "string") {
+    return ["true", "yes", "1"].includes(value.trim().toLowerCase());
+  }
+  return false;
+}
+
+function normalizeFeaturedOrder(value: unknown) {
+  const order = typeof value === "number" ? value : Number(value);
+  return Number.isFinite(order) ? order : undefined;
 }
 
 function ratingValue(rating: number | null) {
@@ -166,11 +295,18 @@ function readLibraryItem(fileName: string): LibraryItem {
   const fullPath = path.join(libraryDirectory, fileName);
   const fileContents = fs.readFileSync(fullPath, "utf8");
   const { data, content } = matter(fileContents);
+  const parsedContent = parseMarkdownRecommendations(content);
   const title = normalizeString(data.title, fileSlug);
   const explicitSlug = normalizeString(data.slug);
   const slug = slugify(explicitSlug || fileSlug);
   const rating = normalizeRating(data.rating);
-  const hasReview = content.trim().length > 0;
+  const hasReview = parsedContent.body.trim().length > 0;
+  const frontmatterRecommendations = normalizeRecommendations(data.recommendations);
+  const recommendedWorks =
+    parsedContent.recommendations.length > 0
+      ? parsedContent.recommendations
+      : frontmatterRecommendations;
+  const recommendedWorksWithImages = recommendedWorks.map(withFallbackRecommendationImage);
 
   return {
     id: slug,
@@ -184,12 +320,14 @@ function readLibraryItem(fileName: string): LibraryItem {
     status: normalizeStatus(data.status),
     recommendation: recommendationFromRating(rating),
     rating,
+    featured: normalizeBoolean(data.featured),
+    featuredOrder: normalizeFeaturedOrder(data.featuredOrder),
     tags: normalizeTags(data.tags),
     note: normalizeString(data.note),
     link: normalizeString(data.link) || undefined,
-    recommendedWorks: normalizeRecommendations(data.recommendations),
+    recommendedWorks: recommendedWorksWithImages,
     image: normalizeImage(data.image, title),
-    content,
+    content: parsedContent.body,
     hasReview,
     statusVisibility: normalizeString(data.statusVisibility),
   };

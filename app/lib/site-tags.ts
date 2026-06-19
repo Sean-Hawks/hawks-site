@@ -1,5 +1,5 @@
 import type { Post } from "../types";
-import { getSortedPostsData, tagToSlug } from "./posts";
+import { getPostDescription, getSortedPostsData, tagToSlug } from "./posts";
 import { getAllLibraryItems } from "./library";
 import type { LibraryItem } from "../data/library";
 
@@ -52,14 +52,14 @@ function getTaggedItems(): TaggedSiteItem[] {
     label: "Blog" as const,
     href: `/blog/${post.slug}`,
     title: post.title,
-    desc: post.desc,
+    desc: getPostDescription(post),
     date: post.date,
     tags: post.tags.map(normalizeDisplayTag).filter(Boolean),
     source: post,
   }));
 
   const libraryItems = getAllLibraryItems().map((item) => {
-    const hasDetail = item.hasReview || item.category === "artist";
+    const hasDetail = item.hasReview || item.recommendedWorks.length > 0;
 
     return {
       id: `library-${item.slug}`,

@@ -5,6 +5,8 @@ category: artist
 date: "2026-06-16"
 status: listened
 rating: 9.2
+featured: true
+featuredOrder: 9
 tags:
   - composer
   - anime score

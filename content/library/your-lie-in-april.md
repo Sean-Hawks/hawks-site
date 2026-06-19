@@ -6,6 +6,8 @@ year: "2014"
 date: 2026-06-16
 status: watched
 rating: 9.1
+featured: true
+featuredOrder: 5
 tags:
   - music
   - romance

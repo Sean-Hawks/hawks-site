@@ -137,6 +137,8 @@ category: anime
 year: "2026"
 status: watched
 rating: 8.5
+featured: false
+featuredOrder:
 tags:
   - tag
 note: "一句話心得，會顯示在 Library 卡片上。"
@@ -159,6 +161,7 @@ Notes:
 - `recommendations` can be used on artist pages to list recommended songs or works from Obsidian. Each item can be a plain title or an object with `title`, `image`, `link`, `source`, and `note`.
 - `status` supports `watched`, `listened`, `watching`, `played`, `planned`, and `recommended`.
 - `recommendation` is derived from `rating`: `9.5+` Brilliant, `9.0+` Favorite, `8.5+` Recommended, otherwise Casual.
+- `featured: true` promotes an item into curated Library highlights. Use `featuredOrder` to control the manual order.
 - Leave the Markdown body empty for a non-clickable collection item.
 - Once the Markdown body has review text, the card becomes clickable and the review page is available at `/library/<category>/<slug>/`.
 

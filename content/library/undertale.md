@@ -5,6 +5,8 @@ year: "2015"
 date: "2026-06-16"
 status: played
 rating: 9.0
+featured: true
+featuredOrder: 11
 tags:
   - indie
   - rpg

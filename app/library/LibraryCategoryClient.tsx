@@ -237,7 +237,7 @@ function LibraryCard({ item }: { item: LibraryItem }) {
   const recommendation = recommendationMeta[item.recommendation];
   const CategoryIcon = category.Icon;
   const RecommendationIcon = recommendation.Icon;
-  const hasDetail = item.hasReview || item.category === "artist";
+  const hasDetail = item.hasReview || item.recommendedWorks.length > 0;
   const status = statusMeta[item.status];
   const StatusIcon = status.Icon;
   const imageBlock = (

@@ -6,6 +6,8 @@ year: "2000"
 date: "2026-06-17"
 status: watched
 rating: 8.8
+featured: true
+featuredOrder: 10
 tags:
   - thriller
   - mystery

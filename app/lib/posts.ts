@@ -71,6 +71,28 @@ function normalizeBanner(value: unknown) {
   return value;
 }
 
+function excerptMarkdown(value = "", length = 140) {
+  const text = value
+    .replace(/```[\s\S]*?```/g, "")
+    .replace(/!\[[^\]]*\]\([^)]+\)/g, "")
+    .replace(/\[[^\]]+\]\([^)]+\)/g, (match) => match.replace(/^\[|\]\([^)]+\)$/g, ""))
+    .replace(/[#>*_`~|-]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (text.length <= length) return text;
+  return `${text.slice(0, length).trim()}...`;
+}
+
+export function getPostDescription(
+  post: Pick<Post, "desc" | "content">,
+  length = 140
+) {
+  const desc = post.desc?.trim();
+  if (desc) return desc;
+  return excerptMarkdown(post.content, length);
+}
+
 function readPost(fileName: string): Post {
   const sourceFile = fileName;
   const fileSlug = fileName.replace(/\.md$/, '');

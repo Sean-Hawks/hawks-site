@@ -6,6 +6,8 @@ year: "2013"
 date: "2026-06-16"
 status: watched
 rating: 9.5
+featured: true
+featuredOrder: 2
 tags:
   - dark fantasy
   - action

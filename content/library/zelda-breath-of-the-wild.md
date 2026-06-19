@@ -6,6 +6,8 @@ year: "2017"
 date: "2026-06-18"
 status: played
 rating: 9.1
+featured: true
+featuredOrder: 8
 tags:
   - zelda
   - open world

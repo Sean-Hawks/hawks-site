@@ -43,6 +43,11 @@ export default async function BlogTagPage({ params }: PageProps) {
   const tagInfo = getSiteTagBySlug(tag);
   const items = getSiteItemsByTagSlug(tag);
   const allTags = getAllSiteTags();
+  const activeTagSlug = tagToSlug(tagInfo?.tag ?? tag);
+  const visibleTags = allTags.filter(
+    (item, index) => index < 32 || item.slug === activeTagSlug
+  );
+  const hiddenTagCount = Math.max(0, allTags.length - visibleTags.length);
 
   return (
     <div className="site-shell min-h-screen text-[rgb(var(--text))]">
@@ -71,29 +76,37 @@ export default async function BlogTagPage({ params }: PageProps) {
           </p>
         </div>
 
-        <div className="mb-8 flex flex-wrap gap-2">
-          {allTags.map((item) => (
+        <div className="mb-8 flex max-h-40 flex-wrap gap-2 overflow-y-auto pr-1">
+          {visibleTags.map((item) => (
             <Link
               key={item.slug}
               href={`/blog/tag/${item.slug}`}
               className={[
-                "rounded-full border px-3 py-1.5 text-sm transition-colors",
-                item.slug === tagToSlug(tagInfo?.tag ?? tag)
+                "max-w-full rounded-full border px-3 py-1.5 text-sm transition-colors",
+                item.slug === activeTagSlug
                   ? "border-[rgb(var(--accent)/0.26)] bg-[rgb(var(--accent)/0.12)] text-[rgb(var(--accent))]"
                   : "border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.72)] text-[rgb(var(--muted))] hover:text-[rgb(var(--accent))]",
               ].join(" ")}
             >
-              {item.tag}
+              <span className="break-words">{item.tag}</span>
               <span className="ml-1 opacity-60">{item.count}</span>
             </Link>
           ))}
+          {hiddenTagCount > 0 && (
+            <Link
+              href="/search"
+              className="rounded-full border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.04)] px-3 py-1.5 text-sm text-[rgb(var(--muted))] transition-colors hover:text-[rgb(var(--accent))]"
+            >
+              +{hiddenTagCount} tags
+            </Link>
+          )}
         </div>
 
         <div className="space-y-4">
           {items.map((item) => (
             <article
               key={item.id}
-              className="rounded-2xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.86)] p-5 shadow-[0_18px_60px_rgba(90,76,55,0.08)] transition-colors hover:border-[rgb(var(--accent)/0.28)] sm:p-6"
+              className="min-w-0 rounded-2xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.86)] p-5 shadow-[0_18px_60px_rgba(90,76,55,0.08)] transition-colors hover:border-[rgb(var(--accent)/0.28)] sm:p-6"
             >
               <div className="mb-4 flex flex-wrap items-center gap-2 text-xs text-[rgb(var(--muted))]">
                 <span className="inline-flex items-center gap-1.5 rounded-md bg-[rgb(var(--line)/0.05)] px-2 py-1">
@@ -107,16 +120,16 @@ export default async function BlogTagPage({ params }: PageProps) {
                   <Link
                     key={postTag}
                     href={`/blog/tag/${tagToSlug(postTag)}`}
-                    className="rounded-md bg-[rgb(var(--accent)/0.10)] px-2 py-1 font-medium text-[rgb(var(--accent))] transition-colors hover:bg-[rgb(var(--accent)/0.16)]"
+                    className="max-w-full rounded-md bg-[rgb(var(--accent)/0.10)] px-2 py-1 font-medium text-[rgb(var(--accent))] transition-colors hover:bg-[rgb(var(--accent)/0.16)]"
                   >
                     {postTag}
                   </Link>
                 ))}
               </div>
               {item.href ? (
-                <Link href={item.href} className="group flex gap-4">
-                  <div className="flex-1">
-                    <h2 className="text-xl font-bold leading-snug transition-colors group-hover:text-[rgb(var(--accent))] sm:text-2xl">
+                <Link href={item.href} className="group flex min-w-0 gap-4">
+                  <div className="min-w-0 flex-1">
+                    <h2 className="break-words text-xl font-bold leading-snug transition-colors group-hover:text-[rgb(var(--accent))] sm:text-2xl">
                       {item.title}
                     </h2>
                     <p className="mt-2 line-clamp-2 text-sm leading-7 text-[rgb(var(--muted))] sm:text-base">
@@ -126,9 +139,9 @@ export default async function BlogTagPage({ params }: PageProps) {
                   <ArrowRight className="mt-1 hidden h-5 w-5 flex-shrink-0 text-[rgb(var(--muted))] transition-colors group-hover:text-[rgb(var(--accent))] sm:block" />
                 </Link>
               ) : (
-                <div className="flex gap-4">
-                  <div className="flex-1">
-                    <h2 className="text-xl font-bold leading-snug sm:text-2xl">
+                <div className="flex min-w-0 gap-4">
+                  <div className="min-w-0 flex-1">
+                    <h2 className="break-words text-xl font-bold leading-snug sm:text-2xl">
                       {item.title}
                     </h2>
                     <p className="mt-2 line-clamp-2 text-sm leading-7 text-[rgb(var(--muted))] sm:text-base">

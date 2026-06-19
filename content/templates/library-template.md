@@ -6,6 +6,8 @@ year: ""
 date: "{{date:YYYY-MM-DD}}"
 status: watched
 rating: 8 # Use N/A if it is not rated yet.
+featured: false
+featuredOrder:
 tags:
   - tag
 note: "一句話心得，會顯示在 Library 卡片上。"

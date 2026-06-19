@@ -73,7 +73,7 @@ export function buildSearchIndex(
   const librarySearchItems = libraryItems.map((item) => {
     const desc = item.note || excerpt(item.content);
     const tags = item.tags.map(displayTag).filter(Boolean);
-    const hasDetail = item.hasReview || item.category === "artist";
+    const hasDetail = item.hasReview || item.recommendedWorks.length > 0;
     return {
       id: `library-${item.slug}`,
       type: "library" as const,

@@ -5,6 +5,8 @@ year: "2020"
 date: "2026-06-16"
 status: played
 rating: 9.2
+featured: true
+featuredOrder: 4
 tags:
   - final fantasy
   - jrpg

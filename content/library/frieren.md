@@ -6,6 +6,8 @@ year: "2023"
 date: "2026-06-16"
 status: watched
 rating: 9
+featured: true
+featuredOrder: 12
 tags:
   - fantasy
   - journey

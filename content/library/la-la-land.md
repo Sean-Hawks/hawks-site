@@ -6,6 +6,8 @@ year: "2016"
 date: "2026-06-16"
 status: watched
 rating: 9.5
+featured: true
+featuredOrder: 3
 tags:
   - musical
   - romance

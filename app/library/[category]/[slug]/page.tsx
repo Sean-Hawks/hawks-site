@@ -15,8 +15,8 @@ import type { Metadata } from "next";
 
 type PageProps = { params: Promise<{ category: string; slug: string }> };
 
-function hasLibraryDetail(item: { hasReview: boolean; category: string }) {
-  return item.hasReview || item.category === "artist";
+function hasLibraryDetail(item: { hasReview: boolean; recommendedWorks: unknown[] }) {
+  return item.hasReview || item.recommendedWorks.length > 0;
 }
 
 export function generateStaticParams() {
@@ -384,8 +384,8 @@ export default async function LibraryReviewPage({ params }: PageProps) {
                 </div>
               </header>
 
-              <div className="space-y-8 p-6 sm:p-10">
-                {item.hasReview ? (
+              {item.hasReview && (
+                <div className="space-y-8 p-6 sm:p-10">
                   <section className="rounded-2xl border border-[rgb(var(--accent)/0.16)] bg-gradient-to-br from-[rgb(var(--panel2)/0.62)] via-[rgb(var(--panel)/0.58)] to-[rgb(var(--accent)/0.06)] p-5 shadow-[0_18px_56px_rgba(90,76,55,0.10)] sm:p-7">
                     <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
                       <div>
@@ -403,12 +403,8 @@ export default async function LibraryReviewPage({ params }: PageProps) {
                     </div>
                     <MarkdownContent content={item.content} variant="libraryReview" />
                   </section>
-                ) : (
-                  <div className="rounded-2xl border border-[rgb(var(--line)/0.08)] bg-[rgb(var(--line)/0.025)] p-5 text-sm leading-7 text-[rgb(var(--muted))]">
-                    這個頁面目前先放基本資料與推薦作品，之後可以直接在 Obsidian 補上正文評論。
-                  </div>
-                )}
-              </div>
+                </div>
+              )}
             </article>
 
             {recommendedWorksSection}

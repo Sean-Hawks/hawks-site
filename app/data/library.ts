@@ -43,6 +43,8 @@ export type LibraryItem = {
   status: LibraryStatus;
   recommendation: LibraryRecommendation;
   rating: number | null; // Personal score from 0 to 10, or null when unrated.
+  featured: boolean;
+  featuredOrder?: number;
   tags: string[];
   note: string;
   link?: string;

@@ -1,6 +1,11 @@
 import Link from "next/link";
 import { ArrowRight, CalendarDays, FileText } from "lucide-react";
-import { getAllTags, getSortedPostsData, tagToSlug } from "../lib/posts";
+import {
+  getAllTags,
+  getPostDescription,
+  getSortedPostsData,
+  tagToSlug,
+} from "../lib/posts";
 import ThemeStyles from "../components/ThemeStyles";
 import Header from "../components/Header";
 import type { Metadata } from "next";
@@ -22,6 +27,8 @@ export const metadata: Metadata = {
 export default function BlogPage() {
   const posts = getSortedPostsData();
   const tags = getAllTags();
+  const mobileTags = tags.slice(0, 8);
+  const hiddenMobileTagCount = Math.max(0, tags.length - mobileTags.length);
 
   return (
     <div className="site-shell min-h-screen text-[rgb(var(--text))]">
@@ -51,7 +58,7 @@ export default function BlogPage() {
                 <h3 className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-[rgb(var(--muted))]">
                   Tags
                 </h3>
-                <div className="flex flex-wrap gap-2">
+                <div className="max-h-[36vh] overflow-y-auto pr-1 flex flex-wrap gap-2">
                   {tags.map((tag) => (
                     <Link
                       key={tag.slug}
@@ -67,7 +74,7 @@ export default function BlogPage() {
             </div>
           </aside>
 
-          <div>
+          <div className="min-w-0">
             <div className="mb-8 rounded-2xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.86)] p-5 shadow-[0_18px_60px_rgba(90,76,55,0.10)] sm:p-6">
               <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-[rgb(var(--accent)/0.22)] bg-[rgb(var(--accent)/0.10)] px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-[rgb(var(--accent))]">
                 <FileText className="h-3.5 w-3.5" />
@@ -86,41 +93,49 @@ export default function BlogPage() {
               </div>
 
               <div className="mt-5 flex flex-wrap gap-2 lg:hidden">
-                {tags.map((tag) => (
+                {mobileTags.map((tag) => (
                   <Link
                     key={tag.slug}
                     href={`/blog/tag/${tag.slug}`}
-                    className="rounded-full border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel2))] px-3 py-1.5 text-sm text-[rgb(var(--muted))] transition-colors hover:text-[rgb(var(--accent))]"
+                    className="max-w-full rounded-full border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel2))] px-3 py-1.5 text-sm text-[rgb(var(--muted))] transition-colors hover:text-[rgb(var(--accent))]"
                   >
-                    {tag.tag}
+                    <span className="break-words">{tag.tag}</span>
                     <span className="ml-1 opacity-60">{tag.count}</span>
                   </Link>
                 ))}
+                {hiddenMobileTagCount > 0 && (
+                  <Link
+                    href="/search"
+                    className="rounded-full border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.04)] px-3 py-1.5 text-sm text-[rgb(var(--muted))] transition-colors hover:text-[rgb(var(--accent))]"
+                  >
+                    +{hiddenMobileTagCount} tags
+                  </Link>
+                )}
               </div>
             </div>
 
             <div className="space-y-4">
                 {posts.map((post) => (
-                        <article key={post.slug} className="rounded-2xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.86)] p-5 shadow-[0_18px_60px_rgba(90,76,55,0.08)] transition-colors hover:border-[rgb(var(--accent)/0.28)] sm:p-6">
+                        <article key={post.slug} className="min-w-0 rounded-2xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.86)] p-5 shadow-[0_18px_60px_rgba(90,76,55,0.08)] transition-colors hover:border-[rgb(var(--accent)/0.28)] sm:p-6">
                             <div className="mb-4 flex flex-wrap items-center gap-2 text-xs text-[rgb(var(--muted))]">
                                 <span className="inline-flex items-center gap-1.5 rounded-md bg-[rgb(var(--line)/0.05)] px-2 py-1">
                                     <CalendarDays className="h-3.5 w-3.5" />
                                     <time>{post.date}</time>
                                 </span>
                                 {post.tags.map(tag => (
-                                    <Link key={tag} href={`/blog/tag/${tagToSlug(tag)}`} className="rounded-md bg-[rgb(var(--accent)/0.10)] px-2 py-1 font-medium text-[rgb(var(--accent))] transition-colors hover:bg-[rgb(var(--accent)/0.16)]">
+                                    <Link key={tag} href={`/blog/tag/${tagToSlug(tag)}`} className="max-w-full rounded-md bg-[rgb(var(--accent)/0.10)] px-2 py-1 font-medium text-[rgb(var(--accent))] transition-colors hover:bg-[rgb(var(--accent)/0.16)]">
                                         {tag}
                                     </Link>
                                 ))}
                             </div>
 
-                            <Link href={`/blog/${post.slug}`} className="group flex gap-4">
-                              <div className="flex-1">
-                                <h2 className="text-xl font-bold leading-snug text-[rgb(var(--text))] transition-colors group-hover:text-[rgb(var(--accent))] sm:text-2xl">
+                            <Link href={`/blog/${post.slug}`} className="group flex min-w-0 gap-4">
+                              <div className="min-w-0 flex-1">
+                                <h2 className="break-words text-xl font-bold leading-snug text-[rgb(var(--text))] transition-colors group-hover:text-[rgb(var(--accent))] sm:text-2xl">
                                 {post.title}
                                 </h2>
                                 <p className="mt-2 line-clamp-2 text-sm leading-7 text-[rgb(var(--muted))] sm:text-base">
-                                  {post.desc}
+                                  {getPostDescription(post)}
                                 </p>
                               </div>
                               <ArrowRight className="mt-1 hidden h-5 w-5 flex-shrink-0 text-[rgb(var(--muted))] transition-colors group-hover:text-[rgb(var(--accent))] sm:block" />

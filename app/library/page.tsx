@@ -68,7 +68,7 @@ function formatRating(rating: LibraryItem["rating"]) {
 }
 
 function getItemHref(item: LibraryItem) {
-  return item.hasReview || item.category === "artist"
+  return item.hasReview || item.recommendedWorks.length > 0
     ? `/library/${item.category}/${item.slug}`
     : undefined;
 }
@@ -93,6 +93,9 @@ function getTopPicks(items: LibraryItem[]) {
   return [...items]
     .sort(
       (a, b) =>
+        Number(b.featured) - Number(a.featured) ||
+        (a.featuredOrder ?? Number.POSITIVE_INFINITY) -
+          (b.featuredOrder ?? Number.POSITIVE_INFINITY) ||
         ratingValue(b) - ratingValue(a) ||
         (b.year ?? "").localeCompare(a.year ?? "") ||
         a.title.localeCompare(b.title)
