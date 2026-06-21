@@ -70,6 +70,9 @@ HW01 一開始我是透過 Google Colab 直接 call Github 上的作業抓下來
 
 再來是下幾週會有自主學習的報告所以未完待續．．．．．
 
+## 參考閱讀
+
+我 Partner 的心得供參：[https://hackmd.io/@hannnnie/HJxEFJQzfl?brid=YWdncwEb8fS0s3vdVYp1M1a2C3HG](https://hackmd.io/@hannnnie/HJxEFJQzfl?brid=YWdncwEb8fS0s3vdVYp1M1a2C3HG)
 ### 照片紀錄
 
 ![[ml-study-20260610.jpg|Machine Learning 2021 自主學習照片 2026-06-10]]
