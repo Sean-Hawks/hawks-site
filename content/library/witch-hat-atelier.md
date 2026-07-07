@@ -4,7 +4,7 @@ subtitle: Witch Hat Atelier
 category: anime
 year: "2025"
 date: 2026-06-16
-status: watching
+status: watched
 rating: 8.7
 tags:
   - fantasy

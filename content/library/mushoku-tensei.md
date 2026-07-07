@@ -4,7 +4,7 @@ subtitle: "Mushoku Tensei: Jobless Reincarnation"
 category: anime
 year: "2021"
 date: "2026-06-16"
-status: watched
+status: watching
 rating: 9.0
 tags:
   - fantasy
