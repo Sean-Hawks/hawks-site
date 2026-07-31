@@ -174,7 +174,13 @@ function joinPublicPath(basePath: string, fileName: string) {
 
 function publicAssetExists(publicPath: string) {
   if (!publicPath.startsWith("/")) return false;
-  return fs.existsSync(path.join(process.cwd(), "public", publicPath));
+  try {
+    return fs.existsSync(
+      path.join(process.cwd(), "public", decodeURIComponent(publicPath)),
+    );
+  } catch {
+    return false;
+  }
 }
 
 function resolveObsidianAsset(fileName: string, assetBasePath?: string) {

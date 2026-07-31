@@ -51,24 +51,24 @@ export default function ArticleImages({ images }: { images: Img[] }) {
   return (
     <>
       {isGrid ? (
-        <div className="my-8 grid grid-cols-1 items-start gap-3 sm:grid-cols-2">
+        <div className="my-10 grid grid-cols-1 items-start gap-x-4 gap-y-6 sm:grid-cols-2">
           {images.map((img, i) => (
-            <figure key={`${img.src}-${i}`} className="m-0">
+            <figure key={`${img.src}-${i}`} className="m-0 min-w-0">
               <button
                 type="button"
                 onClick={() => setActive(i)}
                 aria-label="放大圖片"
-                className="group block aspect-[4/3] w-full cursor-zoom-in overflow-hidden rounded-xl border border-[rgb(var(--line)/0.12)] bg-[rgb(var(--line)/0.04)] shadow-lg focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent)/0.5)]"
+                className="group block aspect-[4/3] w-full cursor-zoom-in overflow-hidden rounded-2xl border border-[rgb(var(--line)/0.12)] bg-[rgb(var(--panel2)/0.5)] p-1 shadow-lg transition-[border-color,transform] duration-300 hover:-translate-y-0.5 hover:border-[rgb(var(--accent)/0.32)] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent)/0.5)]"
               >
                 <img
                   src={img.src}
                   alt={img.alt ?? ""}
                   loading="lazy"
-                  className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-[1.02]"
+                  className="h-full w-full rounded-[0.7rem] object-contain transition-transform duration-300 group-hover:scale-[1.015]"
                 />
               </button>
               {captionOf(img) && (
-                <figcaption className="mt-2 text-center text-sm text-[rgb(var(--muted))] opacity-70">
+                <figcaption className="mt-2.5 px-2 text-center text-sm leading-6 text-[rgb(var(--muted))] opacity-75">
                   {captionOf(img)}
                 </figcaption>
               )}
