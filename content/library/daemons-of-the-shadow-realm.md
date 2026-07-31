@@ -10,7 +10,7 @@ tags:
   - fantasy
   - action
   - bones
-note: 荒川弘的新作動畫，先放在跟播觀察清單裡。
+note: ""
 link: https://www.yominotsugai.com/
 image:
   src: /images/library/daemons-of-the-shadow-realm.png

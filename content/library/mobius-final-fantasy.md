@@ -9,7 +9,7 @@ tags:
   - final fantasy
   - mobile game
   - rpg
-note: 美術和 Final Fantasy 味道很強，放在推薦區間。
+note: ""
 link: https://en.wikipedia.org/wiki/Mobius_Final_Fantasy
 image:
   src: /images/library/mobius-final-fantasy.png

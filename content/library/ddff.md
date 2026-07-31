@@ -9,7 +9,7 @@ tags:
   - final fantasy
   - mobile game
   - team battle
-note: 現代東京背景的新 Dissidia，先放在玩過清單裡。
+note: ""
 link: https://www.square-enix.com/ddff/en/
 image:
   src: /images/library/dissidia-duellum-final-fantasy.jpg

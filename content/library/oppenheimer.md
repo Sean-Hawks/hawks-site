@@ -10,7 +10,7 @@ tags:
   - biography
   - historical
   - christopher nolan
-note: 待補心得。
+note: ""
 link: https://en.wikipedia.org/wiki/Oppenheimer_(film)
 image:
   src: /images/library/oppenheimer.jpg

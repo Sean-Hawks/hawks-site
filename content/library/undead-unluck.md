@@ -10,7 +10,7 @@ tags:
   - action
   - supernatural
   - shonen
-note: 設定很有衝勁，先放在跟播中的收藏。
+note: ""
 link: https://undead-unluck.net/
 image:
   src: /images/library/undead-unluck.jpg

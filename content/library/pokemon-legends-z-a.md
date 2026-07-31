@@ -10,7 +10,7 @@ tags:
   - pokemon
   - rpg
   - switch
-note: 放在想整理的遊戲清單裡，分數先保留在輕推薦區間。
+note: ""
 link: https://legends.pokemon.com/en-us/
 image:
   src: /images/library/pokemon-legends-z-a.png

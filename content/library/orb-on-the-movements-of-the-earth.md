@@ -12,7 +12,7 @@ tags:
   - historical
   - astronomy
   - seinen
-note: 關於真理、信念和代價的重量很強，值得高分收藏。
+note: ""
 link: https://anime-chi.jp/
 image:
   src: /images/library/orb-on-the-movements-of-the-earth.png

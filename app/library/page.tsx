@@ -222,9 +222,11 @@ function SpotlightCard({ item }: { item: LibraryItem }) {
             {item.subtitle}
           </p>
         )}
-        <p className="mt-3 text-sm leading-7 text-[rgb(var(--muted))]">
-          {item.note}
-        </p>
+        {item.note && (
+          <p className="mt-3 text-sm leading-7 text-[rgb(var(--muted))]">
+            {item.note}
+          </p>
+        )}
 
         <div className="mt-auto flex items-center justify-between gap-3 pt-5">
           <span className="inline-flex items-center gap-1.5 rounded-lg bg-[rgb(var(--accent)/0.12)] px-3 py-2 text-sm font-bold text-[rgb(var(--accent))]">
@@ -338,9 +340,11 @@ function WatchingCard({ item }: { item: LibraryItem }) {
         <h3 className="truncate text-lg font-bold text-[rgb(var(--text))] transition-colors group-hover:text-[rgb(var(--accent))]">
           {item.title}
         </h3>
-        <p className="mt-1 line-clamp-2 text-sm leading-6 text-[rgb(var(--muted))]">
-          {item.note}
-        </p>
+        {item.note && (
+          <p className="mt-1 line-clamp-2 text-sm leading-6 text-[rgb(var(--muted))]">
+            {item.note}
+          </p>
+        )}
       </div>
       <div className="col-start-2 inline-flex flex-shrink-0 items-center gap-1.5 self-start rounded-lg bg-[rgb(var(--accent)/0.12)] px-3 py-2 text-sm font-bold text-[rgb(var(--accent))] sm:col-start-auto sm:self-auto">
         <Star className="h-4 w-4 fill-[rgb(var(--accent))]" />

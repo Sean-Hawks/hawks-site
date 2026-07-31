@@ -10,7 +10,7 @@ tags:
   - idol
   - drama
   - mystery
-note: 待補心得。
+note: ""
 link: https://ichigoproduction.com/
 image:
   src: /images/library/oshi-no-ko.jpg

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, BookOpenText, FileText, NotebookText, Radio } from "lucide-react";
 import Chip from "./Chip";
@@ -12,6 +13,7 @@ type ActivityItem = {
   date: string;
   tags: string[];
   href: string;
+  banner?: string;
 };
 
 const activityIcons = {
@@ -97,38 +99,52 @@ export default function ReadmeSection({
                 <span className="h-1.5 w-1.5 rounded-full bg-[rgb(var(--accent))]" />
               </div>
 
-              <div className="rounded-xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel2)/0.34)] p-4 shadow-[0_12px_36px_rgba(90,76,55,0.08)] transition-colors group-hover:border-[rgb(var(--accent)/0.28)] group-hover:bg-[rgb(var(--panel2)/0.50)]">
-                <div className="mb-2 flex flex-wrap items-center gap-2 text-[10px] uppercase tracking-[0.08em] text-[rgb(var(--muted))]">
-                  <span className="inline-flex items-center gap-1.5 rounded-md border border-[rgb(var(--accent)/0.18)] bg-[rgb(var(--accent)/0.08)] px-2 py-1 font-bold text-[rgb(var(--accent))]">
-                    <Icon className="h-3 w-3" />
-                    {item.label}
-                  </span>
-                  <span className="opacity-40">/</span>
-                  <time>{item.date}</time>
-                </div>
-                <h3 className="line-clamp-2 text-sm font-bold leading-6 text-[rgb(var(--text))] transition-colors group-hover:text-[rgb(var(--accent))]">
-                  {item.title}
-                </h3>
-                <p className="mt-1 line-clamp-2 text-xs leading-5 text-[rgb(var(--muted))]">
-                  {item.desc}
-                </p>
-                {item.tags.length > 0 && (
-                  <div className="mt-3 flex flex-wrap gap-1.5">
-                    {visibleTags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="inline-flex max-w-full items-center rounded-md border border-[rgb(var(--line)/0.08)] bg-[rgb(var(--panel)/0.42)] px-2 py-1 text-[10px] leading-none text-[rgb(var(--muted))]"
-                      >
-                        <span className="truncate">#{tag.replace(/^#/, "")}</span>
-                      </span>
-                    ))}
-                    {hiddenTagCount > 0 && (
-                      <span className="inline-flex items-center rounded-md border border-[rgb(var(--line)/0.08)] bg-[rgb(var(--line)/0.035)] px-2 py-1 text-[10px] leading-none text-[rgb(var(--muted))]">
-                        +{hiddenTagCount}
-                      </span>
-                    )}
+              <div className="overflow-hidden rounded-xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel2)/0.34)] shadow-[0_12px_36px_rgba(90,76,55,0.08)] transition-colors group-hover:border-[rgb(var(--accent)/0.28)] group-hover:bg-[rgb(var(--panel2)/0.50)]">
+                {item.banner && (
+                  <div className="relative aspect-[16/9] overflow-hidden border-b border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.04)] sm:aspect-[16/7]">
+                    <Image
+                      src={item.banner}
+                      alt={`${item.title} banner`}
+                      fill
+                      sizes="(min-width: 1024px) 640px, 100vw"
+                      className="object-cover transition-transform duration-500 group-hover:scale-[1.025]"
+                    />
                   </div>
                 )}
+
+                <div className="p-4">
+                  <div className="mb-2 flex flex-wrap items-center gap-2 text-[10px] uppercase tracking-[0.08em] text-[rgb(var(--muted))]">
+                    <span className="inline-flex items-center gap-1.5 rounded-md border border-[rgb(var(--accent)/0.18)] bg-[rgb(var(--accent)/0.08)] px-2 py-1 font-bold text-[rgb(var(--accent))]">
+                      <Icon className="h-3 w-3" />
+                      {item.label}
+                    </span>
+                    <span className="opacity-40">/</span>
+                    <time>{item.date}</time>
+                  </div>
+                  <h3 className="line-clamp-2 text-sm font-bold leading-6 text-[rgb(var(--text))] transition-colors group-hover:text-[rgb(var(--accent))]">
+                    {item.title}
+                  </h3>
+                  <p className="mt-1 line-clamp-2 text-xs leading-5 text-[rgb(var(--muted))]">
+                    {item.desc}
+                  </p>
+                  {item.tags.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-1.5">
+                      {visibleTags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="inline-flex max-w-full items-center rounded-md border border-[rgb(var(--line)/0.08)] bg-[rgb(var(--panel)/0.42)] px-2 py-1 text-[10px] leading-none text-[rgb(var(--muted))]"
+                        >
+                          <span className="truncate">#{tag.replace(/^#/, "")}</span>
+                        </span>
+                      ))}
+                      {hiddenTagCount > 0 && (
+                        <span className="inline-flex items-center rounded-md border border-[rgb(var(--line)/0.08)] bg-[rgb(var(--line)/0.035)] px-2 py-1 text-[10px] leading-none text-[rgb(var(--muted))]">
+                          +{hiddenTagCount}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
             </Link>
           );

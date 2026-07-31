@@ -10,7 +10,7 @@ tags:
   - anime film
   - action
   - ufotable
-note: 待補心得。
+note: ""
 link: https://en.wikipedia.org/wiki/Demon_Slayer:_Kimetsu_no_Yaiba_%E2%80%93_The_Movie:_Mugen_Train
 image:
   src: /images/library/demon-slayer-mugen-train.jpg

@@ -25,6 +25,7 @@ type ActivityItem = {
   date: string;
   tags: string[];
   href: string;
+  banner?: string;
 };
 
 function excerpt(value = "", length = 120) {
@@ -86,6 +87,7 @@ function getRecentActivity({
       date: post.date,
       tags: post.tags,
       href: `/blog/${post.slug}`,
+      banner: post.banner,
     })),
     ...talks.map((talk) => ({
       key: `talk-${talk.id}`,
@@ -209,9 +211,11 @@ function LibraryShowcase({ items }: { items: LibraryItem[] }) {
                   <h3 className="truncate text-sm font-bold text-[rgb(var(--text))] transition-colors group-hover:text-[rgb(var(--accent))]">
                     {item.title}
                   </h3>
-                  <p className="mt-1 line-clamp-1 text-xs text-[rgb(var(--muted))]">
-                    {item.note}
-                  </p>
+                  {item.note && (
+                    <p className="mt-1 line-clamp-1 text-xs text-[rgb(var(--muted))]">
+                      {item.note}
+                    </p>
+                  )}
                 </div>
                 <ArrowUpRight className="h-4 w-4 text-[rgb(var(--muted))] transition-colors group-hover:text-[rgb(var(--accent))]" />
               </Link>

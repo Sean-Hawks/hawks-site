@@ -10,7 +10,7 @@ tags:
   - anime film
   - action
   - mappa
-note: 待補心得。
+note: ""
 link: https://chainsawmanmovie.tw/
 image:
   src: /images/library/chainsaw-man-reze-arc.jpg

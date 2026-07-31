@@ -10,7 +10,7 @@ tags:
   - sci-fi
   - adventure
   - james cameron
-note: 待補心得。
+note: ""
 link: https://en.wikipedia.org/wiki/Avatar:_The_Way_of_Water
 image:
   src: /images/library/avatar-the-way-of-water.jpg

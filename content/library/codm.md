@@ -9,7 +9,7 @@ tags:
   - mobile game
   - shooter
   - multiplayer
-note: 手機 FPS 的完成度不差，但目前放在比較輕量的遊玩清單。
+note: ""
 link: https://www.callofduty.com/mobile
 image:
   src: /images/library/call-of-duty-mobile.png

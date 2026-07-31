@@ -355,9 +355,11 @@ function LibraryCard({ item }: { item: LibraryItem }) {
         )}
       </div>
 
-      <p className="mt-4 text-sm leading-7 text-[rgb(var(--muted))]">
-        {item.note}
-      </p>
+      {item.note && (
+        <p className="mt-4 text-sm leading-7 text-[rgb(var(--muted))]">
+          {item.note}
+        </p>
+      )}
 
       {item.recommendedWorks.length > 0 && (
         <div className="mt-4">

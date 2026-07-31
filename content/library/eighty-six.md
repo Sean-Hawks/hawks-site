@@ -10,7 +10,7 @@ tags:
   - mecha
   - war
   - drama
-note: 戰爭、階級和情感線都有重量，值得放進推薦清單。
+note: ""
 link: https://anime-86.com/
 image:
   src: /images/library/eighty-six.jpg

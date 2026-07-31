@@ -356,9 +356,11 @@ export default async function LibraryReviewPage({ params }: PageProps) {
                     </p>
                   )}
 
-                  <p className="mt-5 max-w-2xl text-base leading-8 text-[rgb(var(--muted))]">
-                    {item.note}
-                  </p>
+                  {item.note && (
+                    <p className="mt-5 max-w-2xl text-base leading-8 text-[rgb(var(--muted))]">
+                      {item.note}
+                    </p>
+                  )}
 
                   <div className="mt-5 flex flex-wrap items-center gap-4 text-sm text-[rgb(var(--muted))]">
                     <Rating rating={item.rating} />

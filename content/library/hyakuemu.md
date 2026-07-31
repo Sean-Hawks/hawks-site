@@ -10,7 +10,7 @@ tags:
   - anime film
   - sports
   - drama
-note: 待補心得。
+note: ""
 link: https://en.wikipedia.org/wiki/100_Meters_(manga)
 image:
   src: /images/library/hyakuemu.jpg

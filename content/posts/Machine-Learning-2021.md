@@ -1,8 +1,8 @@
 ---
-title: "李宏毅教授 Machine Learning 2021 自主學習計劃"
-date: "2026-06-18"
+title: 高中生如何學 Machine Learning？以李宏毅教授的 ML 2021 學起
+date: 2026-06-18
 desc: ""
-banner: "/images/posts/machine-learning-2021/ml-study-20260610.jpg"
+banner: /images/posts/machine-learning-2021/ml-study-20260610.jpg
 tags:
   - "#blog"
   - "#machine-learning"

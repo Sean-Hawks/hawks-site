@@ -10,7 +10,7 @@ tags:
   - sci-fi
   - space
   - adaptation
-note: 待補心得。
+note: ""
 link: https://en.wikipedia.org/wiki/Project_Hail_Mary_(film)
 image:
   src: /images/library/project-hail-mary.jpg

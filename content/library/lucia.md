@@ -9,7 +9,7 @@ tags:
   - j-pop
   - utaite
   - vocal
-note: 聲音情緒很細，適合放在之後慢慢補歌單的位置。
+note: ""
 link: https://www.tunecore.co.jp/artists/Lucia_Sings?lang=en
 image:
   src: /images/library/lucia.png

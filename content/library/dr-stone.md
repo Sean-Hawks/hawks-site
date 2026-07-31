@@ -3,14 +3,14 @@ title: Dr.STONE 新石紀
 subtitle: Dr.STONE
 category: anime
 year: "2019"
-date: "2026-06-17"
-status: watched
-rating: 8.4
+date: 2026-06-17
+status: watching
+rating: 8.8
 tags:
   - science
   - adventure
   - shonen
-note: 科學重建文明的爽感很明確，放在輕推薦區間。
+note: ""
 link: https://dr-stone.jp/
 image:
   src: /images/library/dr-stone.jpg

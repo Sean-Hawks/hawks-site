@@ -10,7 +10,7 @@ tags:
   - action
   - fantasy
   - leveling
-note: 待補心得。
+note: ""
 link: https://sololeveling-anime.net/
 image:
   src: /images/library/solo-leveling.jpg

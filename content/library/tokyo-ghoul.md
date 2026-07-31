@@ -10,7 +10,7 @@ tags:
   - dark fantasy
   - horror
   - seinen
-note: 待補心得。
+note: ""
 link: https://en.wikipedia.org/wiki/Tokyo_Ghoul
 image:
   src: /images/library/tokyo-ghoul.jpg

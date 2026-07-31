@@ -10,7 +10,7 @@ tags:
   - shonen
   - superhero
   - action
-note: 待補心得。
+note: ""
 link: https://heroaca.com/
 image:
   src: /images/library/my-hero-academia.png

@@ -10,7 +10,7 @@ tags:
   - pokemon
   - rpg
   - switch
-note: Galar 世代的主線作品，先放在寶可夢遊戲收藏裡。
+note: ""
 link: https://swordshield.pokemon.com/
 image:
   src: /images/library/pokemon-sword-shield.jpg

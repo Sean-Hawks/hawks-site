@@ -9,7 +9,7 @@ tags:
   - final fantasy
   - jrpg
   - remake
-note: 目前遊玩中，評分先留白，等玩完再補。
+note: ""
 link: https://ffvii.square-enix-games.com/en-us/games/rebirth
 image:
   src: /images/library/ff7-rebirth.png
