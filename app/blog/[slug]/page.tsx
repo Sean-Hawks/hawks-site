@@ -5,6 +5,7 @@ import { getSortedTalksData } from "../../lib/talks";
 import ThemeStyles from "../../components/ThemeStyles";
 import Header from "../../components/Header";
 import MarkdownContent, { headingId } from "../../components/MarkdownContent";
+import Comments from "../../components/Comments";
 import type { Metadata } from "next";
 import { excerpt, stripMarkdown } from "../../lib/content";
 import { getRelatedTalksForPost } from "../../lib/related";
@@ -154,7 +155,7 @@ export default async function PostPage({ params }: PageProps) {
                     <img
                       src={post.banner}
                       alt={post.title}
-                      className="w-full h-auto max-h-[500px] object-cover"
+                      className="aspect-[16/9] w-full object-cover sm:aspect-[16/7]"
                     />
                   </div>
                 )}
@@ -244,6 +245,8 @@ export default async function PostPage({ params }: PageProps) {
                 </div>
               </section>
             )}
+
+            <Comments />
           </div>
         </main>
 

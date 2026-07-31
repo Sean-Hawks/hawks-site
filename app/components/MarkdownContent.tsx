@@ -8,6 +8,41 @@ import remarkGfm from "remark-gfm";
 import remarkDirective from "remark-directive";
 import { visit } from "unist-util-visit";
 import type { Plugin } from "unified";
+import CopyButton from "./CopyButton";
+import ArticleImages from "./ArticleImages";
+
+type HastNode = {
+  type?: string;
+  tagName?: string;
+  value?: string;
+  properties?: Record<string, unknown>;
+  children?: HastNode[];
+};
+
+// 若一個段落「只由圖片組成」（可含換行），回傳其中的圖片清單；否則回傳空陣列。
+// 用來把連續多張圖轉成相簿格狀排版，單張則維持大圖，兩者都支援點擊放大。
+function imageOnlyParagraph(node: unknown): { src: string; alt: string; title: string }[] {
+  const n = node as HastNode | undefined;
+  if (!n || !Array.isArray(n.children)) return [];
+  const imgs: { src: string; alt: string; title: string }[] = [];
+  for (const child of n.children) {
+    if (child.type === "element" && child.tagName === "img") {
+      const props = child.properties ?? {};
+      imgs.push({
+        src: typeof props.src === "string" ? props.src : "",
+        alt: typeof props.alt === "string" ? props.alt : "",
+        title: typeof props.title === "string" ? props.title : "",
+      });
+    } else if (child.type === "text") {
+      if (typeof child.value === "string" && child.value.trim() !== "") return [];
+    } else if (child.type === "element" && child.tagName === "br") {
+      // 忽略換行
+    } else {
+      return []; // 段落含其他內容 → 不視為純圖片段落
+    }
+  }
+  return imgs;
+}
 
 type Directiveish = {
   type: string;
@@ -165,6 +200,31 @@ function transformObsidianEmbeds(content: string, assetBasePath?: string) {
   });
 }
 
+// 讓「自成一行的圖片」與相鄰文字之間有空行，使其獨立成段（連續多張圖仍相鄰＝同一段落）。
+// 這樣純圖片段落就能被 imageOnlyParagraph 認出，轉成相簿排版，不需改動原始文章內容。
+function normalizeImageParagraphs(content: string) {
+  const lines = content.split("\n");
+  const isImg = (l: string) => /^\s*!\[[^\]]*\]\([^)]*\)\s*$/.test(l);
+  const out: string[] = [];
+  let inFence = false;
+
+  for (const line of lines) {
+    if (/^\s*(```|~~~)/.test(line)) inFence = !inFence;
+
+    const prev = out.length ? out[out.length - 1] : "";
+    if (!inFence) {
+      if (isImg(line)) {
+        if (prev !== "" && !isImg(prev)) out.push("");
+      } else if (line.trim() !== "" && prev !== "" && isImg(prev)) {
+        out.push("");
+      }
+    }
+    out.push(line);
+  }
+
+  return out.join("\n");
+}
+
 export default function MarkdownContent({
   content,
   variant = "default",
@@ -179,7 +239,7 @@ export default function MarkdownContent({
   const isTalk = variant === "talk";
   const isLibraryReview = variant === "libraryReview";
   const transformedContent = content
-    ? transformObsidianEmbeds(content, assetBasePath)
+    ? normalizeImageParagraphs(transformObsidianEmbeds(content, assetBasePath))
     : "";
 
   const components: Components = {
@@ -200,18 +260,23 @@ export default function MarkdownContent({
         );
       }
 
+      const codeText = textFromChildren(children);
+
       return (
-        <pre
-          className={[
-            "bg-[rgb(var(--line)/0.05)] border border-[rgb(var(--line)/0.10)] p-4 rounded-xl overflow-x-auto my-6",
-            className,
-          ]
-            .filter(Boolean)
-            .join(" ")}
-          {...props}
-        >
-          {children}
-        </pre>
+        <div className="group relative my-6">
+          <CopyButton text={codeText} />
+          <pre
+            className={[
+              "bg-[rgb(var(--line)/0.05)] border border-[rgb(var(--line)/0.10)] p-4 rounded-xl overflow-x-auto m-0",
+              className,
+            ]
+              .filter(Boolean)
+              .join(" ")}
+            {...props}
+          >
+            {children}
+          </pre>
+        </div>
       );
     },
 
@@ -248,14 +313,26 @@ export default function MarkdownContent({
     ),
 
     // 避免 p 內塞進 block element（admonition/pre 等）造成 DOM repair
-    p: (props) => {
+    p: ({ node, children, ...props }: React.ComponentPropsWithoutRef<"p"> & { node?: unknown }) => {
+      // 純圖片段落：改用相簿/大圖 + 點擊放大（default 版型限定）
+      if (variant === "default") {
+        const imgs = imageOnlyParagraph(node);
+        if (imgs.length > 0) {
+          return <ArticleImages images={imgs} />;
+        }
+      }
+
       const paragraphClass = isTalk
         ? "my-7 text-base leading-8 text-[rgb(var(--text)/0.82)] sm:text-[1.08rem] sm:leading-9"
         : isLibraryReview
           ? "my-4 rounded-xl border border-[rgb(var(--line)/0.08)] bg-[rgb(var(--panel2)/0.34)] px-4 py-3 text-base leading-8 text-[rgb(var(--text)/0.92)] shadow-[0_10px_30px_rgba(90,76,55,0.06)] sm:px-5 sm:py-4 sm:text-[1.06rem]"
           : "my-5 leading-8 text-[rgb(var(--text)/0.84)] text-base sm:text-[1.05rem]";
 
-      return <div className={paragraphClass} {...props} />;
+      return (
+        <div className={paragraphClass} {...props}>
+          {children}
+        </div>
+      );
     },
 
     ul: (props) => (

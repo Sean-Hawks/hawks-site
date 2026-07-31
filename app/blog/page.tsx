@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight, CalendarDays, FileText } from "lucide-react";
 import {
   getAllTags,
@@ -116,7 +117,23 @@ export default function BlogPage() {
 
             <div className="space-y-4">
                 {posts.map((post) => (
-                        <article key={post.slug} className="min-w-0 rounded-2xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.86)] p-5 shadow-[0_18px_60px_rgba(90,76,55,0.08)] transition-colors hover:border-[rgb(var(--accent)/0.28)] sm:p-6">
+                        <article key={post.slug} className="min-w-0 overflow-hidden rounded-2xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.86)] shadow-[0_18px_60px_rgba(90,76,55,0.08)] transition-colors hover:border-[rgb(var(--accent)/0.28)]">
+                          {post.banner && (
+                            <Link
+                              href={`/blog/${post.slug}`}
+                              aria-label={`閱讀「${post.title}」`}
+                              className="group relative block aspect-[16/9] overflow-hidden border-b border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.04)] sm:aspect-[16/7]"
+                            >
+                              <Image
+                                src={post.banner}
+                                alt={post.title}
+                                fill
+                                sizes="(min-width: 1024px) 736px, 100vw"
+                                className="object-cover transition-transform duration-500 group-hover:scale-[1.025]"
+                              />
+                            </Link>
+                          )}
+                          <div className="p-5 sm:p-6">
                             <div className="mb-4 flex flex-wrap items-center gap-2 text-xs text-[rgb(var(--muted))]">
                                 <span className="inline-flex items-center gap-1.5 rounded-md bg-[rgb(var(--line)/0.05)] px-2 py-1">
                                     <CalendarDays className="h-3.5 w-3.5" />
@@ -140,6 +157,7 @@ export default function BlogPage() {
                               </div>
                               <ArrowRight className="mt-1 hidden h-5 w-5 flex-shrink-0 text-[rgb(var(--muted))] transition-colors group-hover:text-[rgb(var(--accent))] sm:block" />
                             </Link>
+                          </div>
                         </article>
                 ))}
             </div>

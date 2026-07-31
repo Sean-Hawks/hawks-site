@@ -2,7 +2,7 @@
 title: "李宏毅教授 Machine Learning 2021 自主學習計劃"
 date: "2026-06-18"
 desc: ""
-banner: ""
+banner: "/images/posts/machine-learning-2021/ml-study-20260610.jpg"
 tags:
   - "#blog"
   - "#machine-learning"
@@ -10,7 +10,9 @@ relatedTalks: []
 ogImage: ""
 status: published
 ---
+## TL;DR
 
+這是一篇紀錄我在高二 115 學年下學期在自主學習計劃的主題，以李宏毅教授 ML 2021為參考從零開始學習 Machine Learning。
 ## 背景
 
 一直很想要接觸看看 Machine Learning 這個領域，尤其是我高一高二接觸了那麼久的演算法覺得應該要做一些更有趣的領域不然真的會很疲乏。剛好大安高工彈性課程有自主學習的選項，雖然控制科有開一個人工智慧的課程，不過老實說我相信在這種高中端不太可能會有我實際上想學的 Training 的部分，所以最後還是決定去做自主學習計劃了。
