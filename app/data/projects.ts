@@ -12,6 +12,12 @@ export const projects = [
     link: "https://github.com/Sean-Hawks/gift-guru",
   },
   {
+    title: "AIS3 LLM SecEval",
+    desc: "AIS3 2026 AI 組專題：用 Inspect AI 與 CTF 題組評測 LLM 資安能力，並把資料污染問題納入對照設計。",
+    tags: ["LLM Eval", "Cybersecurity", "Inspect AI", "Python"],
+    link: "https://github.com/Sean-Hawks/ais3-llm-seceval",
+  },
+  {
     title: "ML2021 Spring",
     desc: "李宏毅機器學習課程作業整理，包含以 Notebook 為主的機器學習與深度學習練習紀錄。",
     tags: ["Machine Learning", "Deep Learning", "Jupyter Notebook", "Python"],
