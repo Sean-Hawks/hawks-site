@@ -13,14 +13,14 @@ export default function Header() {
   const [theme, setTheme] = React.useState<ThemeMode>("dark");
 
   const navItems = [
-    { label: "首頁", href: "/" },
+    { label: "README", href: "/" },
     { label: "Blog", href: "/blog" },
     { label: "Now", href: "/now" },
     { label: "Library", href: "/library" },
-    { label: "專案", href: "/project" },
-    { label: "搜尋", href: "/search" },
-    { label: "訂閱", href: "/subscribe" },
-    { label: "聯絡", href: "/contact" },
+    { label: "Project", href: "/project" },
+    { label: "Search", href: "/search" },
+    { label: "Subscribe", href: "/subscribe" },
+    { label: "Contact", href: "/contact" },
   ];
 
   React.useEffect(() => {
@@ -67,7 +67,7 @@ export default function Header() {
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-3">
         <Link
           href="/"
-          className="text-xl font-extrabold tracking-wide text-[rgb(var(--text))] transition-opacity hover:opacity-80 sm:text-2xl"
+          className="font-serif text-xl font-bold tracking-tight text-[rgb(var(--text))] transition-opacity hover:opacity-80 sm:text-2xl"
         >
           <div>hawks.tw</div>
         </Link>
@@ -86,7 +86,7 @@ export default function Header() {
                   key={item.label}
                   href={item.href}
                   className={[
-                    "rounded-xl px-3 py-2 text-sm transition-colors",
+                    "rounded-xl px-3 py-2 font-serif text-sm tracking-[0.01em] transition-colors",
                     isActive
                       ? "bg-[rgb(var(--accent)/0.12)] text-[rgb(var(--text))] border border-[rgb(var(--accent)/0.24)]"
                       : "text-[rgb(var(--muted))] hover:text-[rgb(var(--text))] hover:bg-[rgb(var(--line)/0.05)]",
@@ -131,7 +131,7 @@ export default function Header() {
                   key={item.label}
                   href={item.href}
                   className={[
-                    "rounded-lg px-3 py-2 text-sm transition-colors",
+                    "rounded-lg px-3 py-2 font-serif text-sm tracking-[0.01em] transition-colors",
                     isActive
                       ? "bg-[rgb(var(--accent)/0.12)] text-[rgb(var(--text))]"
                       : "text-[rgb(var(--muted))] hover:bg-[rgb(var(--line)/0.05)] hover:text-[rgb(var(--text))]",

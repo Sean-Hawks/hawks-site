@@ -72,14 +72,14 @@ export default function ProfileSidebar({ roles }: { roles: RoleTag[] }) {
             <Chip tone="accent">⚡ DAAN</Chip>
           </div>
           <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-[rgb(var(--muted))]">
-            <span className="opacity-90">@Sean-Hawks</span>
+            <span className="opacity-90">1awks</span>
             <span className="opacity-40">•</span>
-            <span>學生、管樂人，也寫一些 code。</span>
+            <span>A normal human, nothing else...</span>
           </div>
 
           <div className="mt-2 flex items-center gap-2 text-xs text-[rgb(var(--muted))]">
             <Sparkles className="h-4 w-4" />
-            <span>最近在下棋，也在整理這個網站。</span>
+            <span>正在玩 Chess.com</span>
           </div>
         </div>
 
@@ -87,12 +87,12 @@ export default function ProfileSidebar({ roles }: { roles: RoleTag[] }) {
           <div className="space-y-2">
             <SectionTitle icon={<BadgeCheck className="h-4 w-4" />} title="關於我" />
             <div className="rounded-xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.04)] p-3 text-sm leading-relaxed text-[rgb(var(--muted))]">
-              寫程式讓事情運作，音樂讓日子有感覺。
+              Coding helps me survive, music makes me feel alive.
             </div>
           </div>
 
           <div className="space-y-2">
-            <SectionTitle icon={<Pin className="h-4 w-4" />} title="我在做的事" />
+            <SectionTitle icon={<Pin className="h-4 w-4" />} title="身分組" />
             <div className="grid gap-2">
               {roleGroups.map((group) => (
                 <div
