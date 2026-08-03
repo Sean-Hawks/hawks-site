@@ -33,10 +33,10 @@ export default function ReadmeSection({
         <div className="mb-2 text-sm font-medium tracking-[0.08em] text-[rgb(var(--muted))]">
           HAWKS&apos; PERSONAL SITE
         </div>
-        <h1 className="font-serif text-3xl font-bold leading-tight tracking-tight sm:text-4xl">
+        <h1 className="font-serif text-[2rem] font-bold leading-[1.18] tracking-tight sm:text-4xl lg:text-[2.65rem]">
           把喜歡的東西，<span className="text-[rgb(var(--purple))]">好好寫下來。</span>
         </h1>
-        <p className="mt-3 max-w-2xl text-base leading-8 text-[rgb(var(--muted))]">
+        <p className="mt-3 max-w-2xl text-[0.98rem] leading-8 text-[rgb(var(--muted))] sm:text-base">
           這裡是 Hawks 的個人網站。我寫程式、吹管樂，也收藏動畫、音樂、遊戲和偶爾冒出的想法。
           沒有固定主題，有值得記住的事就寫。
         </p>
