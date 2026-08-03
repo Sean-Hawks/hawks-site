@@ -1,11 +1,11 @@
 import { RoleTag } from "../types";
 
 export const rolesTop: RoleTag[] = [
-  { label: "A Student", color: "#ed4245" },
-  { label: "Musician", color: "#68a7ffff" },
-  { label: "Gamer", color: "#68a7ffff" },
-  { label: "Half a Programmer", color: "#68a7ffff" },
+  { label: "學生", color: "#ed4245" },
+  { label: "管樂人", color: "#68a7ffff" },
+  { label: "玩家", color: "#68a7ffff" },
+  { label: "半個程式人", color: "#68a7ffff" },
   { label: "DACSSSC Leader", color: "#ffcd58ff" },
-  { label: "DACB Student Conductor", color: "#ffcd58ff" },
-  { label: "Server Booster", color: "#f47fff" },
+  { label: "DACB 學生指揮", color: "#ffcd58ff" },
+  { label: "網站整理中", color: "#f47fff" },
 ];

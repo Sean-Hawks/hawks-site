@@ -13,14 +13,14 @@ export default function Header() {
   const [theme, setTheme] = React.useState<ThemeMode>("dark");
 
   const navItems = [
-    { label: "README", href: "/" },
+    { label: "首頁", href: "/" },
     { label: "Blog", href: "/blog" },
     { label: "Now", href: "/now" },
     { label: "Library", href: "/library" },
-    { label: "Project", href: "/project" },
-    { label: "Search", href: "/search" },
-    { label: "Subscribe", href: "/subscribe" },
-    { label: "Contact", href: "/contact" },
+    { label: "專案", href: "/project" },
+    { label: "搜尋", href: "/search" },
+    { label: "訂閱", href: "/subscribe" },
+    { label: "聯絡", href: "/contact" },
   ];
 
   React.useEffect(() => {
