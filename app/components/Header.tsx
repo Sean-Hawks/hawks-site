@@ -67,7 +67,7 @@ export default function Header() {
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-3">
         <Link
           href="/"
-          className="font-serif text-xl font-bold tracking-tight text-[rgb(var(--text))] transition-opacity hover:opacity-80 sm:text-2xl"
+          className="text-xl font-extrabold tracking-wide text-[rgb(var(--text))] transition-opacity hover:opacity-80 sm:text-2xl"
         >
           <div>hawks.tw</div>
         </Link>
@@ -86,7 +86,7 @@ export default function Header() {
                   key={item.label}
                   href={item.href}
                   className={[
-                    "rounded-xl px-3 py-2 font-serif text-sm tracking-[0.01em] transition-colors",
+                    "rounded-xl px-3 py-2 text-sm transition-colors",
                     isActive
                       ? "bg-[rgb(var(--accent)/0.12)] text-[rgb(var(--text))] border border-[rgb(var(--accent)/0.24)]"
                       : "text-[rgb(var(--muted))] hover:text-[rgb(var(--text))] hover:bg-[rgb(var(--line)/0.05)]",
@@ -131,7 +131,7 @@ export default function Header() {
                   key={item.label}
                   href={item.href}
                   className={[
-                    "rounded-lg px-3 py-2 font-serif text-sm tracking-[0.01em] transition-colors",
+                    "rounded-lg px-3 py-2 text-sm transition-colors",
                     isActive
                       ? "bg-[rgb(var(--accent)/0.12)] text-[rgb(var(--text))]"
                       : "text-[rgb(var(--muted))] hover:bg-[rgb(var(--line)/0.05)] hover:text-[rgb(var(--text))]",

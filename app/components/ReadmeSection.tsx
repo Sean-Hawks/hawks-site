@@ -30,37 +30,35 @@ export default function ReadmeSection({
   return (
     <div className="grid gap-6">
       <section className="max-w-3xl">
-        <div className="mb-2 text-sm font-medium tracking-[0.08em] text-[rgb(var(--muted))]">
-          HAWKS&apos; PERSONAL SITE
-        </div>
-        <h1 className="font-serif text-[2rem] font-bold leading-[1.18] tracking-tight sm:text-4xl lg:text-[2.65rem]">
-          把喜歡的東西，<span className="text-[rgb(var(--purple))]">好好寫下來。</span>
+        <div className="mb-2 text-sm text-[rgb(var(--muted))]">{`>_ $ whoami`}</div>
+        <h1 className="text-3xl font-bold leading-tight sm:text-4xl">
+          Oh hi, I&apos;m <span className="text-[rgb(var(--purple))]">Hawks</span> :D 
         </h1>
-        <p className="mt-3 max-w-2xl text-[0.98rem] leading-8 text-[rgb(var(--muted))] sm:text-base">
-          這裡是 Hawks 的個人網站。我寫程式、吹管樂，也收藏動畫、音樂、遊戲和偶爾冒出的想法。
-          沒有固定主題，有值得記住的事就寫。
+        <p className="mt-3 max-w-2xl text-base leading-8 text-[rgb(var(--muted))]">
+          學生、管樂人、半個寫 code 的人。這個網站現在最想做好的事，是把我喜歡的作品、
+          正在學的技術，和一些生活筆記整理成可以慢慢逛的地方。
         </p>
 
         <div className="mt-5 flex flex-wrap gap-2">
-          <Chip>技術筆記</Chip>
-          <Chip>音樂</Chip>
-          <Chip>動畫與遊戲</Chip>
-          <Chip>作品收藏</Chip>
-          <Chip>生活碎片</Chip>
+          <Chip>Library</Chip>
+          <Chip>Machine Learning</Chip>
+          <Chip>Music</Chip>
+          <Chip>ACGM</Chip>
+          <Chip>Web</Chip>
         </div>
         <div className="mt-6 flex flex-wrap gap-3">
           <Link
-            href="/blog"
+            href="/library"
             className="inline-flex items-center gap-2 rounded-xl border border-[rgb(var(--accent)/0.24)] bg-[rgb(var(--accent)/0.12)] px-4 py-2 text-sm font-bold text-[rgb(var(--accent))] transition-colors hover:bg-[rgb(var(--accent)/0.17)]"
           >
-            讀最近的文章
+            進入 Library
             <ArrowRight className="h-4 w-4" />
           </Link>
           <Link
-            href="/library"
+            href="/blog"
             className="inline-flex items-center gap-2 rounded-xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.04)] px-4 py-2 text-sm font-medium text-[rgb(var(--muted))] transition-colors hover:border-[rgb(var(--accent)/0.24)] hover:text-[rgb(var(--text))]"
           >
-            逛逛 Library
+            讀一些筆記
           </Link>
         </div>
       </section>
@@ -70,17 +68,17 @@ export default function ReadmeSection({
           <div>
             <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-[rgb(var(--accent)/0.22)] bg-[rgb(var(--accent)/0.10)] px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-[rgb(var(--accent))]">
               <Radio className="h-3.5 w-3.5 text-[rgb(var(--accent))]" />
-              最近更新
+              Activity
             </div>
             <p className="max-w-xl text-sm leading-7 text-[rgb(var(--muted))]">
-              最近寫下來的文章、評論與日常片段。
+              最近留下來的文章、評論、近況和一些不小心寫下來的碎片。
             </p>
           </div>
           <Link
             href="/now"
             className="inline-flex items-center rounded-lg border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.035)] px-3 py-2 text-sm font-medium text-[rgb(var(--muted))] transition-colors hover:border-[rgb(var(--accent)/0.22)] hover:text-[rgb(var(--accent))]"
           >
-            全部更新
+            View all
           </Link>
         </div>
 

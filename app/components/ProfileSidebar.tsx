@@ -87,7 +87,7 @@ export default function ProfileSidebar({ roles }: { roles: RoleTag[] }) {
           <div className="space-y-2">
             <SectionTitle icon={<BadgeCheck className="h-4 w-4" />} title="關於我" />
             <div className="rounded-xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.04)] p-3 text-sm leading-relaxed text-[rgb(var(--muted))]">
-              Coding helps me survive, music makes me feel alive.
+               Coding helps me survive, music makes me feel alive.
             </div>
           </div>
 

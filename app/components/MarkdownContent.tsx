@@ -287,12 +287,12 @@ export default function MarkdownContent({
     },
 
     h1: ({ children, ...props }) => (
-      <h1 id={headingId(textFromChildren(children))} className="scroll-mt-24 mt-12 mb-6 border-b border-[rgb(var(--line)/0.10)] pb-4 font-serif text-3xl font-extrabold tracking-tight text-[rgb(var(--text))] sm:text-4xl" {...props}>
+      <h1 id={headingId(textFromChildren(children))} className="scroll-mt-24 text-3xl sm:text-4xl font-extrabold mt-12 mb-6 text-[rgb(var(--text))] tracking-tight border-b border-[rgb(var(--line)/0.10)] pb-4" {...props}>
         {children}
       </h1>
     ),
     h2: ({ children, ...props }) => (
-      <h2 id={headingId(textFromChildren(children))} className="scroll-mt-24 mt-12 mb-5 border-l-4 border-[rgb(var(--accent))] pl-4 font-serif text-2xl font-bold tracking-tight text-[rgb(var(--text))] sm:text-3xl" {...props}>
+      <h2 id={headingId(textFromChildren(children))} className="scroll-mt-24 border-l-4 border-[rgb(var(--accent))] pl-4 text-2xl sm:text-3xl font-bold mt-12 mb-5 text-[rgb(var(--text))] tracking-tight" {...props}>
         {children}
       </h2>
     ),
@@ -307,7 +307,7 @@ export default function MarkdownContent({
       }
 
       return (
-        <h3 id={headingId(text)} className="scroll-mt-24 mt-8 mb-3 font-serif text-xl font-bold tracking-tight text-[rgb(var(--text))] sm:text-2xl" {...props}>
+        <h3 id={headingId(text)} className="scroll-mt-24 text-xl sm:text-2xl font-bold mt-8 mb-3 text-[rgb(var(--text))] tracking-tight" {...props}>
           {children}
         </h3>
       );
@@ -332,7 +332,7 @@ export default function MarkdownContent({
         ? "my-7 text-base leading-8 text-[rgb(var(--text)/0.82)] sm:text-[1.08rem] sm:leading-9"
         : isLibraryReview
           ? "my-4 rounded-xl border border-[rgb(var(--line)/0.08)] bg-[rgb(var(--panel2)/0.34)] px-4 py-3 text-base leading-8 text-[rgb(var(--text)/0.92)] shadow-[0_10px_30px_rgba(90,76,55,0.06)] sm:px-5 sm:py-4 sm:text-[1.06rem]"
-          : "my-5 text-base leading-[1.85] text-[rgb(var(--text)/0.88)] sm:text-[1.05rem]";
+          : "my-5 leading-8 text-[rgb(var(--text)/0.84)] text-base sm:text-[1.05rem]";
 
       return (
         <div className={paragraphClass} {...props}>

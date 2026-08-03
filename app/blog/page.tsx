@@ -83,7 +83,7 @@ export default function BlogPage() {
               </div>
               <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                 <div>
-                  <h1 className="font-serif text-3xl font-bold leading-tight tracking-tight sm:text-4xl">Blog</h1>
+                  <h1 className="text-3xl font-bold leading-tight sm:text-4xl">Blog</h1>
                   <p className="mt-2 max-w-2xl text-sm leading-7 text-[rgb(var(--muted))] sm:text-base">
                     筆記、近況與一些有興趣才會寫下來的東西。
                   </p>
@@ -148,7 +148,7 @@ export default function BlogPage() {
 
                             <Link href={`/blog/${post.slug}`} className="group flex min-w-0 gap-4">
                               <div className="min-w-0 flex-1">
-                                <h2 className="break-words font-serif text-xl font-bold leading-snug tracking-tight text-[rgb(var(--text))] transition-colors group-hover:text-[rgb(var(--accent))] sm:text-2xl">
+                                <h2 className="break-words text-xl font-bold leading-snug text-[rgb(var(--text))] transition-colors group-hover:text-[rgb(var(--accent))] sm:text-2xl">
                                 {post.title}
                                 </h2>
                                 <p className="mt-2 line-clamp-2 text-sm leading-7 text-[rgb(var(--muted))] sm:text-base">
