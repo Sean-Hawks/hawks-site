@@ -31,7 +31,7 @@ export default function ReadmeSection({
     <div className="grid gap-6">
       <section className="max-w-3xl">
         <div className="mb-2 text-sm text-[rgb(var(--muted))]">{`>_ $ whoami`}</div>
-        <h1 className="text-3xl font-bold leading-tight sm:text-4xl">
+        <h1 className="font-serif text-3xl font-bold leading-tight tracking-tight sm:text-4xl">
           Oh hi, I&apos;m <span className="text-[rgb(var(--purple))]">Hawks</span> :D 
         </h1>
         <p className="mt-3 max-w-2xl text-base leading-8 text-[rgb(var(--muted))]">
