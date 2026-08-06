@@ -36,7 +36,7 @@ export default function TalkPage() {
         <main className="mx-auto max-w-6xl py-8">
           
           <div className="mb-10">
-            <h1 className="text-3xl font-bold">Talk Archive</h1>
+            <h1 className="font-serif text-3xl font-bold tracking-tight">Talk Archive</h1>
             <p className="mt-2 text-[rgb(var(--muted))]">分享、演講與教學記錄。主要近況現在放在 Now 頁。</p>
           </div>
 
@@ -53,7 +53,7 @@ export default function TalkPage() {
                   LATEST TALK
                 </div>
                 
-                <h2 className="text-2xl sm:text-3xl font-bold text-[rgb(var(--text))] mb-3 group-hover:text-[rgb(var(--accent))] transition-colors">
+                <h2 className="mb-3 font-serif text-2xl font-bold tracking-tight text-[rgb(var(--text))] transition-colors group-hover:text-[rgb(var(--accent))] sm:text-3xl">
                   <Link href={`/talk/${latestTalk.id}`} className="before:absolute before:inset-0 focus:outline-none">
                     {latestTalk.title}
                   </Link>
@@ -144,7 +144,7 @@ export default function TalkPage() {
                       )}
                     </div>
 
-                    <h2 className="mt-3 text-xl font-bold text-[rgb(var(--text))] group-hover:text-[rgb(var(--accent))] transition-colors">
+                    <h2 className="mt-3 font-serif text-xl font-bold tracking-tight text-[rgb(var(--text))] transition-colors group-hover:text-[rgb(var(--accent))]">
                       <Link href={`/talk/${talk.id}`} className="before:absolute before:inset-0 focus:outline-none">
                         {talk.title}
                       </Link>

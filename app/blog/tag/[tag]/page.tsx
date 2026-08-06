@@ -68,7 +68,7 @@ export default async function BlogTagPage({ params }: PageProps) {
             <Hash className="h-3.5 w-3.5" />
             Tag Index
           </div>
-          <h1 className="text-3xl font-bold leading-tight sm:text-4xl">
+          <h1 className="font-serif text-3xl font-bold leading-tight tracking-tight sm:text-4xl">
             {tagInfo?.tag ?? `#${tag}`}
           </h1>
           <p className="mt-2 text-sm leading-7 text-[rgb(var(--muted))] sm:text-base">
@@ -129,7 +129,7 @@ export default async function BlogTagPage({ params }: PageProps) {
               {item.href ? (
                 <Link href={item.href} className="group flex min-w-0 gap-4">
                   <div className="min-w-0 flex-1">
-                    <h2 className="break-words text-xl font-bold leading-snug transition-colors group-hover:text-[rgb(var(--accent))] sm:text-2xl">
+                    <h2 className="break-words font-serif text-xl font-bold leading-snug tracking-tight transition-colors group-hover:text-[rgb(var(--accent))] sm:text-2xl">
                       {item.title}
                     </h2>
                     <p className="mt-2 line-clamp-2 text-sm leading-7 text-[rgb(var(--muted))] sm:text-base">
@@ -141,7 +141,7 @@ export default async function BlogTagPage({ params }: PageProps) {
               ) : (
                 <div className="flex min-w-0 gap-4">
                   <div className="min-w-0 flex-1">
-                    <h2 className="break-words text-xl font-bold leading-snug sm:text-2xl">
+                    <h2 className="break-words font-serif text-xl font-bold leading-snug tracking-tight sm:text-2xl">
                       {item.title}
                     </h2>
                     <p className="mt-2 line-clamp-2 text-sm leading-7 text-[rgb(var(--muted))] sm:text-base">

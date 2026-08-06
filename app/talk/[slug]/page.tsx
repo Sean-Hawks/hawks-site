@@ -73,7 +73,7 @@ export default async function TalkDetailPage({ params }: PageProps) {
         <ThemeStyles />
         <Header />
         <main className="p-6 max-w-2xl mx-auto">
-          <h1 className="text-2xl font-bold">Talk 未找到</h1>
+          <h1 className="font-serif text-2xl font-bold tracking-tight">Talk 未找到</h1>
           <Link href="/talk" className="mt-4 text-[rgb(var(--accent))] hover:underline inline-flex items-center gap-2">
             <ArrowLeft className="h-4 w-4" />
             回到 Talks
@@ -131,7 +131,7 @@ export default async function TalkDetailPage({ params }: PageProps) {
                 </div>
               )}
 
-              <h1 className="text-3xl font-bold leading-tight text-[rgb(var(--text))] sm:text-4xl">
+              <h1 className="font-serif text-3xl font-bold leading-tight tracking-tight text-[rgb(var(--text))] sm:text-4xl">
                 {talk.title}
               </h1>
 

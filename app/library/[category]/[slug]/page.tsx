@@ -347,7 +347,7 @@ export default async function LibraryReviewPage({ params }: PageProps) {
                     )}
                   </div>
 
-                  <h1 className="text-3xl font-bold leading-tight text-[rgb(var(--text))] sm:text-4xl">
+                  <h1 className="font-serif text-3xl font-bold leading-tight tracking-tight text-[rgb(var(--text))] sm:text-4xl">
                     {item.hasReview ? `評論：${item.title}` : item.title}
                   </h1>
                   {item.subtitle && (
@@ -395,7 +395,7 @@ export default async function LibraryReviewPage({ params }: PageProps) {
                           <Sparkles className="h-3.5 w-3.5" />
                           Review
                         </div>
-                        <h2 className="mt-3 text-2xl font-bold leading-tight text-[rgb(var(--text))]">
+                        <h2 className="mt-3 font-serif text-2xl font-bold leading-tight tracking-tight text-[rgb(var(--text))]">
                           個人評論
                         </h2>
                       </div>

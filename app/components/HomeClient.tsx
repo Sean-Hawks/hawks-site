@@ -153,7 +153,7 @@ function LibraryShowcase({ items }: { items: LibraryItem[] }) {
                 {formatRating(spotlight.rating)}
               </span>
             </div>
-            <h3 className="max-w-xl text-2xl font-bold leading-tight text-white transition-colors group-hover:text-yellow-100 sm:text-3xl">
+            <h3 className="max-w-xl font-serif text-2xl font-bold leading-tight tracking-tight text-white transition-colors group-hover:text-yellow-100 sm:text-3xl">
               {spotlight.title}
             </h3>
             {spotlight.subtitle && (
@@ -251,7 +251,7 @@ function SectionHeader({
         <div className="text-xs font-bold uppercase tracking-[0.18em] text-[rgb(var(--accent))]">
           {eyebrow}
         </div>
-        <h2 className="mt-1 text-2xl font-bold leading-tight text-[rgb(var(--text))] sm:text-3xl">{title}</h2>
+        <h2 className="mt-1 font-serif text-2xl font-bold leading-tight tracking-tight text-[rgb(var(--text))] sm:text-3xl">{title}</h2>
         {desc && <p className="mt-1 max-w-2xl text-sm leading-6 text-[rgb(var(--muted))]">{desc}</p>}
       </div>
       {href && (

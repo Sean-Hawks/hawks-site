@@ -69,7 +69,7 @@ export default function NowPage() {
             Now
           </div>
           <div>
-            <h1 className="text-3xl font-bold leading-tight sm:text-5xl">最近更新</h1>
+            <h1 className="font-serif text-3xl font-bold leading-tight tracking-tight sm:text-5xl">最近更新</h1>
             <p className="mt-3 max-w-2xl text-base leading-8 text-[rgb(var(--muted))]">
               最近公開的文章、評論與分享紀錄。
             </p>
@@ -84,7 +84,7 @@ export default function NowPage() {
                   <FileText className="h-3.5 w-3.5" />
                   Blog
                 </div>
-                <h2 className="mt-3 text-2xl font-bold leading-tight sm:text-3xl">最新長文</h2>
+                <h2 className="mt-3 font-serif text-2xl font-bold leading-tight tracking-tight sm:text-3xl">最新長文</h2>
               </div>
               <Link href="/blog" className="inline-flex items-center gap-1.5 text-sm text-[rgb(var(--muted))] transition-colors hover:text-[rgb(var(--accent))]">
                 Blog Archive
@@ -125,7 +125,7 @@ export default function NowPage() {
               <div className="inline-flex items-center rounded-full border border-[rgb(var(--accent)/0.20)] bg-[rgb(var(--accent)/0.08)] px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-[rgb(var(--accent))]">
                 Latest Updates
               </div>
-              <h2 className="mt-1 text-2xl font-bold">短更新與評論</h2>
+              <h2 className="mt-1 font-serif text-2xl font-bold tracking-tight">短更新與評論</h2>
             </div>
             <div className="flex gap-4 text-sm">
               <Link href="/library" className="inline-flex items-center gap-1.5 text-[rgb(var(--muted))] transition-colors hover:text-[rgb(var(--accent))]">

@@ -287,12 +287,12 @@ export default function MarkdownContent({
     },
 
     h1: ({ children, ...props }) => (
-      <h1 id={headingId(textFromChildren(children))} className="scroll-mt-24 text-3xl sm:text-4xl font-extrabold mt-12 mb-6 text-[rgb(var(--text))] tracking-tight border-b border-[rgb(var(--line)/0.10)] pb-4" {...props}>
+      <h1 id={headingId(textFromChildren(children))} className="scroll-mt-24 mt-12 mb-6 border-b border-[rgb(var(--line)/0.10)] pb-4 font-serif text-3xl font-extrabold tracking-tight text-[rgb(var(--text))] sm:text-4xl" {...props}>
         {children}
       </h1>
     ),
     h2: ({ children, ...props }) => (
-      <h2 id={headingId(textFromChildren(children))} className="scroll-mt-24 border-l-4 border-[rgb(var(--accent))] pl-4 text-2xl sm:text-3xl font-bold mt-12 mb-5 text-[rgb(var(--text))] tracking-tight" {...props}>
+      <h2 id={headingId(textFromChildren(children))} className="scroll-mt-24 mt-12 mb-5 border-l-4 border-[rgb(var(--accent))] pl-4 font-serif text-2xl font-bold tracking-tight text-[rgb(var(--text))] sm:text-3xl" {...props}>
         {children}
       </h2>
     ),
@@ -300,14 +300,14 @@ export default function MarkdownContent({
       const text = textFromChildren(children);
       if (isTalk) {
         return (
-          <h3 id={headingId(text)} className="talk-section-heading scroll-mt-24 mt-12 grid grid-cols-[2.5rem_1fr] items-baseline gap-3 text-2xl font-extrabold leading-tight text-[rgb(var(--text))] sm:mt-14 sm:grid-cols-[3.25rem_1fr] sm:text-[1.8rem]" {...props}>
+          <h3 id={headingId(text)} className="talk-section-heading scroll-mt-24 mt-12 grid grid-cols-[2.5rem_1fr] items-baseline gap-3 font-serif text-2xl font-extrabold leading-tight text-[rgb(var(--text))] sm:mt-14 sm:grid-cols-[3.25rem_1fr] sm:text-[1.8rem]" {...props}>
             <span>{children}</span>
           </h3>
         );
       }
 
       return (
-        <h3 id={headingId(text)} className="scroll-mt-24 text-xl sm:text-2xl font-bold mt-8 mb-3 text-[rgb(var(--text))] tracking-tight" {...props}>
+        <h3 id={headingId(text)} className="scroll-mt-24 mt-8 mb-3 font-serif text-xl font-bold tracking-tight text-[rgb(var(--text))] sm:text-2xl" {...props}>
           {children}
         </h3>
       );

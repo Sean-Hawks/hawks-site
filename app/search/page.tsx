@@ -39,7 +39,7 @@ export default function SearchPage() {
           <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-[rgb(var(--accent)/0.22)] bg-[rgb(var(--accent)/0.10)] px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-[rgb(var(--accent))]">
             Search
           </div>
-          <h1 className="text-3xl font-bold leading-tight sm:text-4xl">搜尋</h1>
+          <h1 className="font-serif text-3xl font-bold leading-tight tracking-tight sm:text-4xl">搜尋</h1>
           <p className="mt-2 max-w-2xl text-sm leading-7 text-[rgb(var(--muted))] sm:text-base">
             從 Blog、Talk、Library、tag 和內文裡快速找到你想回頭看的東西。
           </p>
