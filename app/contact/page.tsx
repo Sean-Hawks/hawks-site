@@ -38,7 +38,7 @@ export default function ContactPage() {
       <div className="w-full px-4 sm:px-3">
         <main className="mx-auto max-w-2xl py-12">
           <div className="text-center mb-12">
-            <h1 className="text-3xl font-bold">Contact Me</h1>
+            <h1 className="font-serif text-3xl font-bold tracking-tight">Contact Me</h1>
             <p className="mt-3 text-[rgb(var(--muted))]">
               有任何問題或合作邀約，歡迎透過以下方式聯繫我。
             </p>

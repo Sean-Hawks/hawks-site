@@ -95,7 +95,7 @@ export default async function PostPage({ params }: PageProps) {
         <ThemeStyles />
         <Header />
         <main className="p-6 max-w-2xl mx-auto">
-          <h1 className="text-2xl font-bold">文章未找到</h1>
+          <h1 className="font-serif text-2xl font-bold tracking-tight">文章未找到</h1>
           <Link href="/blog" className="mt-4 text-[rgb(var(--accent))] hover:underline inline-flex items-center gap-2">
             <ArrowLeft className="h-4 w-4" />
             回到 Blog
@@ -177,7 +177,7 @@ export default async function PostPage({ params }: PageProps) {
                   ))}
                 </div>
                 
-                <h1 className="text-3xl sm:text-4xl font-bold leading-tight text-[rgb(var(--text))]">
+                <h1 className="font-serif text-3xl font-bold leading-tight tracking-tight text-[rgb(var(--text))] sm:text-4xl">
                   {post.title}
                 </h1>
                 <div className="mt-4 flex items-center gap-4 text-sm text-[rgb(var(--muted))]">

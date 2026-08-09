@@ -214,7 +214,7 @@ function SpotlightCard({ item }: { item: LibraryItem }) {
         <p className="text-xs font-bold uppercase tracking-[0.16em] text-[rgb(var(--accent))]">
           精選
         </p>
-        <h2 className="mt-2 text-2xl font-bold leading-tight text-[rgb(var(--text))] transition-colors group-hover:text-[rgb(var(--accent))]">
+        <h2 className="mt-2 font-serif text-2xl font-bold leading-tight tracking-tight text-[rgb(var(--text))] transition-colors group-hover:text-[rgb(var(--accent))]">
           {item.hasReview ? `評論：${item.title}` : item.title}
         </h2>
         {item.subtitle && (
@@ -417,7 +417,7 @@ export default function LibraryPage() {
               <Clapperboard className="h-3.5 w-3.5" />
               Hawks Library
             </div>
-            <h1 className="max-w-2xl text-3xl font-bold leading-tight sm:text-5xl">
+            <h1 className="max-w-2xl font-serif text-3xl font-bold leading-tight tracking-tight sm:text-5xl">
               看過，聽過，玩過
             </h1>
             <p className="mt-4 max-w-2xl text-base leading-8 text-[rgb(var(--muted))]">
@@ -469,7 +469,7 @@ export default function LibraryPage() {
                   <PlayCircle className="h-3.5 w-3.5" />
                   Now
                 </div>
-                <h2 className="mt-1 text-2xl font-bold leading-tight">
+                <h2 className="mt-1 font-serif text-2xl font-bold leading-tight tracking-tight">
                   Watching / Playing
                 </h2>
               </div>
@@ -488,7 +488,7 @@ export default function LibraryPage() {
               <div className="text-xs font-bold uppercase tracking-[0.16em] text-[rgb(var(--accent))]">
                 Picks
               </div>
-              <h2 className="mt-1 text-2xl font-bold leading-tight">
+              <h2 className="mt-1 font-serif text-2xl font-bold leading-tight tracking-tight">
                 分類精選
               </h2>
             </div>
@@ -510,7 +510,7 @@ export default function LibraryPage() {
               <div className="text-xs font-bold uppercase tracking-[0.16em] text-[rgb(var(--accent))]">
                 Library
               </div>
-              <h2 className="mt-1 text-2xl font-bold leading-tight">
+              <h2 className="mt-1 font-serif text-2xl font-bold leading-tight tracking-tight">
                 分類
               </h2>
             </div>
@@ -537,7 +537,7 @@ export default function LibraryPage() {
                     <div className="text-xs font-bold uppercase tracking-[0.16em] text-[rgb(var(--accent))]">
                       {category.label}
                     </div>
-                    <h2 className="mt-1 text-2xl font-bold leading-tight">
+                    <h2 className="mt-1 font-serif text-2xl font-bold leading-tight tracking-tight">
                       {category.title}
                     </h2>
                     <p className="mt-2 text-sm leading-7 text-[rgb(var(--muted))]">

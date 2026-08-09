@@ -30,7 +30,7 @@ export default function ProjectPage() {
             <FolderGit2 className="h-3.5 w-3.5" />
             Projects
           </div>
-          <h1 className="text-3xl font-bold">Project</h1>
+          <h1 className="font-serif text-3xl font-bold tracking-tight">Project</h1>
           <p className="mt-2 max-w-2xl leading-7 text-[rgb(var(--muted))]">
             放一些正在做、做過，或之後想慢慢補完的東西。
           </p>

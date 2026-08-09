@@ -31,7 +31,7 @@ export default function ReadmeSection({
     <div className="grid gap-6">
       <section className="max-w-3xl">
         <div className="mb-2 text-sm text-[rgb(var(--muted))]">{`>_ $ whoami`}</div>
-        <h1 className="text-3xl font-bold leading-tight sm:text-4xl">
+        <h1 className="font-serif text-3xl font-bold leading-tight tracking-tight sm:text-4xl">
           Oh hi, I&apos;m <span className="text-[rgb(var(--purple))]">Hawks</span> :D 
         </h1>
         <p className="mt-3 max-w-2xl text-base leading-8 text-[rgb(var(--muted))]">
@@ -121,7 +121,7 @@ export default function ReadmeSection({
                     <span className="opacity-40">/</span>
                     <time>{item.date}</time>
                   </div>
-                  <h3 className="line-clamp-2 text-sm font-bold leading-6 text-[rgb(var(--text))] transition-colors group-hover:text-[rgb(var(--accent))]">
+                  <h3 className="line-clamp-2 font-serif text-sm font-bold leading-6 tracking-tight text-[rgb(var(--text))] transition-colors group-hover:text-[rgb(var(--accent))]">
                     {item.title}
                   </h3>
                   <p className="mt-1 line-clamp-2 text-xs leading-5 text-[rgb(var(--muted))]">
