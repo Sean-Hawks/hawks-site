@@ -21,6 +21,7 @@ export default function Header() {
     { label: "Search", href: "/search" },
     { label: "Subscribe", href: "/subscribe" },
     { label: "Contact", href: "/contact" },
+    { label: "Timeline", href: "/timeline" },
   ];
 
   React.useEffect(() => {

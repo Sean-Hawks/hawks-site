@@ -207,3 +207,65 @@ html {
     padding: 1.5rem 1.35rem 1.6rem;
   }
 }
+
+@media print {
+  @page {
+    margin: 14mm 16mm;
+  }
+
+  :root,
+  :root[data-theme="dark"],
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --background: #ffffff;
+    --foreground: #1f1d1a;
+    --bg: 255 255 255;
+    --panel: 255 255 255;
+    --panel2: 250 248 244;
+    --text: 31 29 26;
+    --muted: 89 83 75;
+    --accent: 146 92 16;
+    --purple: 94 73 163;
+    --line: 31 29 26;
+  }
+
+  body,
+  .site-shell {
+    background: #ffffff !important;
+  }
+
+  .site-shell::before,
+  .site-shell::after,
+  .resume-print-root > header,
+  .print-hidden {
+    display: none !important;
+  }
+
+  .resume-page {
+    max-width: none !important;
+    padding: 0 !important;
+  }
+
+  .resume-timeline {
+    margin-top: 2rem !important;
+  }
+
+  .resume-timeline-line {
+    left: 9.25rem !important;
+  }
+
+  .resume-timeline-item {
+    break-inside: avoid;
+    grid-template-columns: 7.5rem 1.25rem minmax(0, 1fr) !important;
+    column-gap: 1.25rem !important;
+    padding-bottom: 1.5rem !important;
+  }
+
+  .resume-period-desktop {
+    display: block !important;
+  }
+
+  .resume-period-mobile {
+    display: none !important;
+  }
+}
