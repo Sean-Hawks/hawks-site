@@ -314,7 +314,7 @@ export default function HomeClient({ posts, talks, libraryItems }: HomeClientPro
                 <div className="font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-cyan-500">
                   Hawks.tw / Personal signal grid
                 </div>
-                <h1 className="home-hero-title mt-5 text-[clamp(4rem,10vw,8.8rem)] font-black uppercase leading-[0.78] tracking-[-0.075em]">
+                <h1 className="home-hero-title mt-5 font-black uppercase leading-[0.78] tracking-[-0.075em]">
                   <span className="block">Hawks</span>
                   <span className="home-hero-outline block">.tw</span>
                 </h1>

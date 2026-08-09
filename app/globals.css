@@ -259,7 +259,13 @@ html {
   opacity: 0.7;
 }
 
+.home-hero-copy {
+  container-type: inline-size;
+}
+
 .home-hero-title {
+  max-width: 100%;
+  font-size: clamp(4rem, 19cqi, 7.5rem);
   text-wrap: balance;
   text-shadow: 0.045em 0.045em 0 rgb(6 182 212 / 0.12);
   transition: letter-spacing 320ms ease, text-shadow 320ms ease;
