@@ -121,7 +121,7 @@ export default function ReadmeSection({
                     <span className="opacity-40">/</span>
                     <time>{item.date}</time>
                   </div>
-                  <h3 className="line-clamp-2 text-sm font-bold leading-6 text-[rgb(var(--text))] transition-colors group-hover:text-[rgb(var(--accent))]">
+                  <h3 className="line-clamp-2 font-serif text-sm font-bold leading-6 tracking-tight text-[rgb(var(--text))] transition-colors group-hover:text-[rgb(var(--accent))]">
                     {item.title}
                   </h3>
                   <p className="mt-1 line-clamp-2 text-xs leading-5 text-[rgb(var(--muted))]">
