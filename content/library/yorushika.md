@@ -18,7 +18,8 @@ image:
   alt: Yorushika logo
   credit: Wikimedia Commons
   source: https://commons.wikimedia.org/wiki/File:Yorushika_Logo.jpg
-  fit: contain
+  fit: cover
+  zoom: true
 statusVisibility: published
 ---
 ## 推薦作品

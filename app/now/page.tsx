@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { ArrowRight, BookOpenText, FileText, Mic2, Sparkles } from "lucide-react";
+import { ArrowRight, BookOpenText, FileText, Mic2 } from "lucide-react";
 import Header from "../components/Header";
+import SignalPageHeader from "../components/SignalPageHeader";
 import ThemeStyles from "../components/ThemeStyles";
 import { getSortedPostsData } from "../lib/posts";
 import { getSortedTalksData } from "../lib/talks";
@@ -62,22 +63,17 @@ export default function NowPage() {
       <ThemeStyles />
       <Header />
 
-      <main className="mx-auto max-w-6xl px-4 py-10 sm:px-3">
-        <section className="mb-8 rounded-2xl border border-[rgb(var(--accent)/0.16)] bg-gradient-to-br from-[rgb(var(--panel2)/0.92)] via-[rgb(var(--panel)/0.86)] to-[rgb(var(--accent)/0.07)] p-5 shadow-[0_24px_80px_rgba(90,76,55,0.16)] sm:p-7">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[rgb(var(--accent)/0.26)] bg-[rgb(var(--accent)/0.12)] px-3 py-1.5 text-xs font-bold uppercase tracking-[0.16em] text-[rgb(var(--accent))]">
-            <Sparkles className="h-3.5 w-3.5" />
-            Now
-          </div>
-          <div>
-            <h1 className="font-serif text-3xl font-bold leading-tight tracking-tight sm:text-5xl">最近更新</h1>
-            <p className="mt-3 max-w-2xl text-base leading-8 text-[rgb(var(--muted))]">
-              最近公開的文章、評論與分享紀錄。
-            </p>
-          </div>
-        </section>
+      <main className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
+        <SignalPageHeader
+          code="02 / LIVE FEED"
+          title="最近更新"
+          description="最近公開的文章、評論與分享紀錄。"
+          statLabel="Signals"
+          statValue={String(latestItems.length + (latestBlog ? 1 : 0)).padStart(2, "0")}
+        />
 
         {latestBlog && (
-          <section className="mb-8 rounded-2xl border border-[rgb(var(--accent)/0.18)] bg-[rgb(var(--panel)/0.90)] p-5 shadow-[0_20px_64px_rgba(90,76,55,0.12)] sm:p-6">
+          <section className="mb-10">
             <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div>
                 <div className="inline-flex items-center gap-2 rounded-full border border-[rgb(var(--accent)/0.22)] bg-[rgb(var(--accent)/0.10)] px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-[rgb(var(--accent))]">
@@ -139,7 +135,7 @@ export default function NowPage() {
             </div>
           </div>
 
-          <div className="space-y-3">
+          <div className="border-y border-[rgb(var(--line)/0.10)]">
             {latestItems.map((item) => {
               const Icon = item.Icon;
 
@@ -147,10 +143,10 @@ export default function NowPage() {
                 <Link
                   key={item.id}
                   href={item.href}
-                  className="group grid gap-3 rounded-2xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.88)] p-5 shadow-[0_16px_48px_rgba(90,76,55,0.08)] transition-colors hover:border-[rgb(var(--accent)/0.30)] hover:bg-[rgb(var(--panel))] sm:grid-cols-[auto_1fr]"
+                  className="group grid grid-cols-[2.25rem_minmax(0,1fr)] gap-3 border-b border-[rgb(var(--line)/0.09)] py-4 transition-colors last:border-b-0 hover:border-[rgb(var(--accent)/0.24)]"
                 >
-                  <div className="grid h-11 w-11 place-items-center rounded-xl border border-[rgb(var(--accent)/0.20)] bg-[rgb(var(--accent)/0.09)] text-[rgb(var(--accent))] transition-colors group-hover:bg-[rgb(var(--accent)/0.14)]">
-                    <Icon className="h-5 w-5" />
+                  <div className="grid h-9 w-9 place-items-center rounded-lg border border-[rgb(var(--accent)/0.20)] bg-[rgb(var(--accent)/0.09)] text-[rgb(var(--accent))] transition-colors group-hover:bg-[rgb(var(--accent)/0.14)]">
+                    <Icon className="h-4 w-4" />
                   </div>
                   <div>
                     <div className="mb-2 flex flex-wrap items-center gap-2 text-xs text-[rgb(var(--muted))]">

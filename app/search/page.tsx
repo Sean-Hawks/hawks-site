@@ -1,4 +1,5 @@
 import Header from "../components/Header";
+import SignalPageHeader from "../components/SignalPageHeader";
 import ThemeStyles from "../components/ThemeStyles";
 import { getSortedPostsData } from "../lib/posts";
 import { getSortedTalksData } from "../lib/talks";
@@ -35,15 +36,13 @@ export default function SearchPage() {
       <Header />
 
       <main className="mx-auto max-w-4xl px-4 py-10 sm:px-3">
-        <div className="mb-8">
-          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-[rgb(var(--accent)/0.22)] bg-[rgb(var(--accent)/0.10)] px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-[rgb(var(--accent))]">
-            Search
-          </div>
-          <h1 className="font-serif text-3xl font-bold leading-tight tracking-tight sm:text-4xl">搜尋</h1>
-          <p className="mt-2 max-w-2xl text-sm leading-7 text-[rgb(var(--muted))] sm:text-base">
-            從 Blog、Talk、Library、tag 和內文裡快速找到你想回頭看的東西。
-          </p>
-        </div>
+        <SignalPageHeader
+          code="05 / QUERY"
+          title="搜尋"
+          description="從 Blog、Talk、Library、tag 和內文裡快速找到你想回頭看的東西。"
+          statLabel="Indexed"
+          statValue={String(items.length).padStart(2, "0")}
+        />
 
         <SearchClient items={items} tags={tags} />
       </main>

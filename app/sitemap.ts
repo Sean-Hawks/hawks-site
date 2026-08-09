@@ -20,6 +20,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "",
     "/blog/",
     "/now/",
+    "/timeline/",
     "/library/",
     "/project/",
     "/search/",

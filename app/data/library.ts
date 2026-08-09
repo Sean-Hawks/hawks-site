@@ -21,6 +21,7 @@ export type LibraryImage = {
   credit: string;
   source: string;
   fit?: "cover" | "contain";
+  zoom?: boolean;
 };
 
 export type LibraryRecommendedWork = {

@@ -4,6 +4,7 @@ import React from "react";
 import { Mail, Github, MessageSquare } from "lucide-react";
 import ThemeStyles from "../components/ThemeStyles";
 import Header from "../components/Header";
+import SignalPageHeader from "../components/SignalPageHeader";
 
 export default function ContactPage() {
   const contacts = [
@@ -36,15 +37,16 @@ export default function ContactPage() {
       <Header />
 
       <div className="w-full px-4 sm:px-3">
-        <main className="mx-auto max-w-2xl py-12">
-          <div className="text-center mb-12">
-            <h1 className="font-serif text-3xl font-bold tracking-tight">Contact Me</h1>
-            <p className="mt-3 text-[rgb(var(--muted))]">
-              有任何問題或合作邀約，歡迎透過以下方式聯繫我。
-            </p>
-          </div>
+        <main className="mx-auto max-w-5xl py-10 sm:py-14">
+          <SignalPageHeader
+            code="07 / UPLINK"
+            title="Contact"
+            description="有任何問題或合作邀約，歡迎透過以下方式聯繫我。"
+            statLabel="Channels"
+            statValue={String(contacts.length).padStart(2, "0")}
+          />
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-3">
             {contacts.map((item) => (
               <a
                 key={item.name}
@@ -65,7 +67,7 @@ export default function ContactPage() {
           </div>
         </main>
 
-        <footer className="mx-auto max-w-2xl px-4 pb-10 pt-8 text-xs text-[rgb(var(--muted))] text-center">
+        <footer className="mx-auto max-w-5xl px-4 pb-10 pt-8 text-center text-xs text-[rgb(var(--muted))]">
           <div className="opacity-70">© {new Date().getFullYear()} Hawks</div>
         </footer>
       </div>

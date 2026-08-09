@@ -3,7 +3,6 @@ import Image from "next/image";
 import {
   ArrowRight,
   ArrowUpRight,
-  Clapperboard,
   Disc3,
   Film,
   Gamepad2,
@@ -12,6 +11,7 @@ import {
   Tv,
 } from "lucide-react";
 import Header from "../components/Header";
+import SignalPageHeader from "../components/SignalPageHeader";
 import ThemeStyles from "../components/ThemeStyles";
 import {
   libraryCategories,
@@ -141,7 +141,7 @@ function StatusBadge({ item }: { item: LibraryItem }) {
       className={[
         "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium",
         isWatching
-          ? "border-amber-300/55 bg-amber-300/16 text-amber-700 shadow-[0_0_18px_rgba(251,191,36,0.14)] dark:text-amber-200"
+          ? "border-[rgb(var(--accent)/0.42)] bg-[rgb(var(--accent)/0.12)] text-[rgb(var(--accent))] shadow-[0_0_18px_rgb(var(--accent)/0.10)]"
           : isPlaying
             ? "border-emerald-300/55 bg-emerald-300/16 text-emerald-700 shadow-[0_0_18px_rgba(52,211,153,0.14)] dark:text-emerald-200"
           : "border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.04)] text-[rgb(var(--muted))]",
@@ -168,7 +168,7 @@ function ItemImage({
     <div
       className={[
         "relative overflow-hidden",
-        item.image.fit === "contain" ? "bg-white" : "bg-[rgb(var(--line)/0.05)]",
+        item.image.fit === "contain" ? "bg-[rgb(var(--panel2))]" : "bg-[rgb(var(--line)/0.05)]",
         className ?? "",
       ].join(" ")}
     >
@@ -179,8 +179,12 @@ function ItemImage({
           fill
           sizes={sizes}
           className={[
-            "transition-transform duration-300 group-hover:scale-[1.03]",
-            item.image.fit === "contain" ? "object-contain" : "object-cover",
+            "transition-transform duration-300",
+            item.image.zoom
+              ? "scale-[1.34] object-cover group-hover:scale-[1.38]"
+              : item.image.fit === "contain"
+                ? "object-contain group-hover:scale-[1.03]"
+                : "object-cover group-hover:scale-[1.03]",
           ].join(" ")}
         />
       ) : (
@@ -322,7 +326,7 @@ function WatchingCard({ item }: { item: LibraryItem }) {
   return (
     <Link
       href={href}
-      className="group grid grid-cols-[72px_minmax(0,1fr)] gap-3 rounded-2xl border border-amber-300/28 bg-amber-300/8 p-3 shadow-[0_18px_60px_rgba(251,191,36,0.08)] transition-colors hover:border-amber-300/50 sm:grid-cols-[88px_minmax(0,1fr)_auto] sm:items-center"
+      className="group grid grid-cols-[72px_minmax(0,1fr)] gap-3 rounded-2xl border border-[rgb(var(--accent)/0.24)] bg-[rgb(var(--accent)/0.06)] p-3 shadow-[0_18px_60px_rgb(var(--accent)/0.05)] transition-colors hover:border-[rgb(var(--accent)/0.44)] sm:grid-cols-[88px_minmax(0,1fr)_auto] sm:items-center"
     >
       <ItemImage
         item={item}
@@ -412,19 +416,14 @@ export default function LibraryPage() {
 
       <main className="mx-auto max-w-6xl px-4 py-10 sm:px-3">
         <section className="space-y-5">
-          <div className="rounded-2xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.88)] p-5 shadow-[0_22px_70px_rgb(var(--line)/0.10)] sm:p-7">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[rgb(var(--accent)/0.22)] bg-[rgb(var(--accent)/0.10)] px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-[rgb(var(--accent))]">
-              <Clapperboard className="h-3.5 w-3.5" />
-              Hawks Library
-            </div>
-            <h1 className="max-w-2xl font-serif text-3xl font-bold leading-tight tracking-tight sm:text-5xl">
-              看過，聽過，玩過
-            </h1>
-            <p className="mt-4 max-w-2xl text-base leading-8 text-[rgb(var(--muted))]">
-              關於我對 ACGM 以及藝術的品味。
-            </p>
-
-            <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <SignalPageHeader
+            code="03 / MEDIA INDEX"
+            title="看過，聽過，玩過"
+            description="關於我對 ACGM 以及藝術的品味。"
+            statLabel="Entries"
+            statValue={String(libraryItems.length).padStart(2, "0")}
+          >
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
               {stats.map((stat) => (
                 <div
                   key={stat.label}
@@ -440,7 +439,7 @@ export default function LibraryPage() {
               ))}
             </div>
 
-            <div className="mt-6 flex flex-wrap gap-3">
+            <div className="mt-5 flex flex-wrap gap-3">
               <Link
                 href="/library/anime"
                 className="inline-flex items-center gap-2 rounded-full border border-[rgb(var(--accent)/0.28)] bg-[rgb(var(--accent)/0.12)] px-4 py-2 text-sm font-medium text-[rgb(var(--accent))] transition-colors hover:bg-[rgb(var(--accent)/0.16)]"
@@ -456,7 +455,7 @@ export default function LibraryPage() {
                 Watching / Playing
               </Link>
             </div>
-          </div>
+          </SignalPageHeader>
 
           {spotlight && <SpotlightCard item={spotlight} />}
         </section>
@@ -465,7 +464,7 @@ export default function LibraryPage() {
           <section id="watching" className="mt-8">
             <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
               <div>
-                <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-amber-700 dark:text-amber-200">
+                <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[rgb(var(--accent))]">
                   <PlayCircle className="h-3.5 w-3.5" />
                   Now
                 </div>

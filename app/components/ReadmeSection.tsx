@@ -76,43 +76,44 @@ export default function ReadmeSection({
           </div>
           <Link
             href="/now"
-            className="inline-flex items-center rounded-lg border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.035)] px-3 py-2 text-sm font-medium text-[rgb(var(--muted))] transition-colors hover:border-[rgb(var(--accent)/0.22)] hover:text-[rgb(var(--accent))]"
+            className="inline-flex self-start items-center rounded-lg border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.035)] px-3 py-2 text-sm font-medium text-[rgb(var(--muted))] transition-colors hover:border-[rgb(var(--accent)/0.22)] hover:text-[rgb(var(--accent))]"
           >
             View all
           </Link>
         </div>
 
-        <div className="relative space-y-3 before:absolute before:left-[0.45rem] before:top-4 before:h-[calc(100%-2rem)] before:w-px before:bg-[rgb(var(--accent)/0.22)]">
-          {activityItems.map((item) => {
-          const Icon =
-            activityIcons[item.label as keyof typeof activityIcons] ?? FileText;
-          const visibleTags = item.tags.slice(0, 3);
-          const hiddenTagCount = Math.max(0, item.tags.length - visibleTags.length);
+        <div className="relative before:absolute before:left-2 before:top-3 before:h-[calc(100%-1.5rem)] before:w-px before:-translate-x-1/2 before:bg-[rgb(var(--accent)/0.22)]">
+          {activityItems.map((item, index) => {
+            const Icon =
+              activityIcons[item.label as keyof typeof activityIcons] ?? FileText;
+            const visibleTags = item.tags.slice(0, 3);
+            const hiddenTagCount = Math.max(
+              0,
+              item.tags.length - visibleTags.length
+            );
 
-          return (
-            <Link
-              key={item.key}
-              href={item.href}
-              className="group relative grid grid-cols-[1.1rem_minmax(0,1fr)] gap-3 rounded-xl px-1 py-2 transition-colors hover:bg-[rgb(var(--accent)/0.035)]"
-            >
-              <div className="relative z-10 mt-4 grid h-4 w-4 place-items-center rounded-full border border-[rgb(var(--accent)/0.34)] bg-[rgb(var(--panel))] shadow-[0_0_0_5px_rgb(var(--accent)/0.06)]">
-                <span className="h-1.5 w-1.5 rounded-full bg-[rgb(var(--accent))]" />
-              </div>
+            return (
+              <Link
+                key={item.key}
+                href={item.href}
+                className="group relative grid grid-cols-[1rem_minmax(0,1fr)] gap-4"
+              >
+                <div className="relative z-10 mt-3 grid h-4 w-4 place-items-center rounded-full border border-[rgb(var(--accent)/0.34)] bg-[rgb(var(--panel))] shadow-[0_0_0_5px_rgb(var(--accent)/0.06)]">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[rgb(var(--accent))]" />
+                </div>
 
-              <div className="overflow-hidden rounded-xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel2)/0.34)] shadow-[0_12px_36px_rgba(90,76,55,0.08)] transition-colors group-hover:border-[rgb(var(--accent)/0.28)] group-hover:bg-[rgb(var(--panel2)/0.50)]">
-                {item.banner && (
-                  <div className="relative aspect-[16/9] overflow-hidden border-b border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.04)] sm:aspect-[16/7]">
-                    <Image
-                      src={item.banner}
-                      alt={`${item.title} banner`}
-                      fill
-                      sizes="(min-width: 1024px) 640px, 100vw"
-                      className="object-cover transition-transform duration-500 group-hover:scale-[1.025]"
-                    />
-                  </div>
-                )}
-
-                <div className="p-4">
+                <div className="min-w-0 border-b border-[rgb(var(--line)/0.09)] pb-5 pt-1 transition-colors group-last:border-b-0 group-hover:border-[rgb(var(--accent)/0.22)]">
+                  {index === 0 && item.banner && (
+                    <div className="relative mb-3 aspect-[16/7] overflow-hidden rounded-xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.04)]">
+                      <Image
+                        src={item.banner}
+                        alt={`${item.title} banner`}
+                        fill
+                        sizes="(min-width: 1024px) 600px, 85vw"
+                        className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                      />
+                    </div>
+                  )}
                   <div className="mb-2 flex flex-wrap items-center gap-2 text-[10px] uppercase tracking-[0.08em] text-[rgb(var(--muted))]">
                     <span className="inline-flex items-center gap-1.5 rounded-md border border-[rgb(var(--accent)/0.18)] bg-[rgb(var(--accent)/0.08)] px-2 py-1 font-bold text-[rgb(var(--accent))]">
                       <Icon className="h-3 w-3" />
@@ -121,14 +122,14 @@ export default function ReadmeSection({
                     <span className="opacity-40">/</span>
                     <time>{item.date}</time>
                   </div>
-                  <h3 className="line-clamp-2 font-serif text-sm font-bold leading-6 tracking-tight text-[rgb(var(--text))] transition-colors group-hover:text-[rgb(var(--accent))]">
+                  <h3 className="line-clamp-2 font-serif text-base font-bold leading-6 tracking-tight text-[rgb(var(--text))] transition-colors group-hover:text-[rgb(var(--accent))] sm:text-lg">
                     {item.title}
                   </h3>
-                  <p className="mt-1 line-clamp-2 text-xs leading-5 text-[rgb(var(--muted))]">
+                  <p className="mt-1 line-clamp-2 text-sm leading-6 text-[rgb(var(--muted))]">
                     {item.desc}
                   </p>
                   {item.tags.length > 0 && (
-                    <div className="mt-3 flex flex-wrap gap-1.5">
+                    <div className="mt-3 hidden flex-wrap gap-1.5 sm:flex">
                       {visibleTags.map((tag) => (
                         <span
                           key={tag}
@@ -145,12 +146,11 @@ export default function ReadmeSection({
                     </div>
                   )}
                 </div>
-              </div>
-            </Link>
-          );
-        })}
+              </Link>
+            );
+          })}
         </div>
       </section>
-        </div>
+    </div>
   );
 }

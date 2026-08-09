@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, CalendarDays, FileText } from "lucide-react";
+import { ArrowRight, CalendarDays } from "lucide-react";
 import {
   getAllTags,
   getPostDescription,
@@ -9,6 +9,7 @@ import {
 } from "../lib/posts";
 import ThemeStyles from "../components/ThemeStyles";
 import Header from "../components/Header";
+import SignalPageHeader from "../components/SignalPageHeader";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -76,24 +77,14 @@ export default function BlogPage() {
           </aside>
 
           <div className="min-w-0">
-            <div className="mb-8 rounded-2xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.86)] p-5 shadow-[0_18px_60px_rgba(90,76,55,0.10)] sm:p-6">
-              <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-[rgb(var(--accent)/0.22)] bg-[rgb(var(--accent)/0.10)] px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-[rgb(var(--accent))]">
-                <FileText className="h-3.5 w-3.5" />
-                Writing
-              </div>
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-                <div>
-                  <h1 className="font-serif text-3xl font-bold leading-tight tracking-tight sm:text-4xl">Blog</h1>
-                  <p className="mt-2 max-w-2xl text-sm leading-7 text-[rgb(var(--muted))] sm:text-base">
-                    筆記、近況與一些有興趣才會寫下來的東西。
-                  </p>
-                </div>
-                <div className="rounded-xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel2))] px-3 py-2 text-sm text-[rgb(var(--muted))]">
-                  {posts.length} posts
-                </div>
-              </div>
-
-              <div className="mt-5 flex flex-wrap gap-2 lg:hidden">
+            <SignalPageHeader
+              code="01 / WRITING"
+              title="Blog"
+              description="筆記、近況與一些有興趣才會寫下來的東西。"
+              statLabel="Published"
+              statValue={String(posts.length).padStart(2, "0")}
+            >
+              <div className="flex flex-wrap gap-2 lg:hidden">
                 {mobileTags.map((tag) => (
                   <Link
                     key={tag.slug}
@@ -113,7 +104,7 @@ export default function BlogPage() {
                   </Link>
                 )}
               </div>
-            </div>
+            </SignalPageHeader>
 
             <div className="space-y-4">
                 {posts.map((post) => (
