@@ -111,7 +111,7 @@ function getRecentActivity({
       })),
   ]
     .sort((a, b) => (a.date < b.date ? 1 : -1))
-    .slice(0, 6);
+    .slice(0, 4);
 }
 
 function LibraryShowcase({ items }: { items: LibraryItem[] }) {
@@ -280,11 +280,11 @@ export default function HomeClient({ posts, talks, libraryItems }: HomeClientPro
 
       <main>
         <section className="mx-auto grid max-w-6xl gap-4 px-4 py-5 sm:px-3 lg:grid-cols-[340px_minmax(0,1fr)] lg:items-start">
-          <aside className="overflow-hidden rounded-2xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.90)] shadow-[0_20px_70px_rgba(90,76,55,0.10)] lg:sticky lg:top-20">
+          <aside className="order-2 overflow-hidden rounded-2xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.90)] shadow-[0_20px_70px_rgba(90,76,55,0.10)] lg:order-1 lg:sticky lg:top-20">
             <ProfileSidebar roles={rolesTop} />
           </aside>
 
-          <section className="rounded-2xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.88)] p-5 shadow-[0_20px_70px_rgba(90,76,55,0.08)] sm:p-6">
+          <section className="order-1 rounded-2xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.88)] p-5 shadow-[0_20px_70px_rgba(90,76,55,0.08)] sm:p-6 lg:order-2">
             <ReadmeSection activityItems={recentActivity} />
           </section>
         </section>

@@ -26,20 +26,16 @@ export default function TimelinePage() {
       <ThemeStyles />
       <Header />
 
-      <main className="resume-page mx-auto max-w-5xl px-4 py-12 sm:px-6 sm:py-16">
+      <main className="resume-page mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
         <header className="max-w-3xl">
           <div className="mb-4 text-xs font-bold uppercase tracking-[0.18em] text-[rgb(var(--accent))]">
             Timeline
           </div>
-          <h1 className="font-serif text-4xl font-bold leading-tight tracking-tight sm:text-6xl">
+          <h1 className="font-serif text-3xl font-bold leading-tight tracking-tight sm:text-5xl">
             一路做過的事
           </h1>
-          <p className="mt-5 max-w-2xl text-base leading-8 text-[rgb(var(--muted))] sm:text-lg">
-            我是 Hawks，一個還在摸索技術、音樂與社群之間可能性的學生。
-            這裡不是定稿，而是一份會跟著我繼續往前長的履歷。
-          </p>
 
-          <div className="mt-7 flex flex-wrap gap-3">
+          <div className="mt-6 flex flex-wrap gap-3">
             <PrintResumeButton />
             <a
               href="mailto:me@hawks.tw"

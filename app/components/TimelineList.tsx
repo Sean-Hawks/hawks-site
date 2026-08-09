@@ -33,7 +33,7 @@ export default function TimelineList({ items }: { items: ResumeItem[] }) {
   return (
     <>
       <div
-        className="print-hidden mt-12 border-y border-[rgb(var(--line)/0.09)] py-4"
+        className="print-hidden mt-10 border-y border-[rgb(var(--line)/0.09)] py-4"
         aria-label="篩選時間軸分類"
       >
         <div className="mb-3 text-[10px] font-bold uppercase tracking-[0.18em] text-[rgb(var(--muted))]">
@@ -117,10 +117,6 @@ export default function TimelineList({ items }: { items: ResumeItem[] }) {
                   {item.organization}
                 </div>
               )}
-              <p className="mt-2 line-clamp-2 max-w-2xl text-sm leading-6 text-[rgb(var(--muted))] sm:line-clamp-none sm:leading-7">
-                {item.summary}
-              </p>
-
               <div className="mt-3 flex flex-wrap items-center gap-2">
                 {item.tags.map((tag) => (
                   <span
