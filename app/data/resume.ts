@@ -26,6 +26,12 @@ export type ResumeItem = {
   }[];
 };
 
+export function sortResumeItemsByDate(items: ResumeItem[]) {
+  return [...items].sort((a, b) =>
+    (b.dateTime ?? "").localeCompare(a.dateTime ?? "")
+  );
+}
+
 const external = (label: string, href: string) => ({
   label,
   href,
@@ -34,21 +40,28 @@ const external = (label: string, href: string) => ({
 
 export const resumeItems: ResumeItem[] = [
   {
-    period: "2026 卸任",
-    dateTime: "2026",
+    period: "2026.08.03 卸任",
+    dateTime: "2026-08-03",
     categories: ["社團"],
-    title: "資訊安全研究社｜社長",
-    organization: "校內社團",
+    title: "大安高工資訊安全研究社｜社長",
     summary:
       "任內將資安課程、實作與社群活動整理成可以累積的學習紀錄；現已卸任。",
     tags: ["Cybersecurity", "Community"],
   },
   {
-    period: "2026 卸任",
-    dateTime: "2026",
+    period: "2026.08.03 卸任",
+    dateTime: "2026-08-03",
+    categories: ["社團"],
+    title: "大安高工電腦研究社｜公關",
+    summary:
+      "曾任電腦研究社公關，參與社團宣傳、活動籌備與社群交流；現已卸任。",
+    tags: ["Computer Science", "Public Relations", "Community"],
+  },
+  {
+    period: "2026.07.14 卸任",
+    dateTime: "2026-07-14",
     categories: ["社團", "音樂發表"],
-    title: "管樂團｜學生指揮",
-    organization: "臺北市立大安高級工業職業學校",
+    title: "大安高工管樂團｜學生指揮",
     summary:
       "曾任管樂團學生指揮，從排練與演奏中練習溝通、聆聽，以及讓一群人一起完成一件事；現已卸任。",
     tags: ["Music", "Conducting", "Teamwork"],

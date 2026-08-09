@@ -281,7 +281,7 @@ export default async function LibraryReviewPage({ params }: PageProps) {
                 <div
                   className={[
                     "relative block overflow-hidden",
-                    item.image.fit === "contain" ? "bg-white" : "bg-[rgb(var(--line)/0.05)]",
+                    item.image.fit === "contain" ? "bg-[rgb(var(--panel2))]" : "bg-[rgb(var(--line)/0.05)]",
                     item.image.fit === "contain"
                       ? "h-80 sm:h-96 lg:h-full"
                       : "h-72 sm:h-80 lg:h-full",
@@ -299,7 +299,11 @@ export default async function LibraryReviewPage({ params }: PageProps) {
                       }
                       priority
                       className={
-                        item.image.fit === "contain" ? "object-contain object-center" : "object-cover"
+                        item.image.zoom
+                          ? "scale-[1.34] object-cover object-center"
+                          : item.image.fit === "contain"
+                            ? "object-contain object-center"
+                            : "object-cover"
                       }
                     />
                   ) : (

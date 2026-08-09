@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Github, Mail } from "lucide-react";
 import Header from "../components/Header";
+import SignalPageHeader from "../components/SignalPageHeader";
 import PrintResumeButton from "../components/PrintResumeButton";
 import TimelineList from "../components/TimelineList";
 import ThemeStyles from "../components/ThemeStyles";
@@ -27,15 +28,14 @@ export default function TimelinePage() {
       <Header />
 
       <main className="resume-page mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
-        <header className="max-w-3xl">
-          <div className="mb-4 text-xs font-bold uppercase tracking-[0.18em] text-[rgb(var(--accent))]">
-            Timeline
-          </div>
-          <h1 className="font-serif text-3xl font-bold leading-tight tracking-tight sm:text-5xl">
-            一路做過的事
-          </h1>
-
-          <div className="mt-6 flex flex-wrap gap-3">
+        <SignalPageHeader
+          code="08 / LOGBOOK"
+          title="一路做過的事"
+          description="學習、專案、社群、競賽與音樂留下的時間座標。"
+          statLabel="Records"
+          statValue={String(resumeItems.length).padStart(2, "0")}
+        >
+          <div className="flex flex-wrap gap-3">
             <PrintResumeButton />
             <a
               href="mailto:me@hawks.tw"
@@ -54,7 +54,7 @@ export default function TimelinePage() {
               GitHub
             </a>
           </div>
-        </header>
+        </SignalPageHeader>
 
         <TimelineList items={resumeItems} />
 

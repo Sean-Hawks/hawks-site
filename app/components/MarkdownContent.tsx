@@ -355,7 +355,7 @@ export default function MarkdownContent({
           href={href}
           target={isExternal ? "_blank" : undefined}
           rel={isExternal ? "noopener noreferrer" : undefined}
-          className="text-[rgb(var(--accent))] font-medium no-underline hover:underline decoration-2 underline-offset-2 transition-all hover:text-[rgb(251,191,36)]"
+          className="text-[rgb(var(--accent))] font-medium no-underline hover:underline decoration-2 underline-offset-2 transition-all hover:opacity-75"
           {...props}
         />
       );

@@ -9,6 +9,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import Header from "../components/Header";
+import SignalPageHeader from "../components/SignalPageHeader";
 import ThemeStyles from "../components/ThemeStyles";
 
 const siteUrl = "https://hawks.tw";
@@ -48,20 +49,20 @@ export default function SubscribePage() {
       <Header />
 
       <main className="mx-auto max-w-5xl px-4 py-10 sm:px-3">
-        <section className="rounded-2xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.88)] p-5 shadow-[0_22px_70px_rgb(var(--line)/0.10)] sm:p-7">
-          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-[rgb(var(--accent)/0.22)] bg-[rgb(var(--accent)/0.10)] px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-[rgb(var(--accent))]">
-            <Rss className="h-3.5 w-3.5" />
-            Subscribe
-          </div>
-          <h1 className="font-serif text-3xl font-bold leading-tight tracking-tight sm:text-5xl">
-            訂閱 hawks.tw
-          </h1>
-          <p className="mt-3 max-w-2xl text-base leading-8 text-[rgb(var(--muted))]">
-            用 RSS reader 追蹤 Blog、Talk 和 Library Review。想收到 email 的話，
-            也可以直接訂閱更新信。
-          </p>
+        <SignalPageHeader
+          code="06 / BROADCAST"
+          title="訂閱 hawks.tw"
+          description="用 RSS reader 追蹤 Blog、Talk 和 Library Review；也可以直接訂閱 email 更新。"
+          statLabel="Feeds"
+          statValue="02"
+        />
 
-          <div className="mt-6 grid gap-3 md:grid-cols-2">
+        <section className="home-panel p-5 sm:p-7">
+          <div className="signal-section-title mb-5">
+            <Rss className="h-3.5 w-3.5" />
+            Choose a channel
+          </div>
+          <div className="grid gap-3 md:grid-cols-2">
             <a
               href="/rss.xml"
               className="group rounded-2xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.035)] p-5 transition-colors hover:border-[rgb(var(--accent)/0.28)] hover:bg-[rgb(var(--line)/0.055)]"

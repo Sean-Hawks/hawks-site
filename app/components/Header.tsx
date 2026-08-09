@@ -10,7 +10,7 @@ type ThemeMode = "light" | "dark";
 export default function Header() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = React.useState(false);
-  const [theme, setTheme] = React.useState<ThemeMode>("dark");
+  const [theme, setTheme] = React.useState<ThemeMode>("light");
 
   const navItems = [
     { label: "README", href: "/" },
@@ -57,20 +57,22 @@ export default function Header() {
       aria-pressed={theme === "dark"}
       title={themeLabel}
       onClick={toggleTheme}
-      className="grid h-10 w-10 place-items-center rounded-xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.04)] text-[rgb(var(--text))] transition-colors hover:bg-[rgb(var(--line)/0.07)]"
+      className="grid h-10 w-10 place-items-center border border-[rgb(var(--line)/0.12)] bg-[rgb(var(--line)/0.04)] text-[rgb(var(--text))] transition-colors hover:border-[rgb(var(--accent)/0.40)] hover:text-[rgb(var(--accent))]"
     >
       <ThemeIcon className="h-4 w-4" />
     </button>
   );
 
   return (
-    <header className="sticky top-0 z-20 w-full border-b border-[rgb(var(--line)/0.10)] bg-[rgb(var(--bg)/0.88)] backdrop-blur-xl">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-3">
+    <header className="sticky top-0 z-20 w-full border-b border-[rgb(var(--line)/0.12)] bg-[rgb(var(--bg)/0.88)] backdrop-blur-xl">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
         <Link
           href="/"
-          className="font-serif text-xl font-bold tracking-tight text-[rgb(var(--text))] transition-opacity hover:opacity-80 sm:text-2xl"
+          aria-label="hawks.tw README"
+          className="header-wordmark group text-[rgb(var(--text))]"
         >
-          <div>hawks.tw</div>
+          <span>HAWKS</span>
+          <span className="header-wordmark-outline">.TW</span>
         </Link>
 
         <div className="flex items-center gap-2">
@@ -87,10 +89,10 @@ export default function Header() {
                   key={item.label}
                   href={item.href}
                   className={[
-                    "rounded-xl px-3 py-2 font-serif text-sm tracking-[0.01em] transition-colors",
+                    "border-b px-3 py-2 font-mono text-xs font-semibold tracking-[0.04em] transition-colors",
                     isActive
-                      ? "bg-[rgb(var(--accent)/0.12)] text-[rgb(var(--text))] border border-[rgb(var(--accent)/0.24)]"
-                      : "text-[rgb(var(--muted))] hover:text-[rgb(var(--text))] hover:bg-[rgb(var(--line)/0.05)]",
+                      ? "border-[rgb(var(--accent))] bg-[rgb(var(--accent)/0.07)] text-[rgb(var(--accent))]"
+                      : "border-transparent text-[rgb(var(--muted))] hover:border-cyan-500/30 hover:text-[rgb(var(--text))]",
                   ].join(" ")}
                 >
                   {item.label}
@@ -105,7 +107,7 @@ export default function Header() {
             aria-expanded={isOpen}
             aria-label={isOpen ? "Close navigation" : "Open navigation"}
             onClick={() => setIsOpen((value) => !value)}
-            className="grid h-10 w-10 place-items-center rounded-xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.04)] text-[rgb(var(--text))] transition-colors hover:bg-[rgb(var(--line)/0.07)] lg:hidden"
+            className="grid h-10 w-10 place-items-center border border-[rgb(var(--line)/0.12)] bg-[rgb(var(--line)/0.04)] text-[rgb(var(--text))] transition-colors hover:border-[rgb(var(--accent)/0.40)] lg:hidden"
           >
             {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
@@ -115,12 +117,12 @@ export default function Header() {
       <nav
         id="mobile-nav"
         className={[
-          "mx-auto grid max-w-6xl gap-2 px-4 pb-4 transition-[grid-template-rows,opacity] lg:hidden",
+          "mx-auto grid max-w-7xl gap-2 px-4 pb-4 transition-[grid-template-rows,opacity] sm:px-6 lg:hidden",
           isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0",
         ].join(" ")}
       >
         <div className="overflow-hidden">
-          <div className="grid gap-2 rounded-xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.94)] p-2 shadow-[0_18px_60px_rgba(90,76,55,0.12)]">
+          <div className="grid gap-px border border-[rgb(var(--line)/0.12)] bg-[rgb(var(--line)/0.12)] p-px shadow-[0_18px_60px_rgba(0,0,0,0.12)]">
             {navItems.map((item) => {
               const isActive =
                 item.href === "/"
@@ -132,10 +134,10 @@ export default function Header() {
                   key={item.label}
                   href={item.href}
                   className={[
-                    "rounded-lg px-3 py-2 font-serif text-sm tracking-[0.01em] transition-colors",
+                    "bg-[rgb(var(--panel))] px-3 py-2 font-mono text-xs tracking-[0.04em] transition-colors",
                     isActive
-                      ? "bg-[rgb(var(--accent)/0.12)] text-[rgb(var(--text))]"
-                      : "text-[rgb(var(--muted))] hover:bg-[rgb(var(--line)/0.05)] hover:text-[rgb(var(--text))]",
+                      ? "text-[rgb(var(--accent))]"
+                      : "text-[rgb(var(--muted))] hover:text-[rgb(var(--text))]",
                   ].join(" ")}
                 >
                   {item.label}

@@ -252,6 +252,7 @@ function normalizeImage(value: unknown, title: string): LibraryImage {
     credit: normalizeString(image.credit),
     source: normalizeString(image.source),
     fit: normalizeString(image.fit) === "contain" ? "contain" : "cover",
+    zoom: normalizeBoolean(image.zoom),
   };
 }
 

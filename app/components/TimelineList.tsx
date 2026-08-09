@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { ArrowUpRight } from "lucide-react";
 import {
   timelineCategories,
+  sortResumeItemsByDate,
   type ResumeItem,
   type TimelineCategory,
 } from "../data/resume";
@@ -25,10 +26,11 @@ export default function TimelineList({ items }: { items: ResumeItem[] }) {
     return { 全部: items.length, ...categoryCounts };
   }, [items]);
 
-  const visibleItems =
+  const visibleItems = sortResumeItemsByDate(
     activeFilter === "全部"
       ? items
-      : items.filter((item) => item.categories.includes(activeFilter));
+      : items.filter((item) => item.categories.includes(activeFilter))
+  );
 
   return (
     <>

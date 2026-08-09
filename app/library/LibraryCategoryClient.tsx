@@ -114,7 +114,7 @@ const statusMeta: Record<
     label: "Watching",
     Icon: PlayCircle,
     className:
-      "border-amber-300/55 bg-amber-300/16 text-amber-700 shadow-[0_0_0_1px_rgba(251,191,36,0.18),0_0_24px_rgba(251,191,36,0.16)] dark:text-amber-200",
+      "border-[rgb(var(--accent)/0.42)] bg-[rgb(var(--accent)/0.12)] text-[rgb(var(--accent))] shadow-[0_0_0_1px_rgb(var(--accent)/0.16),0_0_24px_rgb(var(--accent)/0.12)]",
   },
   playing: {
     label: "Playing",
@@ -249,12 +249,14 @@ function LibraryCard({ item }: { item: LibraryItem }) {
           fill
           sizes="(min-width: 640px) 180px, calc(100vw - 32px)"
           className={[
-            "transition-transform duration-300 group-hover:scale-[1.03]",
-            item.category === "artist"
-              ? "object-cover"
+            "transition-transform duration-300",
+            item.image.zoom
+              ? "scale-[1.34] object-cover group-hover:scale-[1.38]"
+              : item.category === "artist"
+              ? "object-cover group-hover:scale-[1.03]"
               : item.image.fit === "contain"
-                ? "object-contain p-4"
-                : "object-cover",
+                ? "object-contain p-4 group-hover:scale-[1.03]"
+                : "object-cover group-hover:scale-[1.03]",
           ].join(" ")}
           referrerPolicy="no-referrer"
         />

@@ -114,9 +114,9 @@ export default function RootLayout({
             __html: `
               try {
                 var theme = localStorage.getItem("theme-v2");
-                document.documentElement.dataset.theme = theme === "light" ? "light" : "dark";
+                document.documentElement.dataset.theme = theme === "dark" ? "dark" : "light";
               } catch (_) {
-                document.documentElement.dataset.theme = "dark";
+                document.documentElement.dataset.theme = "light";
               }
             `,
           }}

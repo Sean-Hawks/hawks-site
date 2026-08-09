@@ -3,6 +3,7 @@ import { Calendar, Presentation, Video, Sparkles } from "lucide-react";
 import { getSortedTalksData } from "../lib/talks";
 import ThemeStyles from "../components/ThemeStyles";
 import Header from "../components/Header";
+import SignalPageHeader from "../components/SignalPageHeader";
 import MarkdownContent from "../components/MarkdownContent";
 import type { Metadata } from "next";
 
@@ -35,10 +36,13 @@ export default function TalkPage() {
       <div className="w-full px-4 sm:px-3">
         <main className="mx-auto max-w-6xl py-8">
           
-          <div className="mb-10">
-            <h1 className="font-serif text-3xl font-bold tracking-tight">Talk Archive</h1>
-            <p className="mt-2 text-[rgb(var(--muted))]">分享、演講與教學記錄。主要近況現在放在 Now 頁。</p>
-          </div>
+          <SignalPageHeader
+            code="09 / TRANSMISSIONS"
+            title="Talk Archive"
+            description="分享、演講與教學記錄。主要近況現在放在 Now 頁。"
+            statLabel="Talks"
+            statValue={String(talks.length).padStart(2, "0")}
+          />
 
           {/* Latest Talk Highlight */}
           {latestTalk && (

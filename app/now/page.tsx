@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { ArrowRight, BookOpenText, FileText, Mic2, Sparkles } from "lucide-react";
+import { ArrowRight, BookOpenText, FileText, Mic2 } from "lucide-react";
 import Header from "../components/Header";
+import SignalPageHeader from "../components/SignalPageHeader";
 import ThemeStyles from "../components/ThemeStyles";
 import { getSortedPostsData } from "../lib/posts";
 import { getSortedTalksData } from "../lib/talks";
@@ -63,18 +64,13 @@ export default function NowPage() {
       <Header />
 
       <main className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
-        <section className="mb-8 border-b border-[rgb(var(--line)/0.10)] pb-7">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[rgb(var(--accent)/0.26)] bg-[rgb(var(--accent)/0.12)] px-3 py-1.5 text-xs font-bold uppercase tracking-[0.16em] text-[rgb(var(--accent))]">
-            <Sparkles className="h-3.5 w-3.5" />
-            Now
-          </div>
-          <div>
-            <h1 className="font-serif text-3xl font-bold leading-tight tracking-tight sm:text-5xl">最近更新</h1>
-            <p className="mt-3 max-w-2xl text-base leading-7 text-[rgb(var(--muted))] sm:leading-8">
-              最近公開的文章、評論與分享紀錄。
-            </p>
-          </div>
-        </section>
+        <SignalPageHeader
+          code="02 / LIVE FEED"
+          title="最近更新"
+          description="最近公開的文章、評論與分享紀錄。"
+          statLabel="Signals"
+          statValue={String(latestItems.length + (latestBlog ? 1 : 0)).padStart(2, "0")}
+        />
 
         {latestBlog && (
           <section className="mb-10">

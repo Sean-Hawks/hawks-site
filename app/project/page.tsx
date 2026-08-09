@@ -1,5 +1,6 @@
-import { ExternalLink, FolderGit2 } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import Header from "../components/Header";
+import SignalPageHeader from "../components/SignalPageHeader";
 import ThemeStyles from "../components/ThemeStyles";
 import { projects } from "../data/projects";
 import type { Metadata } from "next";
@@ -25,16 +26,13 @@ export default function ProjectPage() {
       <Header />
 
       <main className="mx-auto max-w-6xl px-4 py-10 sm:px-3">
-        <div className="mb-8">
-          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-[rgb(var(--accent)/0.18)] bg-[rgb(var(--accent)/0.08)] px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-[rgb(var(--accent))]">
-            <FolderGit2 className="h-3.5 w-3.5" />
-            Projects
-          </div>
-          <h1 className="font-serif text-3xl font-bold tracking-tight">Project</h1>
-          <p className="mt-2 max-w-2xl leading-7 text-[rgb(var(--muted))]">
-            放一些正在做、做過，或之後想慢慢補完的東西。
-          </p>
-        </div>
+        <SignalPageHeader
+          code="04 / BUILDS"
+          title="Project"
+          description="放一些正在做、做過，或之後想慢慢補完的東西。"
+          statLabel="Projects"
+          statValue={String(projects.length).padStart(2, "0")}
+        />
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {projects.map((project) => (
