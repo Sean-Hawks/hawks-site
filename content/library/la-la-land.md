@@ -6,6 +6,8 @@ year: "2016"
 date: "2026-06-16"
 status: watched
 rating: 9.5
+imdbRating: 8.0
+imdbUrl: https://www.imdb.com/title/tt3783958/
 featured: true
 featuredOrder: 3
 tags:

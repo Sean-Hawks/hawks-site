@@ -6,6 +6,8 @@ year: "2021"
 date: "2026-06-17"
 status: watched
 rating: 9.0
+imdbRating: 8.2
+imdbUrl: https://www.imdb.com/title/tt9140554/
 tags:
   - tv series
   - marvel

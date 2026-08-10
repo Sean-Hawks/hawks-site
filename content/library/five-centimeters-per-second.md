@@ -6,6 +6,8 @@ year: "2007"
 date: "2026-06-16"
 status: watched
 rating: 8.5
+imdbRating: 7.4
+imdbUrl: https://www.imdb.com/title/tt0983213/
 tags:
   - anime film
   - romance

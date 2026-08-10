@@ -301,6 +301,7 @@ function readLibraryItem(fileName: string): LibraryItem {
   const explicitSlug = normalizeString(data.slug);
   const slug = slugify(explicitSlug || fileSlug);
   const rating = normalizeRating(data.rating);
+  const imdbRating = normalizeRating(data.imdbRating);
   const hasReview = parsedContent.body.trim().length > 0;
   const frontmatterRecommendations = normalizeRecommendations(data.recommendations);
   const recommendedWorks =
@@ -321,6 +322,8 @@ function readLibraryItem(fileName: string): LibraryItem {
     status: normalizeStatus(data.status),
     recommendation: recommendationFromRating(rating),
     rating,
+    imdbRating,
+    imdbUrl: normalizeString(data.imdbUrl) || undefined,
     featured: normalizeBoolean(data.featured),
     featuredOrder: normalizeFeaturedOrder(data.featuredOrder),
     tags: normalizeTags(data.tags),

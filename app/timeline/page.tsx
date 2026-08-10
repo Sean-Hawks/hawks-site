@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Github, Mail } from "lucide-react";
 import Header from "../components/Header";
 import SignalPageHeader from "../components/SignalPageHeader";
-import PrintResumeButton from "../components/PrintResumeButton";
 import TimelineList from "../components/TimelineList";
 import ThemeStyles from "../components/ThemeStyles";
 import { resumeItems } from "../data/resume";
@@ -36,7 +35,6 @@ export default function TimelinePage() {
           statValue={String(resumeItems.length).padStart(2, "0")}
         >
           <div className="flex flex-wrap gap-3">
-            <PrintResumeButton />
             <a
               href="mailto:me@hawks.tw"
               className="print-hidden inline-flex items-center gap-2 rounded-xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.04)] px-4 py-2 text-sm font-medium text-[rgb(var(--muted))] transition-colors hover:border-[rgb(var(--accent)/0.24)] hover:text-[rgb(var(--text))]"

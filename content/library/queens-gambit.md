@@ -6,6 +6,8 @@ year: "2020"
 date: "2026-06-17"
 status: watched
 rating: 9.0
+imdbRating: 8.5
+imdbUrl: https://www.imdb.com/title/tt10048342/
 tags:
   - tv series
   - netflix

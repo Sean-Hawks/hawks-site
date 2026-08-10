@@ -9,6 +9,7 @@ import { Post, Talk } from "../types";
 import type { LibraryItem } from "../data/library";
 import Header from "./Header";
 import ThemeStyles from "./ThemeStyles";
+import ImdbRating from "../library/ImdbRating";
 
 interface HomeClientProps {
   posts: Post[];
@@ -541,7 +542,12 @@ export default function HomeClient({ posts, talks, libraryItems }: HomeClientPro
                 <div className="p-4">
                   <div className="flex items-center justify-between gap-2 font-mono text-[9px] uppercase tracking-[0.12em] text-[rgb(var(--muted))]">
                     <span>{item.category}</span>
-                    {item.rating !== null && <span className="text-[rgb(var(--accent))]">{item.rating.toFixed(1)}</span>}
+                    <span className="flex items-center gap-1.5">
+                      {item.category === "movie" && (
+                        <ImdbRating rating={item.imdbRating} compact />
+                      )}
+                      {item.rating !== null && <span className="text-[rgb(var(--accent))]">{item.rating.toFixed(1)}</span>}
+                    </span>
                   </div>
                   <h3 className="mt-2 line-clamp-2 font-serif text-lg font-bold leading-7 transition-colors group-hover:text-cyan-500">{item.title}</h3>
                   {item.note && <p className="mt-2 line-clamp-2 text-sm leading-6 text-[rgb(var(--muted))]">{item.note}</p>}

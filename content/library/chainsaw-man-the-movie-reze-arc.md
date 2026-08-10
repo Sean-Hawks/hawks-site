@@ -6,6 +6,8 @@ year: "2025"
 date: "2026-06-19"
 status: watched
 rating: 8.9
+imdbRating: 8.3
+imdbUrl: https://www.imdb.com/title/tt30472557/
 tags:
   - anime film
   - action

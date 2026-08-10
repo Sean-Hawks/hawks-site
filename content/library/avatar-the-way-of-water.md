@@ -6,6 +6,8 @@ year: "2022"
 date: "2026-06-19"
 status: watched
 rating: 8.3
+imdbRating: 7.5
+imdbUrl: https://www.imdb.com/title/tt1630029/
 tags:
   - sci-fi
   - adventure
