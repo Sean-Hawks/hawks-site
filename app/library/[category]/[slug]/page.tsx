@@ -5,6 +5,7 @@ import { ArrowLeft, ArrowUpRight, Award, Disc3, Heart, Sparkles, Star } from "lu
 import Header from "../../../components/Header";
 import MarkdownContent, { headingId } from "../../../components/MarkdownContent";
 import ThemeStyles from "../../../components/ThemeStyles";
+import ImdbRating from "../../ImdbRating";
 import {
   getAllLibraryItems,
   getLibraryCategory,
@@ -368,6 +369,9 @@ export default async function LibraryReviewPage({ params }: PageProps) {
 
                   <div className="mt-5 flex flex-wrap items-center gap-4 text-sm text-[rgb(var(--muted))]">
                     <Rating rating={item.rating} />
+                    {item.category === "movie" && (
+                      <ImdbRating rating={item.imdbRating} href={item.imdbUrl} />
+                    )}
                     {item.rating !== null && (
                       <span className="inline-flex items-center gap-1.5 font-medium text-[rgb(var(--accent))]">
                         <RecommendationIcon className="h-4 w-4" />

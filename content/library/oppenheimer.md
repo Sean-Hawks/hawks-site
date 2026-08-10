@@ -6,6 +6,8 @@ year: "2023"
 date: "2026-06-19"
 status: watched
 rating: 8.9
+imdbRating: 8.2
+imdbUrl: https://www.imdb.com/title/tt15398776/
 tags:
   - biography
   - historical

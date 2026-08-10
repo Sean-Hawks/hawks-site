@@ -6,6 +6,8 @@ year: "2026"
 date: "2026-06-19"
 status: watched
 rating: 8.5
+imdbRating: 8.2
+imdbUrl: https://www.imdb.com/title/tt12042730/
 tags:
   - sci-fi
   - space

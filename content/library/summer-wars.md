@@ -5,7 +5,9 @@ category: movie
 year: "2009"
 date: "2026-06-16"
 status: watched
-rating: 8.2
+rating: 7.9
+imdbRating: 7.4
+imdbUrl: https://www.imdb.com/title/tt1474276/
 tags:
   - anime film
   - family

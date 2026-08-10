@@ -13,6 +13,7 @@ import {
 import Header from "../components/Header";
 import SignalPageHeader from "../components/SignalPageHeader";
 import ThemeStyles from "../components/ThemeStyles";
+import ImdbRating from "./ImdbRating";
 import {
   libraryCategories,
   type LibraryCategory,
@@ -233,10 +234,15 @@ function SpotlightCard({ item }: { item: LibraryItem }) {
         )}
 
         <div className="mt-auto flex items-center justify-between gap-3 pt-5">
-          <span className="inline-flex items-center gap-1.5 rounded-lg bg-[rgb(var(--accent)/0.12)] px-3 py-2 text-sm font-bold text-[rgb(var(--accent))]">
-            <Star className="h-4 w-4 fill-[rgb(var(--accent))]" />
-            {formatRating(item.rating)}
-          </span>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-lg bg-[rgb(var(--accent)/0.12)] px-3 py-2 text-sm font-bold text-[rgb(var(--accent))]">
+              <Star className="h-4 w-4 fill-[rgb(var(--accent))]" />
+              {formatRating(item.rating)}
+            </span>
+            {item.category === "movie" && (
+              <ImdbRating rating={item.imdbRating} />
+            )}
+          </div>
           {href && (
             <span className="inline-flex items-center gap-2 rounded-full border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.04)] px-3 py-2 text-sm font-medium text-[rgb(var(--muted))] transition-colors group-hover:border-[rgb(var(--accent)/0.28)] group-hover:text-[rgb(var(--accent))]">
               閱讀
@@ -293,10 +299,15 @@ function CategoryPickCard({ item, index }: { item: LibraryItem; index: number })
         )}
 
         <div className="mt-auto flex items-center justify-between gap-3 pt-4">
-          <span className="inline-flex items-center gap-1.5 rounded-md bg-[rgb(var(--accent)/0.12)] px-2 py-1 text-sm font-bold text-[rgb(var(--accent))]">
-            <Star className="h-4 w-4 fill-[rgb(var(--accent))]" />
-            {formatRating(item.rating)}
-          </span>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-md bg-[rgb(var(--accent)/0.12)] px-2 py-1 text-sm font-bold text-[rgb(var(--accent))]">
+              <Star className="h-4 w-4 fill-[rgb(var(--accent))]" />
+              {formatRating(item.rating)}
+            </span>
+            {item.category === "movie" && (
+              <ImdbRating rating={item.imdbRating} compact />
+            )}
+          </div>
           {href && (
             <span className="grid h-9 w-9 place-items-center rounded-lg border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.04)] text-[rgb(var(--muted))] transition-colors group-hover:border-[rgb(var(--accent)/0.28)] group-hover:text-[rgb(var(--accent))]">
               <ArrowUpRight className="h-4 w-4" />

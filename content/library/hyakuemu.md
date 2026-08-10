@@ -6,6 +6,8 @@ year: "2025"
 date: "2026-06-19"
 status: watched
 rating: 8.3
+imdbRating: 7.6
+imdbUrl: https://www.imdb.com/title/tt32600395/
 tags:
   - anime film
   - sports

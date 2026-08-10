@@ -5,7 +5,9 @@ category: movie
 year: "2020"
 date: "2026-06-17"
 status: watched
-rating: 8.7
+rating: 8.4
+imdbRating: 7.3
+imdbUrl: https://www.imdb.com/title/tt6723592/
 tags:
   - sci-fi
   - action

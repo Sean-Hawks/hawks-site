@@ -27,6 +27,7 @@ import type {
   LibraryRecommendation,
   LibraryStatus,
 } from "../data/library";
+import ImdbRating from "./ImdbRating";
 
 type StatusFilter = "all" | LibraryStatus;
 type RecommendationFilter = "all" | LibraryRecommendation;
@@ -349,6 +350,9 @@ function LibraryCard({ item }: { item: LibraryItem }) {
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
         <Rating rating={item.rating} />
+        {item.category === "movie" && (
+          <ImdbRating rating={item.imdbRating} />
+        )}
         {item.rating !== null && (
           <div className="inline-flex items-center gap-1.5 text-sm font-medium text-[rgb(var(--accent))]">
             <RecommendationIcon className="h-4 w-4" />

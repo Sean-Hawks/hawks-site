@@ -44,6 +44,8 @@ export type LibraryItem = {
   status: LibraryStatus;
   recommendation: LibraryRecommendation;
   rating: number | null; // Personal score from 0 to 10, or null when unrated.
+  imdbRating: number | null;
+  imdbUrl?: string;
   featured: boolean;
   featuredOrder?: number;
   tags: string[];
@@ -76,7 +78,7 @@ export const libraryCategories: LibraryCategoryInfo[] = [
     id: "movie",
     label: "Movie",
     title: "電影收藏",
-    description: "留下那些畫面、音樂或情緒特別有記憶點的電影。",
+    description: "大概還有五倍多看過但沒有印象的電影，這裡只列出特別有記憶點的作品。",
     href: "/library/movie",
   },
   {
