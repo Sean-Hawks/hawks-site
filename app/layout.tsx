@@ -6,6 +6,7 @@ const siteTitle = "hawks.tw";
 const siteDescription =
   "Hawks 的個人網站，收集 Blog、Talk、Library、Project，以及一些關於程式、音樂、ACGM 和生活的筆記。";
 const defaultImage = "/og/default.png";
+const cloudflareAnalyticsToken = "430b038461df4770b3b0c08cea7572e6";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -128,7 +129,14 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body>{children}</body>
+      <body>
+        {children}
+        <script
+          type="module"
+          src="https://static.cloudflareinsights.com/beacon.min.js"
+          data-cf-beacon={JSON.stringify({ token: cloudflareAnalyticsToken })}
+        />
+      </body>
     </html>
   );
 }
