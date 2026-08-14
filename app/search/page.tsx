@@ -37,7 +37,7 @@ export default function SearchPage() {
 
       <main className="mx-auto max-w-4xl px-4 py-10 sm:px-3">
         <SignalPageHeader
-          code="05 / QUERY"
+          code="04 / QUERY"
           title="搜尋"
           description="從 Blog、Talk、Library、tag 和內文裡快速找到你想回頭看的東西。"
           statLabel="Indexed"

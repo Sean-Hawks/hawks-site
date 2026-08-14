@@ -50,7 +50,7 @@ export default function SubscribePage() {
 
       <main className="mx-auto max-w-5xl px-4 py-10 sm:px-3">
         <SignalPageHeader
-          code="06 / BROADCAST"
+          code="05 / BROADCAST"
           title="訂閱 hawks.tw"
           description="用 RSS reader 追蹤 Blog、Talk 和 Library Review；也可以直接訂閱 email 更新。"
           statLabel="Feeds"

@@ -75,7 +75,7 @@ export default function ReadmeSection({
             </p>
           </div>
           <Link
-            href="/now"
+            href="/blog"
             className="inline-flex self-start items-center rounded-lg border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.035)] px-3 py-2 text-sm font-medium text-[rgb(var(--muted))] transition-colors hover:border-[rgb(var(--accent)/0.22)] hover:text-[rgb(var(--accent))]"
           >
             View all

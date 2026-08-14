@@ -73,7 +73,7 @@ const categoryMeta: Record<
   movie: {
     label: "Movie",
     Icon: Film,
-    tone: "border-sky-400/25 bg-sky-400/10",
+    tone: "border-amber-400/25 bg-amber-400/10",
   },
   artist: {
     label: "Artist",

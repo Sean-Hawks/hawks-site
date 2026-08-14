@@ -37,9 +37,9 @@ export default function TalkPage() {
         <main className="mx-auto max-w-6xl py-8">
           
           <SignalPageHeader
-            code="09 / TRANSMISSIONS"
+            code="08 / TRANSMISSIONS"
             title="Talk Archive"
-            description="分享、演講與教學記錄。主要近況現在放在 Now 頁。"
+            description="分享、演講與教學記錄。主要近況現在和文章一起放在 Blog。"
             statLabel="Talks"
             statValue={String(talks.length).padStart(2, "0")}
           />

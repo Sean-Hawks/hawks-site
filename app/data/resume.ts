@@ -657,8 +657,8 @@ export const resumeItems: ResumeItem[] = [
     period: "2020.12.28",
     dateTime: "2020-12-28",
     categories: ["音樂發表"],
-    title: "《毗濕奴之夢》｜國家音樂廳演出",
-    organization: "大安國中管樂團",
+    title: "《毗濕奴之夢》｜臺北聯合管樂團 × 大安國中管樂團",
+    organization: "臺北聯合管樂團、大安國中管樂團",
     summary:
       "109 學年度隨大安國中管樂團登上國家音樂廳，參與《毗濕奴之夢》音樂會。",
     tags: ["Wind Band", "Concert", "National Concert Hall"],

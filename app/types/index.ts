@@ -32,4 +32,5 @@ export interface Talk {
   banner?: string; // 新增：Talk 封面圖片路徑
   relatedPosts?: string[];
   ogImage?: string;
+  titleGenerated?: boolean;
 }

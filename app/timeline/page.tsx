@@ -28,7 +28,7 @@ export default function TimelinePage() {
 
       <main className="resume-page mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
         <SignalPageHeader
-          code="08 / LOGBOOK"
+          code="07 / LOGBOOK"
           title="一路做過的事"
           description="學習、專案、社群、競賽與音樂留下的時間座標。"
           statLabel="Records"

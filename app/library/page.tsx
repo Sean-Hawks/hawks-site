@@ -428,7 +428,7 @@ export default function LibraryPage() {
       <main className="mx-auto max-w-6xl px-4 py-10 sm:px-3">
         <section className="space-y-5">
           <SignalPageHeader
-            code="03 / MEDIA INDEX"
+            code="02 / MEDIA INDEX"
             title="看過，聽過，玩過"
             description="關於我對 ACGM 以及藝術的品味。"
             statLabel="Entries"

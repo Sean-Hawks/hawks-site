@@ -202,12 +202,13 @@ function transformObsidianEmbeds(content: string, assetBasePath?: string) {
     const alt = label && !/^\d+(x\d+)?$/.test(label) ? label : fileName;
     const src = resolveObsidianAsset(fileName, assetBasePath);
 
-    return `![${alt}](${src})`;
+    // Obsidian 圖片即使接在句尾也獨立成段，才能與後續照片合併成相簿。
+    return `\n\n![${alt}](${src})\n\n`;
   });
 }
 
-// 讓「自成一行的圖片」與相鄰文字之間有空行，使其獨立成段（連續多張圖仍相鄰＝同一段落）。
-// 這樣純圖片段落就能被 imageOnlyParagraph 認出，轉成相簿排版，不需改動原始文章內容。
+// 讓「自成一行的圖片」與文字分段，並把只隔著空行的連續圖片合併成同一段。
+// 作者可以維持自然的 Markdown 寫法，前台仍會自動把一串照片轉成緊湊相簿。
 function normalizeImageParagraphs(content: string) {
   const lines = content.split("\n");
   const isImg = (l: string) => /^\s*!\[[^\]]*\]\([^)]*\)\s*$/.test(l);
@@ -220,7 +221,21 @@ function normalizeImageParagraphs(content: string) {
     const prev = out.length ? out[out.length - 1] : "";
     if (!inFence) {
       if (isImg(line)) {
-        if (prev !== "" && !isImg(prev)) out.push("");
+        let previousContentIndex = out.length - 1;
+        while (
+          previousContentIndex >= 0 &&
+          out[previousContentIndex].trim() === ""
+        ) {
+          previousContentIndex -= 1;
+        }
+        const previousContent = previousContentIndex >= 0 ? out[previousContentIndex] : "";
+
+        if (isImg(previousContent)) {
+          // 圖片之間即使有空行，也視為同一組相簿。
+          out.splice(previousContentIndex + 1);
+        } else if (prev !== "") {
+          out.push("");
+        }
       } else if (line.trim() !== "" && prev !== "" && isImg(prev)) {
         out.push("");
       }

@@ -2,6 +2,7 @@
 
 /* eslint-disable @next/next/no-img-element */
 import { useCallback, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 
 type Img = { src: string; alt?: string; title?: string };
@@ -20,6 +21,8 @@ function captionOf(img: Img) {
   if (!alt) return "";
   // 過濾純尺寸標記（如 300、300x200）當作說明文字
   if (/^\d+(x\d+)?$/.test(alt)) return "";
+  // Obsidian 沒有填說明時會以檔名作為 alt；檔名不適合作為畫面上的圖說。
+  if (/^(?:.*\/)?[^/]+\.(?:avif|gif|jpe?g|png|webp)$/i.test(alt)) return "";
   return alt;
 }
 
@@ -27,6 +30,7 @@ export default function ArticleImages({ images }: { images: Img[] }) {
   const [active, setActive] = useState<number | null>(null);
   const close = useCallback(() => setActive(null), []);
   const isGrid = images.length > 1;
+  const previewImages = images.slice(0, 4);
 
   useEffect(() => {
     if (active === null) return;
@@ -51,43 +55,65 @@ export default function ArticleImages({ images }: { images: Img[] }) {
   return (
     <>
       {isGrid ? (
-        <div className="my-10 grid grid-cols-1 items-start gap-x-4 gap-y-6 sm:grid-cols-2">
-          {images.map((img, i) => (
-            <figure key={`${img.src}-${i}`} className="m-0 min-w-0">
-              <button
-                type="button"
-                onClick={() => setActive(i)}
-                aria-label="放大圖片"
-                className="group block aspect-[4/3] w-full cursor-zoom-in overflow-hidden rounded-2xl border border-[rgb(var(--line)/0.12)] bg-[rgb(var(--panel2)/0.5)] p-1 shadow-lg transition-[border-color,transform] duration-300 hover:-translate-y-0.5 hover:border-[rgb(var(--accent)/0.32)] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent)/0.5)]"
-              >
-                <img
-                  src={img.src}
-                  alt={img.alt ?? ""}
-                  loading="lazy"
-                  className="h-full w-full rounded-[0.7rem] object-contain transition-transform duration-300 group-hover:scale-[1.015]"
-                />
-              </button>
-              {captionOf(img) && (
-                <figcaption className="mt-2.5 px-2 text-center text-sm leading-6 text-[rgb(var(--muted))] opacity-75">
-                  {captionOf(img)}
-                </figcaption>
-              )}
-            </figure>
-          ))}
-        </div>
+        <section
+          className="my-10"
+          aria-label={`${images.length} 張文章照片`}
+        >
+          <div className="mb-3 flex items-center justify-between px-1 text-sm text-[rgb(var(--muted))]">
+            <span className="font-medium">{images.length} 張照片</span>
+            <span className="opacity-65">點擊查看完整圖片</span>
+          </div>
+          <div className="grid grid-cols-2 gap-2 sm:gap-3">
+            {previewImages.map((img, i) => {
+              const hiddenCount = images.length - previewImages.length;
+              const hasMore = hiddenCount > 0 && i === previewImages.length - 1;
+              const remainingCount = images.length - i;
+
+              return (
+                <figure key={`${img.src}-${i}`} className="m-0 min-w-0">
+                  <button
+                    type="button"
+                    onClick={() => setActive(i)}
+                    aria-label={hasMore ? `查看全部 ${images.length} 張照片` : `放大第 ${i + 1} 張照片`}
+                    className="group relative block aspect-[4/3] w-full cursor-zoom-in overflow-hidden rounded-xl border border-[rgb(var(--line)/0.12)] bg-[rgb(var(--panel2)/0.5)] shadow-md transition-[border-color,transform] duration-300 hover:-translate-y-0.5 hover:border-[rgb(var(--accent)/0.32)] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent)/0.5)] sm:rounded-2xl"
+                  >
+                    <img
+                      src={img.src}
+                      alt={img.alt ?? ""}
+                      loading="lazy"
+                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.025]"
+                    />
+                    {hasMore && (
+                      <span className="absolute inset-0 grid place-items-center bg-black/55 text-center text-base font-semibold text-white backdrop-blur-[1px] sm:text-lg">
+                        查看其餘 {remainingCount} 張
+                      </span>
+                    )}
+                  </button>
+                  {captionOf(img) && (
+                    <figcaption className="mt-2 px-2 text-center text-xs leading-5 text-[rgb(var(--muted))] opacity-75 sm:text-sm sm:leading-6">
+                      {captionOf(img)}
+                    </figcaption>
+                  )}
+                </figure>
+              );
+            })}
+          </div>
+        </section>
       ) : (
-        <figure className={["my-10 mx-auto", sizeToClass(images[0].title)].join(" ")}>
+        <figure
+          className={["my-10 mx-auto", sizeToClass(images[0].title)].join(" ")}
+        >
           <button
             type="button"
             onClick={() => setActive(0)}
             aria-label="放大圖片"
-            className="group block w-full cursor-zoom-in focus:outline-none"
+            className="group flex w-full cursor-zoom-in justify-center focus:outline-none"
           >
             <img
               src={images[0].src}
               alt={images[0].alt ?? ""}
               loading="lazy"
-              className="h-auto w-full rounded-xl border border-[rgb(var(--line)/0.12)] object-contain shadow-lg transition-opacity group-hover:opacity-95"
+              className="h-auto max-h-[70vh] w-auto max-w-full rounded-xl border border-[rgb(var(--line)/0.12)] object-contain shadow-lg transition-opacity group-hover:opacity-95"
             />
           </button>
           {captionOf(images[0]) && (
@@ -98,7 +124,7 @@ export default function ArticleImages({ images }: { images: Img[] }) {
         </figure>
       )}
 
-      {active !== null && (
+      {active !== null && createPortal(
         <div
           onClick={close}
           role="dialog"
@@ -163,7 +189,8 @@ export default function ArticleImages({ images }: { images: Img[] }) {
               </figcaption>
             )}
           </figure>
-        </div>
+        </div>,
+        document.body,
       )}
     </>
   );

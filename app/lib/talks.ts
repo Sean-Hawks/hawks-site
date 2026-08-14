@@ -39,6 +39,20 @@ function extractSubtitleDirective(content: string) {
   };
 }
 
+function titleFromContent(content: string, date: string) {
+  const plain = content
+    .replace(/:::[\s\S]*?:::/g, " ")
+    .replace(/!\[\[[^\]]+\]\]/g, " ")
+    .replace(/!\[[^\]]*\]\([^)]+\)/g, " ")
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    .replace(/[#>*_`~|]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (!plain) return date || "近況";
+  return plain.length > 34 ? `${plain.slice(0, 34).trim()}…` : plain;
+}
+
 export function getSortedTalksData(): Talk[] {
   // 如果資料夾不存在，回傳空陣列
   if (!fs.existsSync(talksDirectory)) {
@@ -96,6 +110,8 @@ export function getSortedTalksData(): Talk[] {
       }
     }
 
+    const explicitTitle = typeof data.title === 'string' ? data.title.trim() : '';
+
     return {
       id,
       desc: bodyContent, // 內文作為描述
@@ -103,6 +119,8 @@ export function getSortedTalksData(): Talk[] {
       year: dateStr ? dateStr.split('-')[0] : 'Unknown', // 自動從日期提取年份
       ...(data as Omit<Talk, 'id' | 'desc' | 'year' | 'date'>),
       tags: normalizeTags(data.tags),
+      title: explicitTitle || titleFromContent(bodyContent, dateStr),
+      titleGenerated: !explicitTitle,
       date: dateStr,
       banner,
     };

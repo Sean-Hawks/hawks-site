@@ -39,7 +39,7 @@ export default function ContactPage() {
       <div className="w-full px-4 sm:px-3">
         <main className="mx-auto max-w-5xl py-10 sm:py-14">
           <SignalPageHeader
-            code="07 / UPLINK"
+            code="06 / UPLINK"
             title="Contact"
             description="有任何問題或合作邀約，歡迎透過以下方式聯繫我。"
             statLabel="Channels"

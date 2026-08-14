@@ -15,7 +15,6 @@ export default function Header() {
   const navItems = [
     { label: "README", href: "/" },
     { label: "Blog", href: "/blog" },
-    { label: "Now", href: "/now" },
     { label: "Library", href: "/library" },
     { label: "Project", href: "/project" },
     { label: "Search", href: "/search" },
@@ -92,7 +91,7 @@ export default function Header() {
                     "border-b px-3 py-2 font-mono text-xs font-semibold tracking-[0.04em] transition-colors",
                     isActive
                       ? "border-[rgb(var(--accent))] bg-[rgb(var(--accent)/0.07)] text-[rgb(var(--accent))]"
-                      : "border-transparent text-[rgb(var(--muted))] hover:border-cyan-500/30 hover:text-[rgb(var(--text))]",
+                      : "border-transparent text-[rgb(var(--muted))] hover:border-[rgb(var(--accent)/0.3)] hover:text-[rgb(var(--text))]",
                   ].join(" ")}
                 >
                   {item.label}

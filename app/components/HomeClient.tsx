@@ -33,8 +33,8 @@ const tickerItems = [
 ];
 
 const quickLinks = [
-  { label: "Blog", href: "/blog", note: "寫清楚一點的文章" },
-  { label: "Now", href: "/now", note: "近況和沒有結論的碎念" },
+  { label: "Blog", href: "/blog", note: "文章、近況和沒有結論的碎念" },
+  { label: "Library", href: "/library", note: "最近喜歡與收藏的作品" },
   { label: "Project", href: "/project", note: "程式與 side projects" },
   { label: "Search", href: "/search", note: "在這個網站裡找東西" },
 ];
@@ -170,7 +170,7 @@ function SectionTitle({
   return (
     <div className="home-reveal mb-6 flex flex-col gap-4 border-b border-[rgb(var(--line)/0.15)] pb-5 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <div className="mb-2 font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-cyan-500">
+        <div className="mb-2 font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-[rgb(var(--accent))]">
           {code}
         </div>
         <h2 className="font-serif text-3xl font-bold tracking-tight sm:text-4xl">{title}</h2>
@@ -256,7 +256,7 @@ export default function HomeClient({ posts, talks, libraryItems }: HomeClientPro
         <div className="home-ticker-track py-2.5 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[rgb(var(--muted))]">
           {[...tickerItems, ...tickerItems].map((item, index) => (
             <span key={`${item}-${index}`} className="inline-flex items-center gap-5 px-5">
-              <span className="h-1.5 w-1.5 rounded-full bg-cyan-500 shadow-[0_0_12px_rgba(6,182,212,0.9)]" />
+              <span className="h-1.5 w-1.5 rounded-full bg-[rgb(var(--accent))] shadow-[0_0_12px_rgb(var(--accent)/0.72)]" />
               {item}
             </span>
           ))}
@@ -266,7 +266,7 @@ export default function HomeClient({ posts, talks, libraryItems }: HomeClientPro
       <main className="relative mx-auto max-w-7xl px-4 pb-20 pt-6 sm:px-6 sm:pt-10">
         <section className="grid gap-7 lg:grid-cols-[280px_minmax(0,1fr)] xl:gap-10">
           <aside className="home-panel home-profile-panel self-start lg:sticky lg:top-24">
-            <div className="border-b border-[rgb(var(--line)/0.14)] px-5 py-3 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-500">
+            <div className="border-b border-[rgb(var(--line)/0.14)] px-5 py-3 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[rgb(var(--accent))]">
               Profile://1awks
             </div>
 
@@ -312,7 +312,7 @@ export default function HomeClient({ posts, talks, libraryItems }: HomeClientPro
           <div className="min-w-0">
             <section className="home-hero-grid home-panel relative overflow-hidden">
               <div className="home-hero-copy relative z-10 px-5 pb-8 pt-6 sm:px-8 sm:pb-10 sm:pt-8 xl:px-10">
-                <div className="font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-cyan-500">
+                <div className="font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-[rgb(var(--accent))]">
                   Hawks.tw / Personal signal grid
                 </div>
                 <h1 className="home-hero-title mt-5 font-black uppercase leading-[0.78] tracking-[-0.075em]">
@@ -346,7 +346,7 @@ export default function HomeClient({ posts, talks, libraryItems }: HomeClientPro
                   <div className="absolute inset-x-4 bottom-4 z-10 flex items-end justify-between gap-3 sm:inset-x-5">
                     <Link
                       href={currentHero.href}
-                      className="min-w-0 border border-white/25 bg-black/58 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.14em] text-white backdrop-blur transition-colors hover:border-cyan-300/70"
+                      className="min-w-0 border border-white/25 bg-black/58 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.14em] text-white backdrop-blur transition-colors hover:border-[rgb(var(--accent)/0.7)]"
                     >
                       <span className="block truncate">{currentHero.label}</span>
                       <span className="mt-1 block text-[9px] text-white/65">
@@ -385,7 +385,7 @@ export default function HomeClient({ posts, talks, libraryItems }: HomeClientPro
 
                   <div
                     key={`${activeHero}-${isHeroPlaying}`}
-                    className={isHeroPlaying ? "home-hero-progress" : "absolute inset-x-0 bottom-0 z-10 h-0.5 bg-cyan-300/45"}
+                    className={isHeroPlaying ? "home-hero-progress" : "absolute inset-x-0 bottom-0 z-10 h-0.5 bg-[rgb(var(--accent)/0.45)]"}
                   />
                   <span className="home-corner home-corner-tl" />
                   <span className="home-corner home-corner-br" />
@@ -396,7 +396,7 @@ export default function HomeClient({ posts, talks, libraryItems }: HomeClientPro
             <section aria-label="網站內容統計" className="home-stats-grid mt-4 grid grid-cols-2 sm:grid-cols-4">
               {[
                 ["Blog", posts.length],
-                ["Now", talks.length],
+                ["Notes", talks.length],
                 ["Library", libraryItems.length],
                 ["Timeline", resumeItems.length],
               ].map(([label, value]) => (
@@ -443,7 +443,7 @@ export default function HomeClient({ posts, talks, libraryItems }: HomeClientPro
                       <time>{formatDate(currentPost.date)}</time>
                       <span>{currentPost.tags.slice(0, 2).join(" / ")}</span>
                     </div>
-                    <h3 className="mt-6 font-serif text-3xl font-bold leading-tight tracking-tight transition-colors group-hover:text-cyan-500 sm:text-4xl">
+                    <h3 className="mt-6 font-serif text-3xl font-bold leading-tight tracking-tight transition-colors group-hover:text-[rgb(var(--accent))] sm:text-4xl">
                       {currentPost.title}
                     </h3>
                     <p className="mt-4 line-clamp-4 leading-8 text-[rgb(var(--muted))]">{currentPost.desc}</p>
@@ -476,14 +476,14 @@ export default function HomeClient({ posts, talks, libraryItems }: HomeClientPro
                     {isPlaying ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
                   </button>
                 </div>
-                <div key={`${activePost}-${isPlaying}`} className={isPlaying ? "home-signal-progress" : "h-0.5 bg-cyan-500/40"} />
+                <div key={`${activePost}-${isPlaying}`} className={isPlaying ? "home-signal-progress" : "h-0.5 bg-[rgb(var(--accent)/0.4)]"} />
               </article>
             )}
 
             <aside className="home-panel home-reveal">
               <div className="flex items-center justify-between border-b border-[rgb(var(--line)/0.14)] px-5 py-4">
-                <div className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-cyan-500">Now / live notes</div>
-                <Link href="/now" className="font-mono text-[10px] uppercase tracking-wider text-[rgb(var(--muted))] hover:text-[rgb(var(--accent))]">All ↗</Link>
+                <div className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[rgb(var(--accent))]">Latest notes</div>
+                <Link href="/blog" className="font-mono text-[10px] uppercase tracking-wider text-[rgb(var(--muted))] hover:text-[rgb(var(--accent))]">All ↗</Link>
               </div>
               <div>
                 {talks.slice(0, 5).map((talk, index) => (
@@ -492,10 +492,10 @@ export default function HomeClient({ posts, talks, libraryItems }: HomeClientPro
                     href={`/talk/${talk.id}`}
                     className="home-list-row group grid grid-cols-[2rem_minmax(0,1fr)] gap-3 border-b border-[rgb(var(--line)/0.12)] p-4 last:border-b-0"
                   >
-                    <span className="font-mono text-[10px] text-cyan-500">{String(index + 1).padStart(2, "0")}</span>
+                    <span className="font-mono text-[10px] text-[rgb(var(--accent))]">{String(index + 1).padStart(2, "0")}</span>
                     <span>
                       <time className="font-mono text-[10px] text-[rgb(var(--muted))]">{formatDate(talk.date)}</time>
-                      <strong className="mt-1 block font-serif text-lg leading-7 transition-colors group-hover:text-cyan-500">{talk.title}</strong>
+                      <strong className="mt-1 block font-serif text-lg leading-7 transition-colors group-hover:text-[rgb(var(--accent))]">{talk.title}</strong>
                     </span>
                   </Link>
                 ))}
@@ -549,7 +549,7 @@ export default function HomeClient({ posts, talks, libraryItems }: HomeClientPro
                       {item.rating !== null && <span className="text-[rgb(var(--accent))]">{item.rating.toFixed(1)}</span>}
                     </span>
                   </div>
-                  <h3 className="mt-2 line-clamp-2 font-serif text-lg font-bold leading-7 transition-colors group-hover:text-cyan-500">{item.title}</h3>
+                  <h3 className="mt-2 line-clamp-2 font-serif text-lg font-bold leading-7 transition-colors group-hover:text-[rgb(var(--accent))]">{item.title}</h3>
                   {item.note && <p className="mt-2 line-clamp-2 text-sm leading-6 text-[rgb(var(--muted))]">{item.note}</p>}
                 </div>
               </Link>
@@ -572,10 +572,10 @@ export default function HomeClient({ posts, talks, libraryItems }: HomeClientPro
                 href={item.links?.find((link) => !link.external)?.href ?? "/timeline"}
                 className="home-timeline-row group grid gap-3 border-b border-[rgb(var(--line)/0.13)] p-5 last:border-b-0 sm:grid-cols-[3rem_10rem_minmax(0,1fr)_auto] sm:items-center"
               >
-                <span className="font-mono text-[10px] text-cyan-500">{String(index + 1).padStart(2, "0")}</span>
+                <span className="font-mono text-[10px] text-[rgb(var(--accent))]">{String(index + 1).padStart(2, "0")}</span>
                 <time className="font-mono text-xs text-[rgb(var(--muted))]">{item.period}</time>
                 <span>
-                  <strong className="font-serif text-lg transition-colors group-hover:text-cyan-500">{item.title}</strong>
+                  <strong className="font-serif text-lg transition-colors group-hover:text-[rgb(var(--accent))]">{item.title}</strong>
                   {item.organization && <small className="mt-1 block text-sm text-[rgb(var(--muted))]">{item.organization}</small>}
                 </span>
                 <span className="hidden font-mono text-xs text-[rgb(var(--muted))] sm:block">↗</span>
@@ -589,11 +589,11 @@ export default function HomeClient({ posts, talks, libraryItems }: HomeClientPro
           <nav className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4" aria-label="首頁主要入口">
             {quickLinks.map((item, index) => (
               <Link key={item.href} href={item.href} className="home-route-card home-panel home-reveal group p-5">
-                <div className="flex items-center justify-between font-mono text-[10px] text-cyan-500">
+                <div className="flex items-center justify-between font-mono text-[10px] text-[rgb(var(--accent))]">
                   <span>ROUTE_{String(index + 1).padStart(2, "0")}</span>
                   <span>↗</span>
                 </div>
-                <div className="mt-8 font-serif text-2xl font-bold transition-colors group-hover:text-cyan-500">{item.label}</div>
+                <div className="mt-8 font-serif text-2xl font-bold transition-colors group-hover:text-[rgb(var(--accent))]">{item.label}</div>
                 <p className="mt-2 text-sm leading-6 text-[rgb(var(--muted))]">{item.note}</p>
               </Link>
             ))}

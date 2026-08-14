@@ -27,7 +27,7 @@ export default function ProjectPage() {
 
       <main className="mx-auto max-w-6xl px-4 py-10 sm:px-3">
         <SignalPageHeader
-          code="04 / BUILDS"
+          code="03 / BUILDS"
           title="Project"
           description="放一些正在做、做過，或之後想慢慢補完的東西。"
           statLabel="Projects"
