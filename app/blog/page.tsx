@@ -110,10 +110,7 @@ export default function BlogPage() {
 
   const latestNote = notes[0];
   const latestEssay = essays[0];
-  const featuredIds = new Set([latestNote?.id, latestEssay?.id]);
-  const recent = [...notes, ...essays]
-    .sort((a, b) => b.date.localeCompare(a.date))
-    .filter((entry) => !featuredIds.has(entry.id));
+  const recent = [...notes, ...essays].sort((a, b) => b.date.localeCompare(a.date));
   const recentYears = Array.from(new Set(recent.map((entry) => entry.date.slice(0, 4))));
 
   return (
