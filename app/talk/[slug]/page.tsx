@@ -89,7 +89,7 @@ export default async function TalkDetailPage({ params }: PageProps) {
       <Header />
 
       <div className="w-full px-4 sm:px-6">
-        <main className="mx-auto max-w-[900px] py-10 sm:py-16">
+        <main className="mx-auto max-w-[780px] py-10 sm:py-16">
           <Link 
             href="/talk"
             className="group mb-10 inline-flex items-center gap-2 text-sm text-[rgb(var(--muted))] transition-colors hover:text-[rgb(var(--accent))]"
@@ -112,8 +112,9 @@ export default async function TalkDetailPage({ params }: PageProps) {
               </div>
             )}
 
-            <header className="talk-article-header border-b border-[rgb(var(--line)/0.10)] p-6 sm:p-10">
-              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[rgb(var(--accent)/0.24)] bg-[rgb(var(--accent)/0.12)] px-3 py-1.5 text-xs font-bold uppercase tracking-[0.18em] text-[rgb(var(--accent))]">
+            <header className="talk-article-header border-b border-[rgb(var(--line)/0.12)] p-6 sm:p-10">
+              <div className="mb-6 inline-flex items-center gap-3 text-xs font-bold uppercase tracking-[0.2em] text-[rgb(var(--accent))]">
+                <span className="h-px w-8 bg-[rgb(var(--accent)/0.55)]" />
                 <FileText className="h-3.5 w-3.5" />
                 Note
               </div>
@@ -123,7 +124,7 @@ export default async function TalkDetailPage({ params }: PageProps) {
                   {talk.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="rounded-md bg-[rgb(var(--accent)/0.10)] px-2.5 py-1 text-xs font-medium text-[rgb(var(--accent))]"
+                      className="text-xs font-medium text-[rgb(var(--accent))]"
                     >
                       {tag}
                     </span>
@@ -170,10 +171,6 @@ export default async function TalkDetailPage({ params }: PageProps) {
             </header>
 
             <div className="p-6 sm:p-10">
-              <div className="mb-6 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[rgb(var(--muted))]">
-                <span className="h-px w-8 bg-[rgb(var(--accent)/0.45)]" />
-                Note
-              </div>
               <MarkdownContent content={content} variant="talk" />
             </div>
           </article>

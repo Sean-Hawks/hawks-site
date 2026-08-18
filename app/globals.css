@@ -1293,8 +1293,7 @@ html {
 }
 
 .talk-article-header {
-  background-color: rgba(30, 33, 40, 0.42);
-  background-image: linear-gradient(135deg, rgba(30, 33, 40, 0.92), rgba(24, 26, 32, 0.72), rgba(251, 191, 36, 0.06));
+  background: transparent;
 }
 
 :root[data-theme="light"] .talk-article-shell {
@@ -1302,19 +1301,16 @@ html {
   border-color: rgba(180, 119, 22, 0.18);
 }
 
-:root[data-theme="light"] .talk-article-header {
-  background-color: rgba(246, 241, 231, 0.7);
-  background-image: linear-gradient(135deg, rgba(246, 241, 231, 0.92), rgba(255, 253, 248, 0.72), rgba(180, 119, 22, 0.08));
+.talk-section-block {
+  margin: 3.75rem 0 0;
+  padding: 3.25rem 0 0;
+  border-top: 1px solid rgb(var(--line) / 0.1);
 }
 
-.talk-section-block {
-  margin: 2.75rem 0;
-  padding: 1.25rem 1rem 1.35rem;
-  border: 1px solid rgb(var(--line) / 0.1);
-  border-radius: 1rem;
-  background:
-    linear-gradient(135deg, rgb(var(--line) / 0.035), transparent 12rem),
-    rgb(var(--panel) / 0.18);
+.talk-prose > .talk-section-block:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
 }
 
 .talk-section-block > .talk-section-heading {
@@ -1336,13 +1332,6 @@ html {
   font-variant-numeric: tabular-nums;
   font-weight: 700;
   letter-spacing: 0.16em;
-}
-
-@media (min-width: 640px) {
-  .talk-section-block {
-    margin: 3rem 0;
-    padding: 1.5rem 1.35rem 1.6rem;
-  }
 }
 
 @media print {
