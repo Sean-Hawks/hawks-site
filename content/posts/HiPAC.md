@@ -5,6 +5,8 @@ desc: ""
 banner: /images/Pasted image 20260902020933.png
 tags:
   - "#blog"
+  - "#HPC"
+  - "#Machine-Learning"
 relatedTalks: []
 ogImage: ""
 status: published
