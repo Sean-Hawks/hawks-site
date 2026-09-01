@@ -4,6 +4,7 @@ import matter from "gray-matter";
 import sharp from "sharp";
 
 const root = process.cwd();
+const publicDir = path.join(root, "public");
 const outDir = path.join(root, "public/og");
 const postsDir = path.join(root, "content/posts");
 const talksDir = path.join(root, "content/talks");
@@ -114,20 +115,37 @@ function textLines(lines, { x, y, step }) {
     .join("");
 }
 
-function cardSvg({ eyebrow, title, desc, date }) {
+function cardSvg({ eyebrow, title, desc, date, hasBanner = false }) {
   const titleTspans = textLines(wrapLines(title, 13, 2), { x: 132, y: 250, step: 72 });
   const descTspans = textLines(wrapLines(desc, 26, 2), { x: 132, y: 410, step: 40 });
+  const background = hasBanner
+    ? `<defs>
+      <linearGradient id="banner-shade" x1="0" y1="0" x2="0" y2="630" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#070810" stop-opacity="0.18"/>
+        <stop offset="0.55" stop-color="#070810" stop-opacity="0.34"/>
+        <stop offset="1" stop-color="#070810" stop-opacity="0.72"/>
+      </linearGradient>
+    </defs>
+    <rect width="1200" height="630" fill="#0f1014" fill-opacity="0.20"/>
+    <rect width="1200" height="630" fill="url(#banner-shade)"/>`
+    : '<rect width="1200" height="630" fill="#0f1014"/>';
+  const wave = hasBanner
+    ? '<path d="M0 472C188 430 325 470 494 431C670 391 820 328 1200 374V630H0V472Z" fill="#181a20" fill-opacity="0.52"/>'
+    : '<path d="M0 472C188 430 325 470 494 431C670 391 820 328 1200 374V630H0V472Z" fill="#181a20"/>';
+  const card = hasBanner
+    ? '<rect x="88" y="82" width="1024" height="466" rx="34" fill="#11131a" fill-opacity="0.84" stroke="white" stroke-opacity="0.18"/>'
+    : '<rect x="88" y="82" width="1024" height="466" rx="34" fill="#181a20" fill-opacity="0.88" stroke="white" stroke-opacity="0.10"/>';
   return `
   <svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect width="1200" height="630" fill="#0f1014"/>
+    ${background}
     <circle cx="210" cy="78" r="260" fill="#a78bfa" opacity="0.16"/>
     <circle cx="1020" cy="120" r="260" fill="#fbbf24" opacity="0.14"/>
-    <path d="M0 472C188 430 325 470 494 431C670 391 820 328 1200 374V630H0V472Z" fill="#181a20"/>
+    ${wave}
     <g opacity="0.11">
       <path d="M0 110H1200M0 190H1200M0 270H1200M0 350H1200M0 430H1200M0 510H1200" stroke="white"/>
       <path d="M120 0V630M240 0V630M360 0V630M480 0V630M600 0V630M720 0V630M840 0V630M960 0V630M1080 0V630" stroke="white"/>
     </g>
-    <rect x="88" y="82" width="1024" height="466" rx="34" fill="#181a20" fill-opacity="0.88" stroke="white" stroke-opacity="0.10"/>
+    ${card}
     <text x="132" y="154" fill="#fbbf24" font-family="${FONT}" font-size="25" font-weight="800" letter-spacing="5">${escapeHtml(eyebrow)}</text>
     <text x="132" y="250" fill="#e8e4dc" font-family="${FONT}" font-size="58" font-weight="850">${titleTspans}</text>
     <text x="132" y="410" fill="#b2aca4" font-family="${FONT}" font-size="28" font-weight="500">${descTspans}</text>
@@ -136,9 +154,44 @@ function cardSvg({ eyebrow, title, desc, date }) {
   </svg>`;
 }
 
+function resolveBannerPath(value) {
+  if (typeof value !== "string") return null;
+
+  let banner = value.trim();
+  const wikiLink = banner.match(/^\[\[(.*?)(?:\|.*?)?\]\]$/);
+  if (wikiLink) banner = wikiLink[1];
+  if (!banner || /^https?:\/\//.test(banner)) return null;
+
+  const relativePath = banner.startsWith("/")
+    ? banner.slice(1)
+    : banner.startsWith("images/")
+      ? banner
+      : path.join("images", banner);
+  const resolved = path.resolve(publicDir, relativePath);
+  if (!resolved.startsWith(`${publicDir}${path.sep}`) || !fs.existsSync(resolved)) return null;
+  return resolved;
+}
+
 async function renderPng(fileName, data) {
-  const svg = cardSvg(data);
-  await sharp(Buffer.from(svg)).png().toFile(path.join(outDir, fileName));
+  const bannerPath = resolveBannerPath(data.banner);
+  const svg = cardSvg({ ...data, hasBanner: Boolean(bannerPath) });
+  const outputPath = path.join(outDir, fileName);
+
+  if (!bannerPath) {
+    await sharp(Buffer.from(svg)).png().toFile(outputPath);
+    return;
+  }
+
+  const background = await sharp(bannerPath)
+    .rotate()
+    .resize(1200, 630, { fit: "cover", position: "centre" })
+    .png()
+    .toBuffer();
+
+  await sharp(background)
+    .composite([{ input: Buffer.from(svg) }])
+    .png()
+    .toFile(outputPath);
 }
 
 function readMarkdownFiles(dir) {
@@ -168,6 +221,7 @@ for (const { file, data } of readMarkdownFiles(postsDir)) {
     title: data.title || slug,
     desc: data.desc || "Hawks Blog",
     date: data.date || "",
+    banner: data.banner,
   });
 }
 
@@ -178,6 +232,7 @@ for (const { file, data } of readMarkdownFiles(talksDir)) {
     title: data.title || id,
     desc: data.event || "分享、演講與近況紀錄。",
     date: data.date || "",
+    banner: data.banner,
   });
 }
 
