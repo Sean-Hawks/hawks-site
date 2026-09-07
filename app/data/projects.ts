@@ -18,6 +18,24 @@ export const projects = [
     link: "https://github.com/Sean-Hawks/ais3-llm-seceval",
   },
   {
+    title: "slurmtop",
+    desc: "為小型 GPU 叢集打造的單頁終端監控面板，集中顯示 CPU、記憶體、GPU 使用率、歷史趨勢與 Slurm 佇列。",
+    tags: ["Python", "Slurm", "GPU", "TUI"],
+    link: "https://github.com/Sean-Hawks/slurmtop",
+  },
+  {
+    title: "OpenAI 已讀不回計時器",
+    desc: "記錄 ChatGPT Pro 5x 名單送出後等待 OpenAI 回信的時間，以 SITCON 黑客松倒數頁改造成帶點怨念的社群計時器。",
+    tags: ["HTML", "JavaScript", "Cloudflare Workers", "GitHub Pages"],
+    link: "https://github.com/Sean-Hawks/hackathon2026",
+  },
+  {
+    title: "urtube",
+    desc: "從 YouTube 觀看紀錄分析長期興趣，以真實行為資料協助使用者探索共同喜好、配對同好並建立連結。",
+    tags: ["TypeScript", "Hono", "SQLite", "AI Matching"],
+    link: "https://github.com/skyhong2002/urtube.observe.tw",
+  },
+  {
     title: "ML2021 Spring",
     desc: "李宏毅機器學習課程作業整理，包含以 Notebook 為主的機器學習與深度學習練習紀錄。",
     tags: ["Machine Learning", "Deep Learning", "Jupyter Notebook", "Python"],
