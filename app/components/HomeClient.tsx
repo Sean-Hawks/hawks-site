@@ -289,11 +289,11 @@ export default function HomeClient({ posts, talks, libraryItems }: HomeClientPro
               <dl className="mt-5 hidden border-t border-[rgb(var(--line)/0.14)] sm:block">
                 <div className="grid grid-cols-[4.5rem_1fr] gap-3 border-b border-[rgb(var(--line)/0.14)] py-3 text-sm">
                   <dt className="font-mono text-[10px] uppercase tracking-wider text-[rgb(var(--muted))]">Status</dt>
-                  <dd>整理網站</dd>
+                  <dd>Writing Blog</dd>
                 </div>
                 <div className="grid grid-cols-[4.5rem_1fr] gap-3 border-b border-[rgb(var(--line)/0.14)] py-3 text-sm">
                   <dt className="font-mono text-[10px] uppercase tracking-wider text-[rgb(var(--muted))]">Focus</dt>
-                  <dd>Music / Machine Learning / Cyber Security</dd>
+                  <dd className="min-w-0 break-words"><strong>Development / Machine Learning / CyberSec / HPC / Percussion</strong></dd>
                 </div>
                 <div className="grid grid-cols-[4.5rem_1fr] gap-3 border-b border-[rgb(var(--line)/0.14)] py-3 text-sm">
                   <dt className="font-mono text-[10px] uppercase tracking-wider text-[rgb(var(--muted))]">Since</dt>
@@ -320,7 +320,9 @@ export default function HomeClient({ posts, talks, libraryItems }: HomeClientPro
                   <span className="home-hero-outline block">.tw</span>
                 </h1>
                 <p className="mt-7 max-w-xl font-serif text-lg font-bold leading-8 text-[rgb(var(--text)/0.88)] sm:text-xl sm:leading-9">
-                  嗨早安，我是來自台南的 Hawks！這裡會分享我在音樂、程式或在各種影視作品上的心得。
+                  嗨早安，我是 Hawks！
+                  <br />
+                  在這裡我會分享我在學術、活動、藝術等等的見解，目前正在努力週更部落格！
                 </p>
               </div>
 

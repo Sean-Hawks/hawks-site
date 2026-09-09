@@ -21,11 +21,11 @@ type BlogEntry = {
 };
 
 export const metadata: Metadata = {
-  title: "Blog",
+  title: "部落格",
   description: "Hawks 最近寫下來的文章、近況與短更新。",
   alternates: { canonical: "https://hawks.tw/blog/" },
   openGraph: {
-    title: "Blog",
+    title: "部落格",
     description: "Hawks 最近寫下來的文章、近況與短更新。",
     url: "https://hawks.tw/blog/",
     images: ["/og/default.png"],
@@ -123,7 +123,7 @@ export default function BlogPage() {
           <div className="md:col-span-2">
             <div className="now-desk-kicker">01 / WRITING</div>
             <h1 className="now-desk-title mt-5 font-serif font-bold tracking-[-0.06em]">
-              Blog
+              部落格
             </h1>
           </div>
         </header>

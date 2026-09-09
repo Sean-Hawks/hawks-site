@@ -143,10 +143,10 @@ function cardSvg({ eyebrow, title, desc, date, hasBanner = false }) {
       </linearGradient>
       <clipPath id="avatar"><circle cx="206" cy="256" r="100"/></clipPath>
     </defs>
-    <rect width="1200" height="630" fill="url(#base)" fill-opacity="${hasBanner ? '0.94' : '1'}"/>
+    <rect width="1200" height="630" fill="url(#base)" fill-opacity="${hasBanner ? '0.18' : '1'}"/>
     <circle cx="60" cy="40" r="310" fill="#a78bfa" opacity="0.06"/>
     <circle cx="1160" cy="620" r="270" fill="#fbbf24" opacity="0.04"/>
-    <rect x="48" y="48" width="1104" height="534" rx="28" fill="#181a20" fill-opacity="0.90" stroke="#383640"/>
+    <rect x="48" y="48" width="1104" height="534" rx="28" fill="#181a20" fill-opacity="${hasBanner ? '0.68' : '0.90'}" stroke="#383640"/>
     <rect x="76" y="48" width="1048" height="3" rx="1.5" fill="url(#accent)"/>
     <path d="M344 112V518" stroke="#383640"/>
     <circle cx="206" cy="256" r="108" stroke="#a78bfa" stroke-opacity="0.45" stroke-width="2"/>
@@ -186,7 +186,8 @@ function resolveBannerPath(value) {
 }
 
 async function renderPng(fileName, data) {
-  const bannerPath = resolveBannerPath(data.banner);
+  // Use the homepage banner when an article has no usable local banner.
+  const bannerPath = resolveBannerPath(data.banner) || resolveBannerPath("/banner.jpg");
   const svg = cardSvg({ ...data, hasBanner: Boolean(bannerPath) });
   const outputPath = path.join(outDir, fileName);
 
