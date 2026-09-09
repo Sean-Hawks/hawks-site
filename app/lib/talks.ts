@@ -114,10 +114,12 @@ export function getSortedTalksData(): Talk[] {
 
     return {
       id,
-      desc: bodyContent, // 內文作為描述
-      subtitle,
       year: dateStr ? dateStr.split('-')[0] : 'Unknown', // 自動從日期提取年份
       ...(data as Omit<Talk, 'id' | 'desc' | 'year' | 'date'>),
+      // Talk consumers use desc as the full Markdown body. Frontmatter desc
+      // is only a summary and must never replace the article's content.
+      desc: bodyContent,
+      subtitle,
       tags: normalizeTags(data.tags),
       title: explicitTitle || titleFromContent(bodyContent, dateStr),
       titleGenerated: !explicitTitle,
