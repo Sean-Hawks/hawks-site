@@ -81,7 +81,7 @@ export default function ArticleImages({ images }: { images: Img[] }) {
                       src={img.src}
                       alt={img.alt ?? ""}
                       loading="lazy"
-                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.025]"
+                      className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.025]"
                     />
                     {hasMore && (
                       <span className="absolute inset-0 grid place-items-center bg-black/55 text-center text-base font-semibold text-white backdrop-blur-[1px] sm:text-lg">

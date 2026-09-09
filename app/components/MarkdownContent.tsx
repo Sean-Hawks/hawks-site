@@ -211,7 +211,7 @@ function transformObsidianEmbeds(content: string, assetBasePath?: string) {
 // 作者可以維持自然的 Markdown 寫法，前台仍會自動把一串照片轉成緊湊相簿。
 function normalizeImageParagraphs(content: string) {
   const lines = content.split("\n");
-  const isImg = (l: string) => /^\s*!\[[^\]]*\]\([^)]*\)\s*$/.test(l);
+  const isImg = (l: string) => /^(?:\s*!\[[^\]]*\]\([^)]*\)\s*)+$/.test(l);
   const out: string[] = [];
   let inFence = false;
 
@@ -335,8 +335,8 @@ export default function MarkdownContent({
 
     // 避免 p 內塞進 block element（admonition/pre 等）造成 DOM repair
     p: ({ node, children, ...props }: React.ComponentPropsWithoutRef<"p"> & { node?: unknown }) => {
-      // 純圖片段落：改用相簿/大圖 + 點擊放大（default 版型限定）
-      if (variant === "default") {
+      // 所有文章與近況的連續照片均使用四格相簿。
+      {
         const imgs = imageOnlyParagraph(node);
         if (imgs.length > 0) {
           return <ArticleImages images={imgs} />;
