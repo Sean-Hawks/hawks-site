@@ -1,4 +1,4 @@
-# Obsidian Publishing Workflow
+# Obsidian 寫作與發布流程
 
 這個站的內容來源是 Markdown。平常可以先在 Obsidian 寫，最後把要公開的文章放進 `content/posts/`，Talk/分享紀錄放進 `content/talks/`。
 
@@ -11,7 +11,7 @@
 - `content/posts/`: 會被網站讀取的 Blog 文章。
 - `content/talks/`: 會被網站讀取的 Talk / Now archive。Daily Notes 也會直接建立在這裡。
 
-## 我幫你設定好的 Obsidian 行為
+## 本機 Obsidian 設定
 
 - 新檔案預設會放進 `Inbox/`。
 - Daily Notes 會放進 `content/talks/YYYY-MM-DD.md`。
@@ -19,7 +19,7 @@
 - Templates 插件的模板資料夾是 `content/templates/`。
 - 附件預設放在 `public/images/`，方便之後文章引用圖片。
 
-`.obsidian/` 目前在 `.gitignore` 裡，所以這些是本機 Obsidian 使用習慣設定，不會影響網站部署。
+`.obsidian/` 目前在 `.gitignore` 裡，以上設定不會隨儲存庫同步；在新電腦使用時，請自行依此設定 Daily Notes、Templates 與附件位置。
 
 ## 發文章流程
 
@@ -147,7 +147,7 @@ tags:
 
 ## Now Page
 
-`/now/` 不需要另外維護狀態文字。它會自動抓最新文章、最新 Talk archive 和 Projects。
+`/now/` 目前會導向 `/blog/`。Blog 同時收錄長文與 Talk 短近況，不需要另外維護一份 Now 頁面。
 
 現在 Obsidian 的 Daily Note 會直接建立一篇 Talk / Now 草稿：
 
@@ -161,7 +161,7 @@ content/talks/YYYY-MM-DD.md
 status: draft
 ```
 
-寫完要出現在 `/now/` 時改成：
+寫完要出現在 Blog 與 Talk 列表時改成：
 
 ```yaml
 status: published
@@ -175,7 +175,7 @@ tags:
   - "#now"
 ```
 
-但不是每篇都需要。平常只要把文章或 Talk 發布出去，Now 頁就會自然更新。
+但不是每篇都需要。平常只要把文章或 Talk 發布出去，Blog 的文章與近況列表就會在下次建置部署後更新。
 
 ## 建議寫作節奏
 

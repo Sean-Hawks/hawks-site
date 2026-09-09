@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "hawks.tw",
   description:
-    "Hawks 的個人網站：Blog、Talk、Library、Project，以及關於程式、音樂、ACGM 和生活的筆記。",
+    "Hawks 的個人網站，記錄程式開發、機器學習與資安的學習歷程、活動心得和管樂生活，分享喜歡的動畫、電影、音樂與遊戲。",
   alternates: {
     canonical: "https://hawks.tw",
   },
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     url: "https://hawks.tw",
     title: "hawks.tw",
     description:
-      "Hawks 的個人網站：Blog、Talk、Library、Project，以及關於程式、音樂、ACGM 和生活的筆記。",
+      "Hawks 的個人網站，記錄程式開發、機器學習與資安的學習歷程、活動心得和管樂生活，分享喜歡的動畫、電影、音樂與遊戲。",
     images: [
       {
         url: "/og/default.png",
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "hawks.tw",
     description:
-      "Hawks 的個人網站：Blog、Talk、Library、Project，以及關於程式、音樂、ACGM 和生活的筆記。",
+      "Hawks 的個人網站，記錄程式開發、機器學習與資安的學習歷程、活動心得和管樂生活，分享喜歡的動畫、電影、音樂與遊戲。",
     images: ["/og/default.png"],
   },
 };

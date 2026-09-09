@@ -33,10 +33,10 @@ const tickerItems = [
 ];
 
 const quickLinks = [
-  { label: "Blog", href: "/blog", note: "文章、近況和沒有結論的碎念" },
-  { label: "Library", href: "/library", note: "最近喜歡與收藏的作品" },
-  { label: "Project", href: "/project", note: "程式與 side projects" },
-  { label: "Search", href: "/search", note: "在這個網站裡找東西" },
+  { label: "Blog", href: "/blog", note: "技術學習、活動心得與生活近況" },
+  { label: "Library", href: "/library", note: "動畫、電影、音樂與遊戲的收藏和心得" },
+  { label: "Project", href: "/project", note: "程式作品與個人專案紀錄" },
+  { label: "Search", href: "/search", note: "搜尋文章、短筆記、收藏與標籤" },
 ];
 
 function formatDate(date: string) {
@@ -322,7 +322,7 @@ export default function HomeClient({ posts, talks, libraryItems }: HomeClientPro
                 <p className="mt-7 max-w-xl font-serif text-lg font-bold leading-8 text-[rgb(var(--text)/0.88)] sm:text-xl sm:leading-9">
                   嗨早安，我是 Hawks！
                   <br />
-                  在這裡我會分享我在學術、活動、藝術等等的見解，目前正在努力週更部落格！
+                  我是喜歡寫程式、打擊樂與動畫的學生。這裡記錄我的技術學習、活動心得與生活，也收藏喜歡的電影、音樂和遊戲。
                 </p>
               </div>
 

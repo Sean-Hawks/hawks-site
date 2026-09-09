@@ -7,7 +7,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "hawks.tw",
     short_name: "hawks.tw",
     description:
-      "Hawks 的個人網站，收集 Blog、Talk、Library、Project，以及一些生活和技術筆記。",
+      "Hawks 的個人網站，記錄程式開發、機器學習與資安的學習歷程、活動心得和管樂生活，分享喜歡的動畫、電影、音樂與遊戲。",
     start_url: "/",
     scope: "/",
     display: "standalone",
