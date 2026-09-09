@@ -29,11 +29,6 @@ function escapeHtml(value = "") {
     .replace(/"/g, "&quot;");
 }
 
-function short(value = "", length = 92) {
-  const text = String(value).replace(/\s+/g, " ").trim();
-  return text.length > length ? `${text.slice(0, length).trim()}...` : text;
-}
-
 // librsvg (used by sharp) does NOT render <foreignObject>, so title/desc are
 // drawn with native <text>/<tspan>. That means we wrap the text ourselves.
 const isCjk = (ch) =>
@@ -47,10 +42,16 @@ function tokenize(text) {
   let buf = "";
   for (const ch of s) {
     if (ch === " ") {
-      if (buf) tokens.push(buf), (buf = "");
+      if (buf) {
+        tokens.push(buf);
+        buf = "";
+      }
       tokens.push(" ");
     } else if (isCjk(ch)) {
-      if (buf) tokens.push(buf), (buf = "");
+      if (buf) {
+        tokens.push(buf);
+        buf = "";
+      }
       tokens.push(ch);
     } else {
       buf += ch;
@@ -106,7 +107,7 @@ function formatDate(value) {
 // `fonts-noto-cjk`, installed on the CI runner (see .github/workflows).
 const FONT = "PingFang TC, Noto Sans TC, Noto Sans CJK TC, Inter, Arial, sans-serif";
 
-function textLines(lines, { x, y, step }) {
+function textLines(lines, { x, step }) {
   return lines
     .map(
       (line, i) =>
@@ -115,42 +116,54 @@ function textLines(lines, { x, y, step }) {
     .join("");
 }
 
+// Embed the local avatar so generated cards never depend on remote assets.
+const avatar = await sharp(path.join(publicDir, "avatar.jpg"))
+  .rotate()
+  .resize(240, 240, { fit: "cover" })
+  .png()
+  .toBuffer();
+const avatarUri = `data:image/png;base64,${avatar.toString("base64")}`;
+
 function cardSvg({ eyebrow, title, desc, date, hasBanner = false }) {
-  const titleTspans = textLines(wrapLines(title, 13, 2), { x: 132, y: 250, step: 72 });
-  const descTspans = textLines(wrapLines(desc, 26, 2), { x: 132, y: 410, step: 40 });
-  const background = hasBanner
-    ? `<defs>
-      <linearGradient id="banner-shade" x1="0" y1="0" x2="0" y2="630" gradientUnits="userSpaceOnUse">
-        <stop stop-color="#070810" stop-opacity="0.18"/>
-        <stop offset="0.55" stop-color="#070810" stop-opacity="0.34"/>
-        <stop offset="1" stop-color="#070810" stop-opacity="0.72"/>
-      </linearGradient>
-    </defs>
-    <rect width="1200" height="630" fill="#0f1014" fill-opacity="0.20"/>
-    <rect width="1200" height="630" fill="url(#banner-shade)"/>`
-    : '<rect width="1200" height="630" fill="#0f1014"/>';
-  const wave = hasBanner
-    ? '<path d="M0 472C188 430 325 470 494 431C670 391 820 328 1200 374V630H0V472Z" fill="#181a20" fill-opacity="0.52"/>'
-    : '<path d="M0 472C188 430 325 470 494 431C670 391 820 328 1200 374V630H0V472Z" fill="#181a20"/>';
-  const card = hasBanner
-    ? '<rect x="88" y="82" width="1024" height="466" rx="34" fill="#11131a" fill-opacity="0.84" stroke="white" stroke-opacity="0.18"/>'
-    : '<rect x="88" y="82" width="1024" height="466" rx="34" fill="#181a20" fill-opacity="0.88" stroke="white" stroke-opacity="0.10"/>';
+  const titleSize = [52, 48, 44].find((size) =>
+    !wrapLines(title, 700 / size, 3).at(-1)?.endsWith("…"),
+  ) || 44;
+  const titleLines = wrapLines(title, 700 / titleSize, 3);
+  const titleTspans = textLines(titleLines, { x: 390, step: titleSize * 1.35 });
+  const descY = 236 + (titleLines.length - 1) * titleSize * 1.35 + 58;
+  const descTspans = textLines(wrapLines(desc, 26, 1), { x: 390, step: 36 });
   return `
   <svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
-    ${background}
-    <circle cx="210" cy="78" r="260" fill="#a78bfa" opacity="0.16"/>
-    <circle cx="1020" cy="120" r="260" fill="#fbbf24" opacity="0.14"/>
-    ${wave}
-    <g opacity="0.11">
-      <path d="M0 110H1200M0 190H1200M0 270H1200M0 350H1200M0 430H1200M0 510H1200" stroke="white"/>
-      <path d="M120 0V630M240 0V630M360 0V630M480 0V630M600 0V630M720 0V630M840 0V630M960 0V630M1080 0V630" stroke="white"/>
+    <defs>
+      <linearGradient id="base" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#252333"/><stop offset="1" stop-color="#101216"/>
+      </linearGradient>
+      <linearGradient id="accent" x1="64" y1="0" x2="1136" y2="0" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#a78bfa"/><stop offset="1" stop-color="#fbbf24"/>
+      </linearGradient>
+      <clipPath id="avatar"><circle cx="206" cy="256" r="100"/></clipPath>
+    </defs>
+    <rect width="1200" height="630" fill="url(#base)" fill-opacity="${hasBanner ? '0.94' : '1'}"/>
+    <circle cx="60" cy="40" r="310" fill="#a78bfa" opacity="0.06"/>
+    <circle cx="1160" cy="620" r="270" fill="#fbbf24" opacity="0.04"/>
+    <rect x="48" y="48" width="1104" height="534" rx="28" fill="#181a20" fill-opacity="0.90" stroke="#383640"/>
+    <rect x="76" y="48" width="1048" height="3" rx="1.5" fill="url(#accent)"/>
+    <path d="M344 112V518" stroke="#383640"/>
+    <circle cx="206" cy="256" r="108" stroke="#a78bfa" stroke-opacity="0.45" stroke-width="2"/>
+    <image x="106" y="156" width="200" height="200" href="${avatarUri}" clip-path="url(#avatar)"/>
+    <!-- Match the homepage .header-wordmark: heavy type, outlined .TW, offset accent shadow. -->
+    <g font-family="Inter, Arial, sans-serif" font-size="36" font-weight="950" letter-spacing="-2.7">
+      <text x="206" y="410" text-anchor="middle" fill="#fbbf24" fill-opacity="0.18" transform="translate(3.24 2.16)">HAWKS<tspan dx="2.88" font-size="33.84">.TW</tspan></text>
+      <text x="206" y="410" text-anchor="middle" fill="#f2eee7">HAWKS<tspan dx="2.88" font-size="33.84" fill="none" stroke="#f2eee7" stroke-opacity="0.76" stroke-width="1">.TW</tspan></text>
     </g>
-    ${card}
-    <text x="132" y="154" fill="#fbbf24" font-family="${FONT}" font-size="25" font-weight="800" letter-spacing="5">${escapeHtml(eyebrow)}</text>
-    <text x="132" y="250" fill="#e8e4dc" font-family="${FONT}" font-size="58" font-weight="850">${titleTspans}</text>
-    <text x="132" y="410" fill="#b2aca4" font-family="${FONT}" font-size="28" font-weight="500">${descTspans}</text>
-    <text x="132" y="505" fill="#b2aca4" font-family="${FONT}" font-size="24">${escapeHtml(formatDate(date))}</text>
-    <text x="930" y="505" fill="#e8e4dc" font-family="Inter, Arial, sans-serif" font-size="28" font-weight="800">hawks.tw</text>
+    <text x="206" y="447" text-anchor="middle" fill="#b7aecb" font-family="${FONT}" font-size="22">記錄・分享・探索</text>
+    <rect x="390" y="108" width="${eyebrow.length * 15 + 34}" height="42" rx="10" fill="#fbbf24" fill-opacity="0.10"/>
+    <text x="407" y="137" fill="#fbbf24" font-family="${FONT}" font-size="21" font-weight="700" letter-spacing="2">${escapeHtml(eyebrow)}</text>
+    <text x="390" y="236" fill="#f2eee7" font-family="${FONT}" font-size="${titleSize}" font-weight="800">${titleTspans}</text>
+    <text x="390" y="${descY}" fill="#b5b0bb" font-family="${FONT}" font-size="26">${descTspans}</text>
+    <path d="M390 480H1096" stroke="#383640"/>
+    <text x="390" y="522" fill="#b5b0bb" font-family="${FONT}" font-size="23">${escapeHtml(formatDate(date))}</text>
+    <path d="M1060 513H1090M1080 503L1090 513L1080 523" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
   </svg>`;
 }
 
