@@ -95,6 +95,28 @@ export const resumeItems: ResumeItem[] = [
     tags: ["Bass Clarinet", "Clarinet", "Wind Band"],
   },
   {
+    period: "2026.11.07 — 08",
+    dateTime: "2026-11-07",
+    categories: ["競賽"],
+    title: "2026 臺北秋季程式設計節｜城市通微服務大黑客松",
+    organization: "臺北市政府資訊局",
+    summary:
+      "報名參與城市通微服務大黑客松，將以城市通開源架構與臺北市開放資料開發市政微服務。",
+    tags: ["Hackathon", "Open Data", "Microservices"],
+    links: [external("競賽官網", "https://codefest.taipei/")],
+  },
+  {
+    period: "2026.09.04 — 06",
+    dateTime: "2026-09-04",
+    categories: ["競賽"],
+    title: "BUILDMODE GEN-AI Hackathon 2026｜全場總排名第一名",
+    organization: "FUTUREMODE × SITCON",
+    summary:
+      "在台北花博爭艷館參與三天的生成式 AI 黑客松，經書審與現場展示兩輪評選，獲全場總排名第一名。",
+    tags: ["Hackathon", "Generative AI", "1st Place"],
+    links: [external("參賽者資訊站", "https://hackathon2026.sitcon.org/")],
+  },
+  {
     period: "2026.08.21 — 22",
     dateTime: "2026-08-21",
     categories: ["年會"],
@@ -104,6 +126,17 @@ export const resumeItems: ResumeItem[] = [
       "以議程助理身分參與 HITCON 2026，協助講者與議程現場運作。",
     tags: ["Security", "Conference", "Volunteer"],
     links: [external("官方網站", "https://hitcon.org/2026/en-US/cfp/")],
+  },
+  {
+    period: "2026.08.15 — 16",
+    dateTime: "2026-08-15",
+    categories: ["競賽"],
+    title: "THJCC CTF 2026 Summer｜第三名",
+    organization: "第三屆夏季臺灣高中職聯合資安競賽",
+    summary:
+      "參與以 Jeopardy 賽制進行的高中職聯合資安競賽，在 Web、Reverse、Crypto、Pwn 與 Misc 題組中取得第三名。",
+    tags: ["CTF", "Cybersecurity", "3rd Place"],
+    links: [external("競賽官網", "https://ctf2026-sum.thjcc.org/")],
   },
   {
     period: "2026.08.04 — 06",
