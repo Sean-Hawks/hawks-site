@@ -4,7 +4,7 @@ subtitle: Dr.STONE
 category: anime
 year: "2019"
 date: 2026-06-17
-status: watching
+status: watched
 rating: 8.8
 tags:
   - science

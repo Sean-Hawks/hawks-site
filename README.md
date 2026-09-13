@@ -2,7 +2,7 @@
 
 [hawks.tw](https://hawks.tw/) 是我記錄學習與生活的地方。這裡有程式開發、機器學習與資安的學習筆記，參與營隊、競賽和社群活動的心得，也有管樂生活，以及喜歡的動畫、電影、音樂與遊戲。
 
-這個儲存庫包含網站原始碼、Markdown 文章與作品收藏。內容可以用一般文字編輯器或 Obsidian 維護；網站以 Next.js 建置成靜態檔，再透過 GitHub Actions 發布到 GitHub Pages。
+這個儲存庫包含網站原始碼、Markdown 文章、作品收藏和寫作工具。內容可以用一般文字編輯器或 Obsidian 維護；網站以 Next.js 建置成靜態檔，再透過 GitHub Actions 發布到 GitHub Pages。
 
 ## 網站裡有什麼
 
@@ -29,7 +29,7 @@ npm install
 npm run dev
 ```
 
-接著開啟 [http://localhost:3000](http://localhost:3000)。
+接著開啟 [http://localhost:3000](http://localhost:3000)。一般網站預覽不需要啟動 Discord 寫作工具。
 
 ### 常用指令
 
@@ -127,6 +127,7 @@ Blog 與 Talk 的 `status: draft`、`status: private`，以及 Library 的對應
 
 - **直接編輯 Markdown**：修改 `content/` 下的檔案，在本機預覽後提交。
 - **Obsidian**：使用草稿、Daily Notes 與範本整理內容。資料夾與設定方式見 [Obsidian 寫作流程](docs/OBSIDIAN_WORKFLOW.md)。
+- **Discord**：選用 [Hawks Agent 寫作工具](agent/README.md)，在 Discord 建立、編輯、搜尋與匯出草稿，確認後發布 Blog 或 Talk。它是需要獨立設定與執行的服務。
 
 ## 專案結構與技術
 
@@ -150,6 +151,7 @@ content/
 public/          隨網站發布的圖片、分享預覽圖與其他靜態檔
 scripts/         建立短筆記、產生分享圖片與建置後處理
 docs/            寫作與網域設定說明
+agent/           Discord 寫作工具（獨立服務）
 .github/workflows/  GitHub Actions 部署流程
 ```
 
@@ -167,3 +169,4 @@ npm run build
 `build` 已包含分享圖片產生步驟，不需要再另外執行 `npm run og`。確認結果後提交需要發布的變更並推送至 `main`，由 [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) 建置 `out/` 並部署至 GitHub Pages。另一份 `nextjs.yml` 僅保留為手動備援。
 
 - [部署指南](DEPLOYMENT.md)：靜態輸出、GitHub Pages 與自訂網域設定。
+- [Discord 網域設定](docs/DISCORD_DOMAINS.md)：邀請頁及 `discord.hawks.tw`、`dc.hawks.tw` 的設定。

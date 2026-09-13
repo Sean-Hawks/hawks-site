@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="zh-Hant" prefix="og: https://ogp.me/ns#">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>魊窩｜Hawks Discord</title>
+    <meta name="description" content="加入魊窩，和 Hawks 一起在 Discord 聊天。點開邀請，一起來坐坐。">
+    <meta name="theme-color" content="#5865f2">
+    <link rel="canonical" href="https://discord.hawks.tw/">
+    <link rel="icon" href="https://cdn.discordapp.com/icons/1541122075257737266/79f3d4cac6aceea562915e86ecc5410e.png?size=128">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="zh_TW">
+    <meta property="og:site_name" content="Hawks Discord">
+    <meta property="og:title" content="魊窩｜Hawks Discord">
+    <meta property="og:description" content="加入魊窩，和 Hawks 一起在 Discord 聊天。點開邀請，一起來坐坐。">
+    <meta property="og:url" content="https://discord.hawks.tw/">
+    <meta property="og:image" content="https://cdn.discordapp.com/icons/1541122075257737266/79f3d4cac6aceea562915e86ecc5410e.png?size=512">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="512">
+    <meta property="og:image:height" content="512">
+    <meta property="og:image:alt" content="魊窩 Discord 伺服器圖示">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="魊窩｜Hawks Discord">
+    <meta name="twitter:description" content="加入魊窩，和 Hawks 一起在 Discord 聊天。點開邀請，一起來坐坐。">
+    <meta name="twitter:image" content="https://cdn.discordapp.com/icons/1541122075257737266/79f3d4cac6aceea562915e86ecc5410e.png?size=512">
+    <meta name="twitter:image:alt" content="魊窩 Discord 伺服器圖示">
+    <style>
+      :root { color-scheme: dark; font-family: system-ui, -apple-system, "PingFang TC", "Noto Sans TC", sans-serif; background: #111218; color: #f4f3ff; }
+      * { box-sizing: border-box; }
+      body { margin: 0; min-height: 100svh; display: grid; place-items: center; padding: 24px; background: radial-gradient(ellipse at 50% 0%, #5865f22b, transparent 65%); }
+      main { width: min(100%, 440px); padding: 42px 28px 30px; text-align: center; background: #1b1c26; border: 1px solid #ffffff16; border-radius: 24px; box-shadow: 0 24px 90px #0004; }
+      img { width: 88px; height: 88px; border-radius: 26px; background: #303247; }
+      .eyebrow { margin: 24px 0 12px; color: #b9beff; font-size: 12px; font-weight: 700; letter-spacing: .2em; }
+      h1 { margin: 0; font-size: 36px; letter-spacing: .06em; }
+      .description { margin: 16px 0 28px; color: #b9bbce; line-height: 1.8; }
+      .join { display: block; padding: 15px 20px; border-radius: 12px; background: #5865f2; color: white; font-weight: 700; text-decoration: none; }
+      .join:hover { background: #4752c4; }
+      a:focus-visible, button:focus-visible { outline: 3px solid #d8dbff; outline-offset: 5px; }
+      .status { margin: 20px 0 0; font-size: 13px; line-height: 1.8; color: #a5a8bd; }
+      button { margin-top: 8px; padding: 6px 10px; border: 0; background: transparent; color: #b9beff; font: inherit; font-size: 13px; cursor: pointer; text-decoration: underline; text-underline-offset: 4px; }
+      footer { margin-top: 28px; font-size: 12px; }
+      footer a { color: #a5a8bd; text-decoration: none; }
+      [hidden] { display: none; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <img src="https://cdn.discordapp.com/icons/1541122075257737266/79f3d4cac6aceea562915e86ecc5410e.png?size=128" width="88" height="88" alt="魊窩伺服器圖示">
+      <p class="eyebrow">HAWKS / DISCORD</p>
+      <h1>魊窩</h1>
+      <p class="description">和 Hawks 一起在 Discord 聊天。<br>點開邀請，一起來坐坐。</p>
+      <a class="join" id="join" href="https://discord.gg/c2hPpyErDv">加入 Discord 伺服器 ↗</a>
+      <p class="status" id="status" aria-live="polite">點擊上方按鈕即可前往 Discord。</p>
+      <button id="cancel" type="button" hidden>留在此頁</button>
+      <footer><a href="https://hawks.tw/">hawks.tw</a></footer>
+    </main>
+    <script>
+      // Keep metadata in the initial HTML so link preview crawlers can read it.
+      // Redirect only in the browser; no HTTP or meta-refresh redirect.
+      const status = document.getElementById("status");
+      const cancel = document.getElementById("cancel");
+      const join = document.getElementById("join");
+      status.textContent = "3 秒後自動前往 Discord；也可以直接點擊加入。";
+      cancel.hidden = false;
+      const timer = window.setTimeout(() => {
+        status.textContent = "正在前往 Discord…若未開啟，請點擊上方按鈕。";
+        cancel.hidden = true;
+        window.location.replace(join.href);
+      }, 3000);
+      cancel.addEventListener("click", () => {
+        window.clearTimeout(timer);
+        status.textContent = "已暫停自動導向。準備好時，點擊上方按鈕加入。";
+        cancel.hidden = true;
+        join.focus();
+      });
+      join.addEventListener("click", () => window.clearTimeout(timer));
+    </script>
+  </body>
+</html>

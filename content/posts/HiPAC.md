@@ -1,6 +1,6 @@
 ---
 title: 初體驗 HiPAC！佳作、NVIDIA 特別獎、未來之星獎歷程
-date: 2026-08-04
+date: 2026-09-02
 desc: ""
 banner: /images/Pasted image 20260902020933.png
 tags:

@@ -1,0 +1,16 @@
+[Unit]
+Description=Hawks Discord Blog Agent
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/YOUR_USER/hawks-site/agent
+EnvironmentFile=/home/YOUR_USER/hawks-site/agent/.env
+ExecStart=/usr/bin/node /home/YOUR_USER/hawks-site/agent/src/bot.mjs
+Restart=on-failure
+RestartSec=10
+UMask=0077
+
+[Install]
+WantedBy=default.target

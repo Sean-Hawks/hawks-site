@@ -1,0 +1,11 @@
+services:
+  blog-agent:
+    build: .
+    restart: unless-stopped
+    init: true
+    env_file: .env
+    environment:
+      AGENT_DATA_DIR: /data
+    volumes:
+      - ./.data:/data
+    stop_grace_period: 30s
