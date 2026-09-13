@@ -1,9 +1,24 @@
-export const projects = [
+export type Project = {
+  title: string;
+  desc: string;
+  tags: string[];
+  link: string;
+  award?: string;
+};
+
+export const projects: Project[] = [
   {
     title: "Hawks Site",
     desc: "用 Next.js 打造的個人網站，把文章、演講、收藏與專案整理成一個可以持續更新的數位基地。",
     tags: ["Next.js", "React", "TypeScript", "Tailwind"],
     link: "https://github.com/Sean-Hawks/hawks-site",
+  },
+  {
+    title: "urtube",
+    desc: "以 YouTube 觀看紀錄分析長期興趣，透過真實行為資料協助使用者探索共同喜好、配對同好並建立連結。",
+    tags: ["TypeScript", "Hono", "SQLite", "AI Matching"],
+    link: "https://github.com/skyhong2002/urtube.observe.tw",
+    award: "BUILDMODE GEN-AI Hackathon 2026｜全場第一名",
   },
   {
     title: "Gift Guru",
@@ -28,12 +43,6 @@ export const projects = [
     desc: "記錄 ChatGPT Pro 5x 名單送出後等待 OpenAI 回信的時間，以 SITCON 黑客松倒數頁改造成帶點怨念的社群計時器。",
     tags: ["HTML", "JavaScript", "Cloudflare Workers", "GitHub Pages"],
     link: "https://github.com/Sean-Hawks/hackathon2026",
-  },
-  {
-    title: "urtube",
-    desc: "從 YouTube 觀看紀錄分析長期興趣，以真實行為資料協助使用者探索共同喜好、配對同好並建立連結。",
-    tags: ["TypeScript", "Hono", "SQLite", "AI Matching"],
-    link: "https://github.com/skyhong2002/urtube.observe.tw",
   },
   {
     title: "ML2021 Spring",

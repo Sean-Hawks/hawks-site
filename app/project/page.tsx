@@ -1,4 +1,4 @@
-import { ExternalLink } from "lucide-react";
+import { Award, ExternalLink } from "lucide-react";
 import Header from "../components/Header";
 import SignalPageHeader from "../components/SignalPageHeader";
 import ThemeStyles from "../components/ThemeStyles";
@@ -49,6 +49,12 @@ export default function ProjectPage() {
                 </h2>
                 <ExternalLink className="h-4 w-4 text-[rgb(var(--muted))] transition-colors group-hover:text-[rgb(var(--accent))]" />
               </div>
+              {project.award && (
+                <div className="mb-4 inline-flex items-center gap-2 rounded-md border border-amber-400/30 bg-amber-400/10 px-2.5 py-1.5 text-xs font-bold text-amber-700 dark:text-amber-300">
+                  <Award className="h-3.5 w-3.5" />
+                  {project.award}
+                </div>
+              )}
               <p className="text-sm leading-6 text-[rgb(var(--muted))]">{project.desc}</p>
               <div className="mt-4 flex flex-wrap gap-2">
                 {project.tags.map((tag) => (
