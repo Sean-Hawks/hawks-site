@@ -108,13 +108,16 @@ export const resumeItems: ResumeItem[] = [
   {
     period: "2026.09.04 — 06",
     dateTime: "2026-09-04",
-    categories: ["競賽"],
+    categories: ["專案"],
     title: "BUILDMODE GEN-AI Hackathon 2026｜全場總排名第一名",
     organization: "FUTUREMODE × SITCON",
     summary:
-      "在台北花博爭艷館參與三天的生成式 AI 黑客松，經書審與現場展示兩輪評選，獲全場總排名第一名。",
+      "以 urtube 參與台北花博爭艷館舉辦的三天生成式 AI 黑客松，經書審與現場展示兩輪評選，獲全場總排名第一名。",
     tags: ["Hackathon", "Generative AI", "1st Place"],
-    links: [external("參賽者資訊站", "https://hackathon2026.sitcon.org/")],
+    links: [
+      external("urtube 專案", "https://github.com/skyhong2002/urtube.observe.tw"),
+      external("參賽者資訊站", "https://hackathon2026.sitcon.org/"),
+    ],
   },
   {
     period: "2026.08.21 — 22",
