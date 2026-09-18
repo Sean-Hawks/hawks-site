@@ -11,8 +11,6 @@ on:
 # 設定權限
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 # 避免同時進行多個部署
 concurrency:
@@ -22,19 +20,25 @@ concurrency:
 jobs:
   # 建置工作
   build:
+    timeout-minutes: 20
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: "22"
           cache: "npm"
 
       - name: Install
         run: npm ci
+
+      - name: Verify source and regression tests
+        run: npm run lint && npm test && npm run test:export
 
       # OG 圖在 build 前生成 (prebuild)，需中文字型才能正確渲染標題
       - name: Install CJK fonts
@@ -45,13 +49,19 @@ jobs:
           PRESERVE_LIVE_STATIC_ORIGIN: https://hawks.tw
         run: npm run build
 
+      - name: Verify exported pages and assets
+        run: npm run check:export
+
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
         with:
           path: ./out
 
   # 部署工作
   deploy:
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -60,4 +70,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4
