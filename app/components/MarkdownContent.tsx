@@ -1,4 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
+import { optimizedSrc, optimizedSrcSet } from "../lib/image-loader";
 import fs from "fs";
 import path from "path";
 import React from "react";
@@ -424,7 +425,8 @@ export default function MarkdownContent({
       );
     },
 
-    img: ({ title, alt, ...props }) => {
+    img: ({ title, alt, src, ...props }) => {
+      const imageSrc = typeof src === "string" ? src : "";
       const imageTitle = typeof title === "string" ? title : "";
       const size = /(?:^|\s)size=(small|medium|wide)(?:\s|$)/.exec(imageTitle)?.[1];
       const widthClass =
@@ -439,6 +441,11 @@ export default function MarkdownContent({
           <img
             className="rounded-xl border border-[rgb(var(--line)/0.12)] w-full h-auto object-contain shadow-lg"
             alt={alt ?? ""}
+            src={optimizedSrc(imageSrc, 960)}
+            srcSet={optimizedSrcSet(imageSrc)}
+            sizes="(min-width: 800px) 760px, 100vw"
+            loading="lazy"
+            decoding="async"
             {...props}
           />
           {alt && (

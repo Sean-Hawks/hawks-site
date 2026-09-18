@@ -1,0 +1,33 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { spawnSync } from 'node:child_process';
+import sharp from 'sharp';
+
+const script = fileURLToPath(new URL('../scripts/optimize-images.mjs', import.meta.url));
+test('image build never enlarges small assets, caches unchanged files, and fails on corrupt sources', async t => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(),'hawks-images-'));
+  t.after(() => fs.rm(root,{recursive:true,force:true}));
+  const source = path.join(root,'public/images');
+  await fs.mkdir(source,{recursive:true});
+  await sharp({ create: { width: 100, height: 50, channels: 4, background: '#123456' } }).png().toFile(path.join(source,'small.png'));
+  const run = () => spawnSync(process.execPath,[script],{cwd:root,encoding:'utf8',timeout:20000});
+  const first = run();
+  assert.equal(first.status,0,first.stderr);
+  const manifest = JSON.parse(await fs.readFile(path.join(root,'public/_img/manifest.json'),'utf8'));
+  assert.deepEqual(manifest.images['/images/small.png'],[100]);
+  const output = path.join(root,'public/_img/images/small.png/100.webp');
+  assert.equal((await sharp(output).metadata()).width,100);
+  const timestamp = (await fs.stat(output)).mtimeMs;
+  const second = run();
+  assert.equal(second.status,0,second.stderr);
+  assert.match(second.stdout,/0 regenerated/);
+  assert.equal((await fs.stat(output)).mtimeMs,timestamp);
+  await fs.writeFile(path.join(source,'broken.png'),'not an image');
+  const third = run();
+  assert.notEqual(third.status,0);
+  assert.match(third.stderr,/Image optimization failed/);
+});
