@@ -17,9 +17,8 @@ function slugify(value: string) {
   return slug || 'post';
 }
 
-export function tagToSlug(tag: string) {
-  return slugify(tag.replace(/^#/, ''));
-}
+import { tagToSlug } from './tags';
+export { tagToSlug } from './tags';
 
 export function normalizeTag(tag: unknown) {
   if (typeof tag !== 'string') return '';

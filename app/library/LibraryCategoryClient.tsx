@@ -1,5 +1,7 @@
 "use client";
 
+import { useQueryParams } from "../lib/use-query-params";
+
 import React from "react";
 import {
   ArrowLeft,
@@ -407,6 +409,8 @@ function LibraryCard({ item }: { item: LibraryItem }) {
 
   return (
     <article
+      id={`item-${item.slug}`}
+      style={{ scrollMarginTop: "7rem" }}
       className={[
         "overflow-hidden rounded-2xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.84)] shadow-[0_18px_60px_rgba(90,76,55,0.07)] transition-colors",
         hasDetail
@@ -450,11 +454,15 @@ export default function LibraryCategoryClient({
   category: LibraryCategoryInfo;
   items: LibraryItem[];
 }) {
-  const [query, setQuery] = React.useState("");
-  const [recommendation, setRecommendation] =
-    React.useState<RecommendationFilter>("all");
-  const [status, setStatus] = React.useState<StatusFilter>("all");
-  const [sort, setSort] = React.useState<SortMode>("rating");
+  const [params, update] = useQueryParams();
+  const query = params.get("q") ?? "";
+  const recommendation = recommendationOptions.find(option => option.value === params.get("recommendation"))?.value ?? "all";
+  const status = statusOptions.find(option => option.value === params.get("status"))?.value ?? "all";
+  const sort = sortOptions.find(option => option.value === params.get("sort"))?.value ?? "rating";
+  const setQuery = (value: string) => update({ q: value });
+  const setRecommendation = (value: RecommendationFilter) => update({ recommendation: value === "all" ? null : value });
+  const setStatus = (value: StatusFilter) => update({ status: value === "all" ? null : value });
+  const setSort = (value: SortMode) => update({ sort: value === "rating" ? null : value });
   const CategoryIcon = categoryMeta[category.id].Icon;
 
   const filteredItems = React.useMemo(() => {
@@ -480,10 +488,7 @@ export default function LibraryCategoryClient({
   }, [items, query, recommendation, sort, status]);
 
   const resetFilters = () => {
-    setQuery("");
-    setRecommendation("all");
-    setStatus("all");
-    setSort("rating");
+    update({ q: null, recommendation: null, status: null, sort: null });
   };
   const hasActiveFilters =
     query.trim() !== "" ||
