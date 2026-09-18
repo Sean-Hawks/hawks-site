@@ -7,6 +7,7 @@ import {
   writeFileSync,
 } from "node:fs";
 import path from "node:path";
+import { staticAssetPath, sameOriginPage, fetchBounded } from "./static-assets.mjs";
 
 const outDir = path.join(process.cwd(), "out");
 const legacyDir = path.join(process.cwd(), "legacy-static");
@@ -35,11 +36,6 @@ function copyDirectory(fromDir, toDir) {
   return copied;
 }
 
-function staticPathToOutputPath(staticPath) {
-  const cleanPath = staticPath.replace(/\\+$/g, "");
-  return path.join(outDir, decodeURIComponent(cleanPath.replace(/^\//, "")));
-}
-
 function extractStaticPaths(html) {
   return new Set(
     [...html.matchAll(/\/_next\/static\/[^"' <>)]+/g)].map((match) =>
@@ -49,11 +45,7 @@ function extractStaticPaths(html) {
 }
 
 async function fetchText(url) {
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(`${response.status} ${response.statusText}: ${url}`);
-  }
-  return response.text();
+  return (await fetchBounded(url, 4 * 1024 * 1024)).toString("utf8");
 }
 
 async function collectPageUrls(siteOrigin) {
@@ -62,7 +54,8 @@ async function collectPageUrls(siteOrigin) {
   try {
     const sitemap = await fetchText(`${siteOrigin}/sitemap.xml`);
     for (const match of sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)) {
-      urls.add(match[1]);
+      const pageUrl = sameOriginPage(match[1], siteOrigin);
+      if (pageUrl) urls.add(pageUrl);
     }
   } catch (error) {
     console.warn(`Could not read sitemap for static asset preservation: ${error.message}`);
@@ -91,20 +84,14 @@ async function preserveLiveStaticAssets(siteOrigin) {
 
   let downloaded = 0;
 
-  for (const staticPath of staticPaths) {
-    const outputPath = staticPathToOutputPath(staticPath);
-    if (existsSync(outputPath)) continue;
+  for (const staticPath of [...staticPaths].slice(0, 500)) {
+    const outputPath = staticAssetPath(staticPath, outDir);
+    if (!outputPath || existsSync(outputPath)) continue;
 
     const assetUrl = `${normalizedOrigin}${staticPath}`;
 
     try {
-      const response = await fetch(assetUrl);
-      if (!response.ok) {
-        console.warn(`Skipping ${assetUrl}: ${response.status} ${response.statusText}`);
-        continue;
-      }
-
-      const bytes = Buffer.from(await response.arrayBuffer());
+      const bytes = await fetchBounded(assetUrl, 8 * 1024 * 1024);
       mkdirSync(path.dirname(outputPath), { recursive: true });
       writeFileSync(outputPath, bytes);
       downloaded += 1;

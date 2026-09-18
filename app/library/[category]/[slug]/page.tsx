@@ -235,7 +235,7 @@ export default async function LibraryReviewPage({ params }: PageProps) {
       <Header />
 
       <div className="w-full px-4 sm:px-3">
-        <main className="mx-auto grid max-w-6xl grid-cols-1 gap-8 py-8 lg:grid-cols-[220px_minmax(0,1fr)]">
+        <main id="main-content" tabIndex={-1} className="mx-auto grid max-w-6xl grid-cols-1 gap-8 py-8 lg:grid-cols-[220px_minmax(0,1fr)]">
           <aside className="hidden lg:block">
             <div className="sticky top-40 space-y-3">
               <h3 className="text-xs font-bold uppercase tracking-wider text-[rgb(var(--muted))]">

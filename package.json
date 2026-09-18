@@ -10,12 +10,14 @@
     "build": "next build",
     "postbuild": "node scripts/create-pages-fallbacks.mjs && node scripts/preserve-static-assets.mjs",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "node --test tests/*.test.mjs",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",
     "lucide-react": "^0.475.0",
-    "next": "15.1.7",
+    "next": "15.5.25",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-markdown": "^9.0.1",
@@ -23,6 +25,7 @@
     "remark-directive": "^4.0.0",
     "remark-gfm": "^4.0.1",
     "remark-rehype": "^11.1.2",
+    "sharp": "^0.35.4",
     "unist-util-visit": "^5.0.0"
   },
   "devDependencies": {
@@ -34,5 +37,13 @@
     "eslint-config-next": "16.1.1",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "overrides": {
+    "next": {
+      "postcss": "8.5.28"
+    }
+  },
+  "engines": {
+    "node": ">=22.12"
   }
 }

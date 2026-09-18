@@ -26,7 +26,7 @@ export default function TimelinePage() {
       <ThemeStyles />
       <Header />
 
-      <main className="resume-page mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
+      <main id="main-content" tabIndex={-1} className="resume-page mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
         <SignalPageHeader
           code="07 / LOGBOOK"
           title="一路做過的事"

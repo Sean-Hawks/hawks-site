@@ -48,7 +48,7 @@ export default function SubscribePage() {
       <ThemeStyles />
       <Header />
 
-      <main className="mx-auto max-w-5xl px-4 py-10 sm:px-3">
+      <main id="main-content" tabIndex={-1} className="mx-auto max-w-5xl px-4 py-10 sm:px-3">
         <SignalPageHeader
           code="05 / BROADCAST"
           title="訂閱 hawks.tw"

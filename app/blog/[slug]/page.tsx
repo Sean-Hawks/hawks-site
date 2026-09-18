@@ -94,7 +94,7 @@ export default async function PostPage({ params }: PageProps) {
       <div className="site-shell min-h-screen text-[rgb(var(--text))]">
         <ThemeStyles />
         <Header />
-        <main className="p-6 max-w-2xl mx-auto">
+        <main id="main-content" tabIndex={-1} className="p-6 max-w-2xl mx-auto">
           <h1 className="font-serif text-2xl font-bold tracking-tight">文章未找到</h1>
           <Link href="/blog" className="mt-4 text-[rgb(var(--accent))] hover:underline inline-flex items-center gap-2">
             <ArrowLeft className="h-4 w-4" />
@@ -111,7 +111,7 @@ export default async function PostPage({ params }: PageProps) {
       <Header />
 
       <div className="w-full px-4 sm:px-3">
-        <main className="max-w-6xl mx-auto py-8 grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-10">
+        <main id="main-content" tabIndex={-1} className="max-w-6xl mx-auto py-8 grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-10">
           {/* 左側：目錄 */}
           <aside className="hidden lg:block">
             {/* 對應調整 sticky top：從 top-44 改為 top-40 */}

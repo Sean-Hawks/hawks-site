@@ -72,7 +72,7 @@ export default async function TalkDetailPage({ params }: PageProps) {
       <div className="site-shell min-h-screen text-[rgb(var(--text))]">
         <ThemeStyles />
         <Header />
-        <main className="p-6 max-w-2xl mx-auto">
+        <main id="main-content" tabIndex={-1} className="p-6 max-w-2xl mx-auto">
           <h1 className="font-serif text-2xl font-bold tracking-tight">Talk 未找到</h1>
           <Link href="/talk" className="mt-4 text-[rgb(var(--accent))] hover:underline inline-flex items-center gap-2">
             <ArrowLeft className="h-4 w-4" />
@@ -89,7 +89,7 @@ export default async function TalkDetailPage({ params }: PageProps) {
       <Header />
 
       <div className="w-full px-4 sm:px-6">
-        <main className="mx-auto max-w-[780px] py-10 sm:py-16">
+        <main id="main-content" tabIndex={-1} className="mx-auto max-w-[780px] py-10 sm:py-16">
           <Link 
             href="/talk"
             className="group mb-10 inline-flex items-center gap-2 text-sm text-[rgb(var(--muted))] transition-colors hover:text-[rgb(var(--accent))]"

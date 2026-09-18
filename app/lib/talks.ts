@@ -60,7 +60,7 @@ export function getSortedTalksData(): Talk[] {
   }
 
   const fileNames = fs.readdirSync(talksDirectory);
-  const allTalksData = fileNames.map((fileName) => {
+  const allTalksData = fileNames.filter((fileName) => fileName.endsWith('.md') && fs.statSync(path.join(talksDirectory, fileName)).isFile()).map((fileName) => {
     // 移除 ".md" 副檔名作為 id
     const id = fileName.replace(/\.md$/, '');
 
@@ -69,7 +69,7 @@ export function getSortedTalksData(): Talk[] {
     const fileContents = fs.readFileSync(fullPath, 'utf8');
 
     // 使用 gray-matter 解析 metadata
-    const { data, content } = matter(fileContents);
+    const { data, content } = matter(fileContents, { engines: { javascript() { throw new Error("Executable frontmatter is not supported."); } } });
     const { subtitle, content: bodyContent } = extractSubtitleDirective(content);
 
     // 處理 Obsidian 格式的 banner 圖片連結
@@ -92,7 +92,7 @@ export function getSortedTalksData(): Talk[] {
     if (data.date) {
       if (data.date instanceof Date) {
         const d = data.date;
-        dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        dateStr = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
       } else {
         // 嘗試處理已經變成長字串的日期，或者一般字串
         const str = String(data.date);
@@ -100,7 +100,7 @@ export function getSortedTalksData(): Talk[] {
         if (str.includes('GMT') || str.match(/^[A-Z][a-z]{2}\s[A-Z][a-z]{2}\s\d{2}\s\d{4}/)) {
            const d = new Date(str);
            if (!isNaN(d.getTime())) {
-             dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+             dateStr = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
            } else {
              dateStr = str; // 無法解析，保持原樣
            }

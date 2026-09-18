@@ -53,7 +53,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   }));
 
   const libraryReviewRoutes = getAllLibraryItems()
-    .filter((item) => item.hasReview)
+    .filter((item) => item.hasReview || item.recommendedWorks.length > 0)
     .map((item) => ({
       url: `${siteUrl}/library/${item.category}/${item.slug}/`,
       lastModified: toDate(item.date),

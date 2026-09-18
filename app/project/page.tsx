@@ -25,7 +25,7 @@ export default function ProjectPage() {
       <ThemeStyles />
       <Header />
 
-      <main className="mx-auto max-w-6xl px-4 py-10 sm:px-3">
+      <main id="main-content" tabIndex={-1} className="mx-auto max-w-6xl px-4 py-10 sm:px-3">
         <SignalPageHeader
           code="03 / BUILDS"
           title="Project"

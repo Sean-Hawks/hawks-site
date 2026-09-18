@@ -425,7 +425,7 @@ export default function LibraryPage() {
       <ThemeStyles />
       <Header />
 
-      <main className="mx-auto max-w-6xl px-4 py-10 sm:px-3">
+      <main id="main-content" tabIndex={-1} className="mx-auto max-w-6xl px-4 py-10 sm:px-3">
         <section className="space-y-5">
           <SignalPageHeader
             code="02 / MEDIA INDEX"

@@ -33,7 +33,7 @@ export class PublishReview {
   }
   cancel(draft) { for (const [key, r] of this.reviews) if (r.id === draft.id) this.reviews.delete(key); }
   panel(d, checks, siteUrl, token) {
-    const meta = matter(markdown(d, 'published')).data;
+    const meta = matter(markdown(d, 'published'), { engines: { javascript() { throw new Error("Executable frontmatter is not supported."); } } }).data;
     const extra = Object.fromEntries(Object.entries(meta).filter(([k, v]) => !['title','date','slug','tags','desc','ogImage','status'].includes(k) && v !== '' && v != null));
     const cover = meta.ogImage || meta.banner || '';
     const fields = [

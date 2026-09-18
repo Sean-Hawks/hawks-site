@@ -24,9 +24,9 @@ export default function ContactPage() {
     },
     {
       name: "Discord",
-      value: "1awks", // 請修改為你的 Discord
+      value: "魊窩 · 1awks",
       icon: MessageSquare,
-      link: "#",
+      link: "/discord/",
       color: "text-indigo-400",
     }
   ];
@@ -37,7 +37,7 @@ export default function ContactPage() {
       <Header />
 
       <div className="w-full px-4 sm:px-3">
-        <main className="mx-auto max-w-5xl py-10 sm:py-14">
+        <main id="main-content" tabIndex={-1} className="mx-auto max-w-5xl py-10 sm:py-14">
           <SignalPageHeader
             code="06 / UPLINK"
             title="Contact"

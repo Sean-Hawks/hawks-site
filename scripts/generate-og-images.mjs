@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import matter from "gray-matter";
+import { readPublishedMarkdown, removeStaleOgImages } from "./og-content.mjs";
 import sharp from "sharp";
 
 const root = process.cwd();
@@ -208,17 +208,6 @@ async function renderPng(fileName, data) {
     .toFile(outputPath);
 }
 
-function readMarkdownFiles(dir) {
-  if (!fs.existsSync(dir)) return [];
-  return fs.readdirSync(dir)
-    .filter((file) => file.endsWith(".md"))
-    .map((file) => {
-      const fullPath = path.join(dir, file);
-      const { data } = matter(fs.readFileSync(fullPath, "utf8"));
-      return { file, data };
-    });
-}
-
 fs.mkdirSync(outDir, { recursive: true });
 
 await renderPng("default.png", {
@@ -228,8 +217,10 @@ await renderPng("default.png", {
   date: "Blog / Now / Projects",
 });
 
-for (const { file, data } of readMarkdownFiles(postsDir)) {
+const expectedImages = new Set();
+for (const { file, data } of readPublishedMarkdown(postsDir)) {
   const slug = slugify(data.slug || file.replace(/\.md$/, ""));
+  expectedImages.add(`blog-${slug}.png`);
   await renderPng(`blog-${slug}.png`, {
     eyebrow: "BLOG",
     title: data.title || slug,
@@ -239,8 +230,9 @@ for (const { file, data } of readMarkdownFiles(postsDir)) {
   });
 }
 
-for (const { file, data } of readMarkdownFiles(talksDir)) {
+for (const { file, data } of readPublishedMarkdown(talksDir)) {
   const id = file.replace(/\.md$/, "");
+  expectedImages.add(`talk-${id}.png`);
   await renderPng(`talk-${id}.png`, {
     eyebrow: "TALK ARCHIVE",
     title: data.title || id,
@@ -251,3 +243,5 @@ for (const { file, data } of readMarkdownFiles(talksDir)) {
 }
 
 console.log(`Generated OG images in ${path.relative(root, outDir)}`);
+
+removeStaleOgImages(outDir, expectedImages);

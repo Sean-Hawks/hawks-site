@@ -184,6 +184,7 @@ function FilterGroup<T extends string>({
           <button
             key={option.value}
             type="button"
+            aria-pressed={value === option.value}
             onClick={() => onChange(option.value)}
             className={[
               "rounded-full border px-3 py-1.5 text-sm transition-colors",
@@ -516,6 +517,8 @@ export default function LibraryCategoryClient({
         <label className="flex items-center gap-3 rounded-xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.04)] px-4 py-3">
           <Search className="h-5 w-5 flex-shrink-0 text-[rgb(var(--muted))]" />
           <input
+            aria-label="搜尋收藏"
+            type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="搜尋標題、標籤或一句心得..."

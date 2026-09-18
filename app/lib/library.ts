@@ -39,14 +39,14 @@ function formatDate(value: unknown) {
   if (!value) return "";
 
   if (value instanceof Date) {
-    return `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, "0")}-${String(value.getDate()).padStart(2, "0")}`;
+    return `${value.getUTCFullYear()}-${String(value.getUTCMonth() + 1).padStart(2, "0")}-${String(value.getUTCDate()).padStart(2, "0")}`;
   }
 
   const str = String(value);
   if (str.includes("GMT") || str.match(/^[A-Z][a-z]{2}\s[A-Z][a-z]{2}\s\d{2}\s\d{4}/)) {
     const date = new Date(str);
     if (!Number.isNaN(date.getTime())) {
-      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+      return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, "0")}-${String(date.getUTCDate()).padStart(2, "0")}`;
     }
   }
 
@@ -295,7 +295,7 @@ function readLibraryItem(fileName: string): LibraryItem {
   const fileSlug = fileName.replace(/\.md$/, "");
   const fullPath = path.join(libraryDirectory, fileName);
   const fileContents = fs.readFileSync(fullPath, "utf8");
-  const { data, content } = matter(fileContents);
+  const { data, content } = matter(fileContents, { engines: { javascript() { throw new Error("Executable frontmatter is not supported."); } } });
   const parsedContent = parseMarkdownRecommendations(content);
   const title = normalizeString(data.title, fileSlug);
   const explicitSlug = normalizeString(data.slug);

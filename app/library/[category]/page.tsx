@@ -61,7 +61,7 @@ export default async function LibraryCategoryPage({
       <ThemeStyles />
       <Header />
 
-      <main className="mx-auto max-w-6xl px-4 py-10 sm:px-3">
+      <main id="main-content" tabIndex={-1} className="mx-auto max-w-6xl px-4 py-10 sm:px-3">
         <LibraryCategoryClient category={currentCategory} items={items} />
       </main>
 

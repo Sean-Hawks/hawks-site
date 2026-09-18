@@ -54,7 +54,7 @@ export default async function BlogTagPage({ params }: PageProps) {
       <ThemeStyles />
       <Header />
 
-      <main className="mx-auto max-w-6xl px-4 py-10 sm:px-3">
+      <main id="main-content" tabIndex={-1} className="mx-auto max-w-6xl px-4 py-10 sm:px-3">
         <Link
           href="/search"
           className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-[rgb(var(--muted))] transition-colors hover:text-[rgb(var(--accent))]"

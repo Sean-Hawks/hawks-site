@@ -13,7 +13,7 @@ export function fromObsidianBody(body) {
 export function parseObsidianMessage(text) {
   if (!/^---\r?\n/.test(text)) throw new UserError('請使用 YAML 標頭（--- 換行），不支援其他標頭引擎。');
   let parsed;
-  try { parsed = matter(text, { language: 'yaml' }); } catch { throw new UserError('YAML 格式有誤，請檢查縮排、引號與結尾的 ---。'); }
+  try { parsed = matter(text, { language: 'yaml', engines: { javascript() { throw new Error('Executable frontmatter is not supported.'); } } }); } catch { throw new UserError('YAML 格式有誤，請檢查縮排、引號與結尾的 ---。'); }
   const data = parsed.data;
   if (!String(data.title || '').trim()) throw new UserError('請在 YAML 的 title 填入標題。');
   const kind = data.kind || (Object.hasOwn(data, 'relatedPosts') || Object.hasOwn(data, 'event') ? 'talk' : 'post');

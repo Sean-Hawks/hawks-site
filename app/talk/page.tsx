@@ -34,7 +34,7 @@ export default function TalkPage() {
       <Header />
 
       <div className="w-full px-4 sm:px-3">
-        <main className="mx-auto max-w-6xl py-8">
+        <main id="main-content" tabIndex={-1} className="mx-auto max-w-6xl py-8">
           
           <SignalPageHeader
             code="08 / TRANSMISSIONS"

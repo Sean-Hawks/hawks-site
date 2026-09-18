@@ -118,7 +118,7 @@ export default function BlogPage() {
       <ThemeStyles />
       <Header />
 
-      <main className="mx-auto max-w-6xl px-4 pb-24 pt-10 sm:px-6 sm:pt-14">
+      <main id="main-content" tabIndex={-1} className="mx-auto max-w-6xl px-4 pb-24 pt-10 sm:px-6 sm:pt-14">
         <header className="now-desk-hero">
           <div className="md:col-span-2">
             <div className="now-desk-kicker">01 / WRITING</div>

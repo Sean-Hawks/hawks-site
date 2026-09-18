@@ -52,8 +52,7 @@ export default function SearchClient({
           !selectedTag ||
           item.tags.some((tag) => tagSlug(tag) === selectedTag)
       )
-      .filter((item) => terms.every((term) => item.haystack.includes(term)))
-      .slice(0, 24);
+      .filter((item) => terms.every((term) => item.haystack.includes(term)));
   }, [items, query, selectedTag, type]);
 
   return (
@@ -62,6 +61,8 @@ export default function SearchClient({
         <label className="flex items-center gap-3 rounded-xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.04)] px-4 py-3">
           <Search className="h-5 w-5 flex-shrink-0 text-[rgb(var(--muted))]" />
           <input
+            aria-label="搜尋文章、近況與收藏"
+            type="search"
             value={query}
             onChange={(event) => {
               setQuery(event.target.value);
@@ -69,7 +70,6 @@ export default function SearchClient({
             }}
             placeholder="搜尋文章、Talk、Library、tag、內文..."
             className="w-full bg-transparent text-base text-[rgb(var(--text))] outline-none placeholder:text-[rgb(var(--muted))]"
-            autoFocus
           />
           {query && (
             <button
@@ -96,6 +96,7 @@ export default function SearchClient({
             <button
               key={option.value}
               type="button"
+              aria-pressed={type === option.value}
               onClick={() => setType(option.value as SearchType)}
               className={[
                 "rounded-full border px-3 py-1.5 text-sm transition-colors",
@@ -117,6 +118,7 @@ export default function SearchClient({
             {tags.slice(0, 28).map((tag) => (
               <button
                 key={tag.slug}
+                aria-pressed={selectedTag === tag.slug}
                 type="button"
                 onClick={() => {
                   setQuery(tag.tag);
@@ -138,10 +140,15 @@ export default function SearchClient({
         </div>
       </div>
 
-      <div className="text-sm text-[rgb(var(--muted))]">
+      <div role="status" className="text-sm text-[rgb(var(--muted))]">
         {filteredItems.length} result{filteredItems.length === 1 ? "" : "s"}
       </div>
 
+      {filteredItems.length === 0 && (
+        <p className="rounded-2xl border border-[rgb(var(--line)/0.12)] p-6 text-[rgb(var(--muted))]">
+          沒有符合的結果，試試其他關鍵字或清除篩選。
+        </p>
+      )}
       <div className="space-y-3">
         {filteredItems.map((item) => (
           <Link

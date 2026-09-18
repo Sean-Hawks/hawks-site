@@ -42,14 +42,14 @@ function formatDate(value: unknown) {
   if (!value) return '';
 
   if (value instanceof Date) {
-    return `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, '0')}-${String(value.getDate()).padStart(2, '0')}`;
+    return `${value.getUTCFullYear()}-${String(value.getUTCMonth() + 1).padStart(2, '0')}-${String(value.getUTCDate()).padStart(2, '0')}`;
   }
 
   const str = String(value);
   if (str.includes('GMT') || str.match(/^[A-Z][a-z]{2}\s[A-Z][a-z]{2}\s\d{2}\s\d{4}/)) {
     const d = new Date(str);
     if (!isNaN(d.getTime())) {
-      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
     }
   }
 
@@ -98,7 +98,7 @@ function readPost(fileName: string): Post {
   const fileSlug = fileName.replace(/\.md$/, '');
   const fullPath = path.join(postsDirectory, fileName);
   const fileContents = fs.readFileSync(fullPath, 'utf8');
-  const { data, content } = matter(fileContents);
+  const { data, content } = matter(fileContents, { engines: { javascript() { throw new Error("Executable frontmatter is not supported."); } } });
   const explicitSlug = typeof data.slug === 'string' ? data.slug : '';
   const slug = slugify(explicitSlug || fileSlug);
 

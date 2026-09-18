@@ -263,7 +263,7 @@ export default function HomeClient({ posts, talks, libraryItems }: HomeClientPro
         </div>
       </div>
 
-      <main className="relative mx-auto max-w-7xl px-4 pb-20 pt-6 sm:px-6 sm:pt-10">
+      <main id="main-content" tabIndex={-1} className="relative mx-auto max-w-7xl px-4 pb-20 pt-6 sm:px-6 sm:pt-10">
         <section className="grid gap-7 lg:grid-cols-[280px_minmax(0,1fr)] xl:gap-10">
           <aside className="home-panel home-profile-panel self-start lg:sticky lg:top-24">
             <div className="border-b border-[rgb(var(--line)/0.14)] px-5 py-3 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[rgb(var(--accent))]">

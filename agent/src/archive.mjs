@@ -8,7 +8,7 @@ function slugify(value) {
 }
 export function parseArticle(source, filename, kind, siteUrl) {
   if (source.startsWith('---') && !/^---\r?\n/.test(source)) throw new UserError('文章 frontmatter 格式不支援。');
-  const { data, content } = matter(source);
+  const { data, content } = matter(source, { engines: { javascript() { throw new Error("Executable frontmatter is not supported."); } } });
   if (['draft', 'private'].includes(String(data.status || '').trim().toLowerCase())) return null;
   const basename = filename.replace(/\.md$/, '');
   const slug = kind === 'post' ? slugify(typeof data.slug === 'string' && data.slug ? data.slug : basename) : basename;

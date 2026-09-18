@@ -30,12 +30,11 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           cache: "npm"
 
-      # 改用 npm install，避免因 package-lock.json 版本不合或缺失導致 npm ci 失敗
       - name: Install
-        run: npm install
+        run: npm ci
 
       # OG 圖在 build 前生成 (prebuild)，需中文字型才能正確渲染標題
       - name: Install CJK fonts

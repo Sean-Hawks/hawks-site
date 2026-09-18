@@ -1,7 +1,7 @@
 "use client";
 
 /* eslint-disable @next/next/no-img-element */
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -28,14 +28,34 @@ function captionOf(img: Img) {
 
 export default function ArticleImages({ images }: { images: Img[] }) {
   const [active, setActive] = useState<number | null>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const isOpen = active !== null;
   const close = useCallback(() => setActive(null), []);
   const isGrid = images.length > 1;
   const previewImages = images.slice(0, 4);
 
   useEffect(() => {
-    if (active === null) return;
+    if (!isOpen) return;
+    const dialog = dialogRef.current;
+    const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const background = Array.from(document.body.children).filter((element): element is HTMLElement => element instanceof HTMLElement && element !== dialog);
+    const previousInert = background.map(element => element.inert);
+    background.forEach(element => { element.inert = true; });
+    dialog?.querySelector<HTMLButtonElement>("button")?.focus();
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") close();
+      if (e.key === "Tab") {
+        const buttons = dialog?.querySelectorAll<HTMLButtonElement>("button");
+        const first = buttons?.[0];
+        const last = buttons?.[buttons.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last?.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first?.focus();
+        }
+      }
       if (e.key === "ArrowRight")
         setActive((i) => (i === null ? i : (i + 1) % images.length));
       if (e.key === "ArrowLeft")
@@ -49,8 +69,12 @@ export default function ArticleImages({ images }: { images: Img[] }) {
     return () => {
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = prevOverflow;
+      background.forEach((element, index) => { element.inert = previousInert[index]; });
+      previousFocus?.focus();
     };
-  }, [active, images.length, close]);
+  }, [isOpen, images.length, close]);
+
+  if (!images.length) return null;
 
   return (
     <>
@@ -126,8 +150,10 @@ export default function ArticleImages({ images }: { images: Img[] }) {
 
       {active !== null && createPortal(
         <div
+          ref={dialogRef}
           onClick={close}
           role="dialog"
+          aria-label="文章照片檢視器"
           aria-modal="true"
           className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm"
         >

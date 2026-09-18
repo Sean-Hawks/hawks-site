@@ -7,10 +7,21 @@ import { usePathname } from "next/navigation";
 
 type ThemeMode = "light" | "dark";
 
+function subscribeTheme(onChange: () => void) {
+  const observer = new MutationObserver(onChange);
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+  return () => observer.disconnect();
+}
+function themeSnapshot(): ThemeMode {
+  return document.documentElement.dataset.theme === "dark" ? "dark" : "light";
+}
+
 export default function Header() {
   const pathname = usePathname();
-  const [isOpen, setIsOpen] = React.useState(false);
-  const [theme, setTheme] = React.useState<ThemeMode>("light");
+  const menuButtonRef = React.useRef<HTMLButtonElement>(null);
+  const [menuPath, setMenuPath] = React.useState<string | null>(null);
+  const isOpen = menuPath === pathname;
+  const theme = React.useSyncExternalStore(subscribeTheme, themeSnapshot, () => "light" as ThemeMode);
 
   const navItems = [
     { label: "README", href: "/" },
@@ -24,26 +35,25 @@ export default function Header() {
   ];
 
   React.useEffect(() => {
-    setIsOpen(false);
-  }, [pathname]);
-
-  React.useEffect(() => {
-    const currentTheme =
-      document.documentElement.dataset.theme === "dark" ? "dark" : "light";
-    setTheme(currentTheme);
-  }, []);
+    if (!isOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setMenuPath(null);
+        menuButtonRef.current?.focus();
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [isOpen]);
 
   const toggleTheme = React.useCallback(() => {
-    setTheme((current) => {
-      const nextTheme: ThemeMode = current === "dark" ? "light" : "dark";
-      document.documentElement.dataset.theme = nextTheme;
-      try {
-        localStorage.setItem("theme-v2", nextTheme);
-      } catch {
-        // Theme still changes for the current page when storage is unavailable.
-      }
-      return nextTheme;
-    });
+    const nextTheme: ThemeMode = themeSnapshot() === "dark" ? "light" : "dark";
+    document.documentElement.dataset.theme = nextTheme;
+    try {
+      localStorage.setItem("theme-v2", nextTheme);
+    } catch {
+      // Theme still changes for this page when storage is unavailable.
+    }
   }, []);
 
   const themeLabel = theme === "dark" ? "切換到淺色模式" : "切換到深色模式";
@@ -75,7 +85,7 @@ export default function Header() {
         </Link>
 
         <div className="flex items-center gap-2">
-          <nav className="hidden items-center gap-2 lg:flex">
+          <nav aria-label="主要導覽" className="hidden items-center gap-2 lg:flex">
             {navItems.map((item) => {
               // 簡單的路由匹配邏輯
               const isActive = 
@@ -87,6 +97,8 @@ export default function Header() {
                 <Link
                   key={item.label}
                   href={item.href}
+                  onClick={() => setMenuPath(null)}
+                  aria-current={isActive ? "page" : undefined}
                   className={[
                     "border-b px-3 py-2 font-mono text-xs font-semibold tracking-[0.04em] transition-colors",
                     isActive
@@ -102,10 +114,11 @@ export default function Header() {
           {renderThemeButton()}
           <button
             type="button"
+            ref={menuButtonRef}
             aria-controls="mobile-nav"
             aria-expanded={isOpen}
             aria-label={isOpen ? "Close navigation" : "Open navigation"}
-            onClick={() => setIsOpen((value) => !value)}
+            onClick={() => setMenuPath(isOpen ? null : pathname)}
             className="grid h-10 w-10 place-items-center border border-[rgb(var(--line)/0.12)] bg-[rgb(var(--line)/0.04)] text-[rgb(var(--text))] transition-colors hover:border-[rgb(var(--accent)/0.40)] lg:hidden"
           >
             {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -115,6 +128,9 @@ export default function Header() {
 
       <nav
         id="mobile-nav"
+        aria-label="手機導覽"
+        aria-hidden={!isOpen}
+        inert={!isOpen}
         className={[
           "mx-auto grid max-w-7xl gap-2 px-4 pb-4 transition-[grid-template-rows,opacity] sm:px-6 lg:hidden",
           isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0",
@@ -132,6 +148,8 @@ export default function Header() {
                 <Link
                   key={item.label}
                   href={item.href}
+                  onClick={() => setMenuPath(null)}
+                  aria-current={isActive ? "page" : undefined}
                   className={[
                     "bg-[rgb(var(--panel))] px-3 py-2 font-mono text-xs tracking-[0.04em] transition-colors",
                     isActive

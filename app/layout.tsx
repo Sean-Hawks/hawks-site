@@ -130,9 +130,11 @@ export default function RootLayout({
         />
       </head>
       <body>
+        <a href="#main-content" className="skip-link">跳到主要內容</a>
         {children}
         <script
           type="module"
+          async
           src="https://static.cloudflareinsights.com/beacon.min.js"
           data-cf-beacon={JSON.stringify({ token: cloudflareAnalyticsToken })}
         />

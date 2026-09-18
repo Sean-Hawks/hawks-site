@@ -1395,3 +1395,18 @@ html {
     display: none !important;
   }
 }
+
+/* Keep keyboard navigation visible without changing pointer interactions. */
+.skip-link {
+  position: fixed;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 200;
+  padding: 0.75rem 1rem;
+  background: rgb(var(--panel));
+  color: rgb(var(--text));
+  transform: translateY(-150%);
+}
+.skip-link:focus { transform: translateY(0); }
+:focus-visible { outline: 2px solid rgb(var(--accent)); outline-offset: 4px; }
+main:focus { outline: none; }
