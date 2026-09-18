@@ -4,6 +4,8 @@ import { getSortedTalksData } from "../../lib/talks";
 import { getSortedPostsData } from "../../lib/posts";
 import ThemeStyles from "../../components/ThemeStyles";
 import Header from "../../components/Header";
+import ArticleContents from "../../components/ArticleContents";
+import { getArticleHeadings } from "../../lib/headings";
 import MarkdownContent from "../../components/MarkdownContent";
 import type { Metadata } from "next";
 import { getRelatedPostsForTalk } from "../../lib/related";
@@ -171,6 +173,7 @@ export default async function TalkDetailPage({ params }: PageProps) {
             </header>
 
             <div className="p-6 sm:p-10">
+              <ArticleContents headings={getArticleHeadings(content)} mobileOnly={false} />
               <MarkdownContent content={content} variant="talk" />
             </div>
           </article>

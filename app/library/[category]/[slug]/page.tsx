@@ -3,7 +3,9 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowUpRight, Award, Disc3, Heart, Sparkles, Star } from "lucide-react";
 import Header from "../../../components/Header";
-import MarkdownContent, { headingId } from "../../../components/MarkdownContent";
+import MarkdownContent from "../../../components/MarkdownContent";
+import ArticleContents from "../../../components/ArticleContents";
+import { getArticleHeadings } from "../../../lib/headings";
 import ThemeStyles from "../../../components/ThemeStyles";
 import ImdbRating from "../../ImdbRating";
 import {
@@ -76,22 +78,6 @@ export async function generateMetadata({
   };
 }
 
-function buildToc(content?: string) {
-  if (!content) return [];
-  return content
-    .split("\n")
-    .map((line) => {
-      const match = /^(#{1,3})\s+(.*)$/.exec(line.trim());
-      if (!match) return null;
-      const level = match[1].length;
-      const title = match[2].trim();
-      const id = headingId(title);
-      if (!id) return null;
-      return { id, title, level };
-    })
-    .filter(Boolean) as { id: string; title: string; level: number }[];
-}
-
 function Rating({ rating }: { rating: number | null }) {
   const filledStars =
     rating === null ? 0 : Math.max(0, Math.min(5, Math.round(rating / 2)));
@@ -141,7 +127,7 @@ export default async function LibraryReviewPage({ params }: PageProps) {
     notFound();
   }
 
-  const toc = buildToc(item.content);
+  const toc = getArticleHeadings(item.content);
   const readingMinutes = item.hasReview
     ? Math.max(1, Math.ceil(stripMarkdown(item.content ?? "").length / 500))
     : 0;
@@ -241,13 +227,13 @@ export default async function LibraryReviewPage({ params }: PageProps) {
               <h3 className="text-xs font-bold uppercase tracking-wider text-[rgb(var(--muted))]">
                 目錄
               </h3>
-              <nav className="space-y-1">
+              <nav aria-label="文章目錄" className="max-h-[calc(100vh-12rem)] space-y-1 overflow-y-auto">
                 {toc.map((heading) => (
                   <a
                     key={heading.id}
                     href={`#${heading.id}`}
                     className={[
-                      "block truncate text-sm text-[rgb(var(--muted))] transition-colors hover:text-[rgb(var(--accent))]",
+                      "block break-words py-1 text-sm text-[rgb(var(--muted))] transition-colors hover:text-[rgb(var(--accent))]",
                       heading.level > 1 ? "ml-3" : "",
                       heading.level > 2 ? "ml-6" : "",
                     ].join(" ")}
@@ -411,6 +397,7 @@ export default async function LibraryReviewPage({ params }: PageProps) {
                         {item.title}
                       </div>
                     </div>
+                    <ArticleContents headings={toc} />
                     <MarkdownContent content={item.content} variant="libraryReview" />
                   </section>
                 </div>
