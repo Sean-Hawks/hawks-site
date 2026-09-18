@@ -27,10 +27,10 @@
 
 | PR | 改善內容 |
 | --- | --- |
-| [#5 可分享的搜尋與收藏篩選](https://github.com/Sean-Hawks/hawks-site/pull/5) | 搜尋条件放入網址，返回、重新整理與分享連結保留條件。支援全形、重音和連字號，中文標籤不再碰撞，Library 搜尋結果直接定位作品。 |
+| [#5 可分享的搜尋與收藏篩選](https://github.com/Sean-Hawks/hawks-site/pull/5) | 搜尋條件放入網址，返回、重新整理與分享連結保留條件。支援全形、重音和連字號，中文標籤不再碰撞，Library 搜尋結果直接定位作品。 |
 | [#6 手機文章目錄與可靠的段落連結](https://github.com/Sean-Hawks/hawks-site/pull/6) | 同一套 Markdown 標題解析產生目錄和錨點，略過程式碼區塊、處理重複標題，提供手機目錄。 |
 | [#7 找得到出口的 404 頁面](https://github.com/Sean-Hawks/hawks-site/pull/7) | 提供全站搜尋、返回首頁和文章列表入口，保留 noindex。 |
-| [#8 自動網站健檢與依賴更新](https://github.com/Sean-Hawks/hawks-site/pull/8) | PR 自動執行 lint、型別、測試、完整靜態匯出與內部連結檢查，定期追蹤依賴更新。 |
+| [#8 自動網站健檢與依賴更新](https://github.com/Sean-Hawks/hawks-site/pull/8) | PR 自動執行 lint、型別、測試、完整靜態匯出與內部連結檢查，定期追蹤依賴更新；官方 Actions 使用 Node 24 執行環境並固定 commit SHA，runner 固定 Ubuntu 24.04，避免淘汰版本與預設系統遷移影響建置。 |
 | [#9 響應式 WebP 圖片與更順暢的相簿](https://github.com/Sean-Hawks/hawks-site/pull/9) | 依照原有圖片最佳化草稿整理，處理 213 張來源圖片；按顯示寬度載入、提供真實尺寸、載入狀態和原圖入口，保留動畫和未知來源 fallback。原工作目錄未提交的修改完整保留。 |
 
 圖片 PR 的 960px 樣本：13.86 MB 圖片變為 198 KB、10.06 MB 圖片變為 106 KB、1.69 MB 首頁封面變為 60 KB。這些是單一衍生圖片大小；原圖仍保留，全部衍生圖片合計約 88 MB，不代表部署總大小減少相同比例。
