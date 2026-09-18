@@ -23,11 +23,17 @@
 
 ## 可選改善
 
-- 搜尋條件放入網址；返回、重新整理與分享連結可以保留條件。支援全形、重音和連字號，中文標籤不再碰撞，Library 搜尋結果直接定位作品。
-- 使用同一套 Markdown 標題解析產生目錄和錨點，略過程式碼區塊、處理重複標題、提供手機目錄。
-- 將目前通用的 404 換成有全站搜尋、返回首頁和文章列表的站內恢復頁。
-- PR 自動執行 lint、型別、測試、完整靜態匯出與內部連結檢查，定期追蹤依賴更新。
-- 圖片按顯示寬度預先壓縮成 WebP。目前有多張 10–14 MB 原圖；工作目錄已有圖片最佳化草稿，可整理成獨立 PR。
+以下五個 PR 分開提交，尚未合併，可獨立選擇：
+
+| PR | 改善內容 |
+| --- | --- |
+| [#5 可分享的搜尋與收藏篩選](https://github.com/Sean-Hawks/hawks-site/pull/5) | 搜尋条件放入網址，返回、重新整理與分享連結保留條件。支援全形、重音和連字號，中文標籤不再碰撞，Library 搜尋結果直接定位作品。 |
+| [#6 手機文章目錄與可靠的段落連結](https://github.com/Sean-Hawks/hawks-site/pull/6) | 同一套 Markdown 標題解析產生目錄和錨點，略過程式碼區塊、處理重複標題，提供手機目錄。 |
+| [#7 找得到出口的 404 頁面](https://github.com/Sean-Hawks/hawks-site/pull/7) | 提供全站搜尋、返回首頁和文章列表入口，保留 noindex。 |
+| [#8 自動網站健檢與依賴更新](https://github.com/Sean-Hawks/hawks-site/pull/8) | PR 自動執行 lint、型別、測試、完整靜態匯出與內部連結檢查，定期追蹤依賴更新。 |
+| [#9 響應式 WebP 圖片與更順暢的相簿](https://github.com/Sean-Hawks/hawks-site/pull/9) | 依照原有圖片最佳化草稿整理，處理 213 張來源圖片；按顯示寬度載入、提供真實尺寸、載入狀態和原圖入口，保留動畫和未知來源 fallback。原工作目錄未提交的修改完整保留。 |
+
+圖片 PR 的 960px 樣本：13.86 MB 圖片變為 198 KB、10.06 MB 圖片變為 106 KB、1.69 MB 首頁封面變為 60 KB。這些是單一衍生圖片大小；原圖仍保留，全部衍生圖片合計約 88 MB，不代表部署總大小減少相同比例。
 
 ## 尚待選擇或外部設定
 
@@ -44,4 +50,10 @@
 
 官方公告：[Next.js React2Shell](https://nextjs.org/blog/CVE-2025-66478)、[Sharp libheif](https://github.com/lovell/sharp/security/advisories/GHSA-rgj7-g3m4-5g8c)。實際套件修補以本次 lockfile 和 npm audit 為準。
 
-驗證結果：12 項網站測試、65 項寫作工具測試，完整靜態建置、lint 通過。擴大檢查含 fallback 的 351 個 HTML、sitemap 和 RSS，修正後內部頁面、圖片與段落連結檢查通過。
+## 最終交付與驗證
+
+- 明確修正已直接推送 main：[`c8e91d3`](https://github.com/Sean-Hawks/hawks-site/commit/c8e91d3c6e6aedc9d55b2c3167e663a251258de3)、[`a856763`](https://github.com/Sean-Hawks/hawks-site/commit/a85676366f3b7170b9018c26de1681623084a1f2)。[GitHub Pages 正式部署成功](https://github.com/Sean-Hawks/hawks-site/actions/runs/35375108720)。
+- 正式 Discord 寫作服務的四個 Markdown 解析入口亦已更新。更新前核對舊檔雜湊、備份程式與資料，以正式 Node 22 與現有依賴執行 65 項測試；重新啟動後確認新的健康狀態為 ready，後續心跳仍正常。備份留在原服務主機的私有目錄，沒有將憑證或資料上傳至儲存庫。
+- 五個 PR 在本機整合分支可無衝突合併。以 Node 22.23.2 / npm 10 重新安裝依賴後，20 項網站測試、65 項寫作工具測試、5 項匯出檢查器測試、lint、完整靜態建置全部通過。網站與寫作工具的 npm audit 均為 0。
+- 巡檢包含 fallback 的 351 個 HTML、sitemap 和 RSS；內部頁面、圖片與段落連結檢查為 0 問題。
+- 實際瀏覽器驗證包含手機 390px 版面、搜尋連結還原與返回、手機文章目錄、404 導覽、相簿切換／關閉／原圖入口及響應式圖片選擇。這不是完整 WCAG 認證，也未量測真實訪客效能。
