@@ -5,6 +5,7 @@ import { getSortedPostsData, getPostBySlug, tagToSlug } from "../../lib/posts";
 import { getSortedTalksData } from "../../lib/talks";
 import ThemeStyles from "../../components/ThemeStyles";
 import SaveForLater from "../../components/SaveForLater";
+import ArticleHeart from "../../components/ArticleHeart";
 import Header from "../../components/Header";
 import MarkdownContent from "../../components/MarkdownContent";
 import ArticleContents from "../../components/ArticleContents";
@@ -173,6 +174,7 @@ export default async function PostPage({ params }: PageProps) {
                   {post.title}
                 </h1>
                 <SaveForLater id={`post:${post.slug}`} />
+                <ArticleHeart id={`post:${post.slug}`} />
                 <div className="mt-4 flex items-center gap-4 text-sm text-[rgb(var(--muted))]">
                   <time className="flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-[rgb(var(--muted))] opacity-50"></span>

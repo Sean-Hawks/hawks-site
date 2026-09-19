@@ -12,6 +12,7 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "legacy-static/**",
+    "hearts-worker/.wrangler/**",
     "next-env.d.ts",
   ]),
 ]);

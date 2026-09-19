@@ -3,6 +3,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowUpRight, Award, Disc3, Heart, Sparkles, Star } from "lucide-react";
 import SaveForLater from "../../../components/SaveForLater";
+import ArticleHeart from "../../../components/ArticleHeart";
 import Header from "../../../components/Header";
 import MarkdownContent from "../../../components/MarkdownContent";
 import ArticleContents from "../../../components/ArticleContents";
@@ -344,6 +345,7 @@ export default async function LibraryReviewPage({ params }: PageProps) {
                     {item.hasReview ? `評論：${item.title}` : item.title}
                   </h1>
                 <SaveForLater id={`library:${item.category}:${item.slug}`} />
+                <ArticleHeart id={`library:${item.category}:${item.slug}`} />
                   {item.subtitle && (
                     <p className="mt-2 text-sm text-[rgb(var(--muted))]">
                       {item.subtitle}

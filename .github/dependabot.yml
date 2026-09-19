@@ -21,3 +21,12 @@ updates:
     groups:
       actions:
         patterns: ['*']
+  - package-ecosystem: npm
+    directory: /hearts-worker
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 3
+    groups:
+      worker-tooling:
+        patterns: ['*']
+        update-types: [minor, patch]

@@ -1,0 +1,19 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "hawks-hearts-local",
+  "main": "src/index.js",
+  "compatibility_date": "2026-09-18",
+  "workers_dev": false,
+  "observability": { "enabled": false },
+  "vars": {
+    "SITE_ORIGIN": "http://localhost:4174",
+    "ALLOWED_ORIGINS": "http://localhost:4174,http://localhost:3000"
+  },
+  "d1_databases": [
+    { "binding": "HEARTS_DB", "database_name": "hawks-hearts-local", "database_id": "local-only-hearts", "migrations_dir": "migrations" }
+  ],
+  "ratelimits": [
+    { "name": "HEARTS_READ_LIMIT", "namespace_id": "47101", "simple": { "limit": 120, "period": 60 } },
+    { "name": "HEARTS_WRITE_LIMIT", "namespace_id": "47102", "simple": { "limit": 20, "period": 60 } }
+  ]
+}

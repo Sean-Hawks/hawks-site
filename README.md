@@ -129,6 +129,12 @@ Blog 與 Talk 的 `status: draft`、`status: private`，以及 Library 的對應
 
 圖片載入器只使用 manifest 確認存在的尺寸，不放大小圖；動態 WebP、GIF、外部網址與未列入的來源保留原檔。壓縮失敗會停止建置，避免發布指向不存在資源的頁面。新增圖片後若開發伺服器正在運行，請重新啟動，讓 manifest 更新。
 
+## 愛心互動
+
+Blog、Talk 與 Library 詳頁可加入免登入愛心，支援取消與共用總數，和私人「稍後閱讀」清單分開。文章仍由 GitHub Pages 提供，互動資料由獨立的 Cloudflare Worker 與 D1 保存。
+
+尚未設定 `NEXT_PUBLIC_HEARTS_API_URL` 時不顯示按鈕。完整本機預覽、測試、上線順序與匿名互動限制見 [愛心系統指南](docs/HEARTS.md)；後端程式與資料庫遷移在 [`hearts-worker/`](hearts-worker/)。
+
 ## 寫作方式
 
 - **直接編輯 Markdown**：修改 `content/` 下的檔案，在本機預覽後提交。

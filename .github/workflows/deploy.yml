@@ -47,6 +47,7 @@ jobs:
       - name: Build (Next export -> out/)
         env:
           PRESERVE_LIVE_STATIC_ORIGIN: https://hawks.tw
+          NEXT_PUBLIC_HEARTS_API_URL: ${{ vars.NEXT_PUBLIC_HEARTS_API_URL }}
         run: npm run build
 
       - name: Verify exported pages and assets
