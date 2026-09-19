@@ -1,6 +1,8 @@
 "use client";
 import { useId, useRef, useState } from "react";
-import { Copy, Link2, Printer, Share2 } from "lucide-react";
+import { Copy, Link2, MoreHorizontal, Printer, Share2 } from "lucide-react";
+import ArticleHeart from "./ArticleHeart";
+import SaveForLater from "./SaveForLater";
 import {
   articleCitation,
   canonicalArticleUrl,
@@ -8,11 +10,13 @@ import {
   shareArticle,
 } from "../lib/article-actions";
 
-export default function ArticleShare({
+export default function ArticleActions({
+  id,
   title,
   path,
   date,
 }: {
+  id: string;
   title: string;
   path: string;
   date?: string;
@@ -23,8 +27,7 @@ export default function ArticleShare({
   const [busy, setBusy] = useState(false);
   const copyId = useId();
   const textRef = useRef<HTMLTextAreaElement>(null);
-  const buttonClass =
-    "inline-flex min-h-11 items-center gap-2 rounded-lg border border-[rgb(var(--line)/0.12)] px-3 text-sm text-[rgb(var(--muted))] transition-colors hover:border-[rgb(var(--accent)/0.4)] hover:text-[rgb(var(--accent))] disabled:opacity-50";
+  const buttonClass = "article-action-button";
   const port = () => ({
     share: navigator.share?.bind(navigator),
     clipboard: navigator.clipboard,
@@ -53,52 +56,60 @@ export default function ArticleShare({
   return (
     <>
       <section
-        aria-label="分享與列印"
+        aria-label="閱讀後操作"
         data-print-hide
-        className="border-t border-[rgb(var(--line)/0.12)] p-6 sm:px-10"
+        className="border-t border-[rgb(var(--line)/0.12)] px-4 py-4 sm:px-10"
       >
-        <h2 className="text-sm font-bold">把這篇留給自己，或分享給朋友</h2>
-        <div className="mt-3 flex flex-wrap gap-2">
+        <div className="flex flex-wrap items-start gap-1.5">
+          <ArticleHeart id={id} />
+          <SaveForLater id={id} />
           <button
             type="button"
             onClick={share}
             disabled={busy}
             className={buttonClass}
           >
-            <Share2 className="h-4 w-4" />
-            分享文章
+            <Share2 aria-hidden="true" className="h-4 w-4" />
+            分享
           </button>
-          <button
-            type="button"
-            onClick={() => copy(url, "已複製文章連結")}
-            className={buttonClass}
-          >
-            <Link2 className="h-4 w-4" />
-            複製連結
-          </button>
-          <button
-            type="button"
-            onClick={() =>
-              copy(articleCitation(title, url, date), "已複製標題、日期與來源")
-            }
-            className={buttonClass}
-          >
-            <Copy className="h-4 w-4" />
-            複製引用
-          </button>
-          <button
-            type="button"
-            onClick={() => window.print()}
-            className={buttonClass}
-          >
-            <Printer className="h-4 w-4" />
-            列印文字版
-          </button>
+          <details className="article-action-more">
+            <summary className={buttonClass} aria-label="更多操作" title="更多操作">
+              <MoreHorizontal aria-hidden="true" className="h-5 w-5" />
+            </summary>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => copy(url, "已複製文章連結")}
+                className={buttonClass}
+              >
+                <Link2 aria-hidden="true" className="h-4 w-4" />
+                複製連結
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  copy(articleCitation(title, url, date), "已複製標題、日期與來源")
+                }
+                className={buttonClass}
+              >
+                <Copy aria-hidden="true" className="h-4 w-4" />
+                複製引用
+              </button>
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className={buttonClass}
+              >
+                <Printer aria-hidden="true" className="h-4 w-4" />
+                列印文字版
+              </button>
+            </div>
+            <p className="mt-2 text-xs leading-6 text-[rgb(var(--muted))]">
+              文字版保留正文和來源網址，略過封面與相簿；可在列印視窗選擇另存 PDF。
+            </p>
+          </details>
         </div>
-        <p className="mt-3 text-xs leading-6 text-[rgb(var(--muted))]">
-          文字版保留正文和來源網址，略過封面與相簿；可在列印視窗選擇另存 PDF。
-        </p>
-        <p role="status" className="mt-1 text-xs text-[rgb(var(--muted))]">
+        <p role="status" className={message ? "mt-2 text-xs text-[rgb(var(--muted))]" : "sr-only"}>
           {message}
         </p>
         {manual !== null && (

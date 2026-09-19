@@ -2,8 +2,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowUpRight, Award, Disc3, Heart, Sparkles, Star } from "lucide-react";
-import SaveForLater from "../../../components/SaveForLater";
-import ArticleHeart from "../../../components/ArticleHeart";
 import Header from "../../../components/Header";
 import MarkdownContent from "../../../components/MarkdownContent";
 import ArticleContents from "../../../components/ArticleContents";
@@ -17,7 +15,7 @@ import {
 } from "../../../lib/library";
 import { excerpt, stripMarkdown } from "../../../lib/content";
 import type { Metadata } from "next";
-import ArticleShare from "../../../components/ArticleShare";
+import ArticleActions from "../../../components/ArticleActions";
 
 type PageProps = { params: Promise<{ category: string; slug: string }> };
 
@@ -138,7 +136,7 @@ export default async function LibraryReviewPage({ params }: PageProps) {
   const RecommendationIcon = recommendation.Icon;
   const recommendedWorksSection =
     item.recommendedWorks.length > 0 ? (
-      <section data-print-article className="mt-6 rounded-2xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.78)] p-5 shadow-[0_18px_60px_rgba(90,76,55,0.07)]">
+      <section className="border-t border-[rgb(var(--line)/0.10)] p-6 sm:p-10">
         <div className="mb-4 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <div className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[rgb(var(--accent))]">
@@ -344,8 +342,6 @@ export default async function LibraryReviewPage({ params }: PageProps) {
                   <h1 className="font-serif text-3xl font-bold leading-tight tracking-tight text-[rgb(var(--text))] sm:text-4xl">
                     {item.hasReview ? `評論：${item.title}` : item.title}
                   </h1>
-                <SaveForLater id={`library:${item.category}:${item.slug}`} />
-                <ArticleHeart id={`library:${item.category}:${item.slug}`} />
                   {item.subtitle && (
                     <p className="mt-2 text-sm text-[rgb(var(--muted))]">
                       {item.subtitle}
@@ -407,10 +403,10 @@ export default async function LibraryReviewPage({ params }: PageProps) {
                   </section>
                 </div>
               )}
-              <ArticleShare title={item.title} date={item.date} path={`/library/${item.category}/${item.slug}/`} />
+              {recommendedWorksSection}
+              <ArticleActions id={`library:${item.category}:${item.slug}`} title={item.title} date={item.date} path={`/library/${item.category}/${item.slug}/`} />
             </article>
 
-            {recommendedWorksSection}
           </div>
         </main>
 

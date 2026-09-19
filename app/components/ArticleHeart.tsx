@@ -107,7 +107,7 @@ function ConnectedHeart({ id, api }: { id: string; api: string }) {
 
   const loading = phase === "loading" || phase === "writing";
   return (
-    <div className="mt-4 text-sm" data-print-hide>
+    <div className="max-w-full text-sm" data-print-hide>
       <div className="flex flex-wrap items-center gap-3">
         <button
           type="button"
@@ -116,7 +116,7 @@ function ConnectedHeart({ id, api }: { id: string; api: string }) {
           aria-pressed={value?.liked ?? false}
           aria-label={`${value?.liked ? "已喜歡" : "喜歡"}${value && phase !== "error" ? `，共 ${value.count} 個喜歡` : ""}`}
           aria-busy={loading}
-          className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-[rgb(var(--accent)/0.25)] bg-[rgb(var(--accent)/0.07)] px-3 font-medium text-[rgb(var(--accent))] transition-colors hover:bg-[rgb(var(--accent)/0.13)] disabled:cursor-wait disabled:opacity-60 motion-reduce:transition-none"
+          className="article-action-button"
         >
           <Heart aria-hidden="true" className="h-4 w-4" fill={value?.liked ? "currentColor" : "none"} />
           {value?.liked ? "已喜歡" : "喜歡"}
@@ -133,7 +133,6 @@ function ConnectedHeart({ id, api }: { id: string; api: string }) {
             <RotateCcw aria-hidden="true" className="h-3.5 w-3.5" />重新讀取
           </button>
         )}
-        <span className="text-xs text-[rgb(var(--muted))]">給這篇一點回應</span>
       </div>
       <p role="status" className={message ? "mt-1 text-xs text-[rgb(var(--muted))]" : "sr-only"}>{message}</p>
       {temporary && <p className="mt-1 text-xs text-[rgb(var(--muted))]">此瀏覽器無法保存喜歡狀態，重新開啟後可能不會記得你已按過。</p>}
