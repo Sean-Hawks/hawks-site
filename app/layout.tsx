@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { feedChannels } from "./lib/feed-channels";
+import CloudflareAnalytics from "./components/CloudflareAnalytics";
 import "./globals.css";
 import "./article-print.css";
 
@@ -8,7 +9,6 @@ const siteTitle = "hawks.tw";
 const siteDescription =
   "Hawks 的個人網站，記錄程式開發、機器學習與資安的學習歷程、活動心得和管樂生活，分享喜歡的動畫、電影、音樂與遊戲。";
 const defaultImage = "/og/default.png";
-const cloudflareAnalyticsToken = "430b038461df4770b3b0c08cea7572e6";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -133,12 +133,7 @@ export default function RootLayout({
       <body>
         <a href="#main-content" className="skip-link">跳到主要內容</a>
         {children}
-        <script
-          type="module"
-          async
-          src="https://static.cloudflareinsights.com/beacon.min.js"
-          data-cf-beacon={JSON.stringify({ token: cloudflareAnalyticsToken })}
-        />
+        <CloudflareAnalytics />
       </body>
     </html>
   );
