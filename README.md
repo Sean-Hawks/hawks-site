@@ -182,6 +182,7 @@ npm run build
 
 - [部署指南](DEPLOYMENT.md)：靜態輸出、GitHub Pages 與自訂網域設定。
 - [Discord 網域設定](docs/DISCORD_DOMAINS.md)：邀請頁及 `discord.hawks.tw`、`dc.hawks.tw` 的設定。
+- [網站流量紀錄](docs/ANALYTICS.md)：Cloudflare Web Analytics 的查看方式、正式站載入條件與驗證限制。
 
 ## 自動品質檢查
 
