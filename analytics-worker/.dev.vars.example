@@ -1,0 +1,3 @@
+# Local-only values. Do not copy a real Cloudflare credential into this example.
+DASHBOARD_TOKEN=local-development-dashboard-key-replace-me
+# CF_ANALYTICS_TOKEN is only required to exercise collection against Cloudflare.

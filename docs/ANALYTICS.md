@@ -6,6 +6,8 @@ hawks.tw 沿用 Cloudflare Web Analytics，查看瀏覽趨勢、熱門頁面、�
 
 ## 查看統計
 
+需要跨年度保存時，使用獨立的[長期流量紀錄](../analytics-worker/README.md)：每日摘要存入自己的 D1，提供私人報表及 CSV／JSON 匯出，不受 Cloudflare Dashboard 單次查詢月份限制。需完成其 API 權杖、資料庫與排程部署，才會開始自動歸檔。
+
 1. 登入 [Cloudflare Dashboard](https://dash.cloudflare.com/)，切換到管理 hawks.tw 的帳號。
 2. 開啟 **Web Analytics**，選擇 **hawks.tw**。
 3. 選擇日期範圍，先看整體趨勢，再依頁面、來源或裝置篩選。
@@ -56,4 +58,4 @@ Cloudflare 官方表示 **不記錄 query strings**，以避免收集可能敏�
 
 它是瀏覽器端的流量與品質分析，不是完整的伺服器存取紀錄。廣告阻擋、停用 JavaScript、網路中斷等情況都可能缺少資料。它目前不提供 custom events，因此不會自動統計按愛心、收藏或分享按鈕的點擊；若啟用匿名愛心，共用總數由獨立的互動後端負責。[官方 FAQ](https://developers.cloudflare.com/web-analytics/faq/)
 
-此文件不表示已連上 Cloudflare 帳號，也不宣稱已確認實際瀏覽量、歷史資料或 Dashboard 入帳。這些結果需要登入管理帳號後核對。
+2026-09-19 已登入管理帳號核對：hawks.tw 的安裝片段與上述公開 token 一致，Dashboard 已有瀏覽資料。這項確認不代表長期歸檔排程已啟用；排程狀態應以私人報表與實際部署為準。

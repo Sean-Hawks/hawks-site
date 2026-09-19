@@ -1,0 +1,21 @@
+{
+  "name": "hawks-analytics-archive",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "dev": "wrangler dev --config wrangler.local.jsonc",
+    "deploy": "wrangler deploy --config wrangler.production.jsonc",
+    "db:local": "wrangler d1 migrations apply ANALYTICS_DB --local --config wrangler.local.jsonc",
+    "db:production": "wrangler d1 migrations apply ANALYTICS_DB --remote --config wrangler.production.jsonc",
+    "backfill": "node scripts/backfill.mjs"
+  },
+  "devDependencies": {
+    "miniflare": "5.20260918.0-alpha",
+    "wrangler": "4.135.0"
+  }
+}

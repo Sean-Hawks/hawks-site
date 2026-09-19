@@ -1,0 +1,35 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "hawks-analytics",
+  "main": "src/index.js",
+  "compatibility_date": "2026-09-18",
+  "workers_dev": true,
+  "preview_urls": false,
+  "observability": {
+    "enabled": false
+  },
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "run_worker_first": true
+  },
+  "triggers": {
+    "crons": [
+      "0 20 * * *"
+    ]
+  },
+  "vars": {
+    "SITE_HOST": "hawks.tw",
+    "TIME_ZONE": "Asia/Taipei"
+  },
+  "ratelimits": [
+    {
+      "name": "REPORT_LIMIT",
+      "namespace_id": "47103",
+      "simple": {
+        "limit": 60,
+        "period": 60
+      }
+    }
+  ]
+}
