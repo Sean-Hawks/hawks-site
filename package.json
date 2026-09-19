@@ -14,7 +14,9 @@
     "start": "next start",
     "lint": "eslint",
     "test": "node --test tests/*.test.mjs",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "check:export": "python3 scripts/check-export.py",
+    "test:export": "python3 -m unittest discover -s tests -p test_export.py"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",
