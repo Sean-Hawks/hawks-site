@@ -1,0 +1,18 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "hawks-hearts",
+  "main": "src/index.js",
+  "compatibility_date": "2026-09-18",
+  "workers_dev": true,
+  "observability": { "enabled": false },
+  "vars": {
+    "SITE_ORIGIN": "https://hawks.tw",
+    "ALLOWED_ORIGINS": "https://hawks.tw"
+  },
+  // Copy to wrangler.production.jsonc and add the real D1 binding (see README).
+  // There is intentionally no invented account/database ID or usable secret.
+  "ratelimits": [
+    { "name": "HEARTS_READ_LIMIT", "namespace_id": "47101", "simple": { "limit": 120, "period": 60 } },
+    { "name": "HEARTS_WRITE_LIMIT", "namespace_id": "47102", "simple": { "limit": 20, "period": 60 } }
+  ]
+}

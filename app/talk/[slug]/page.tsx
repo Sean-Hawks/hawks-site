@@ -4,13 +4,12 @@ import { ArrowLeft, ArrowUpRight, FileText, Presentation, Rss, Video } from "luc
 import { getSortedTalksData } from "../../lib/talks";
 import { getSortedPostsData } from "../../lib/posts";
 import ThemeStyles from "../../components/ThemeStyles";
-import SaveForLater from "../../components/SaveForLater";
 import Header from "../../components/Header";
 import ArticleContents from "../../components/ArticleContents";
 import { getArticleHeadings } from "../../lib/headings";
 import MarkdownContent from "../../components/MarkdownContent";
 import type { Metadata } from "next";
-import ArticleShare from "../../components/ArticleShare";
+import ArticleActions from "../../components/ArticleActions";
 import { getRelatedPostsForTalk } from "../../lib/related";
 
 export async function generateStaticParams() {
@@ -143,7 +142,6 @@ export default async function TalkDetailPage({ params }: PageProps) {
               <h1 className="font-serif text-3xl font-bold leading-tight tracking-tight text-[rgb(var(--text))] sm:text-4xl">
                 {talk.title}
               </h1>
-                <SaveForLater id={`talk:${talk.id}`} />
 
               <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-[rgb(var(--muted))]">
                 <time className="flex items-center gap-1.5">
@@ -183,7 +181,7 @@ export default async function TalkDetailPage({ params }: PageProps) {
               <ArticleContents headings={getArticleHeadings(content)} mobileOnly={false} />
               <MarkdownContent content={content} variant="talk" />
             </div>
-            <ArticleShare title={talk.title} date={talk.date} path={`/talk/${talk.id}/`} />
+            <ArticleActions id={`talk:${talk.id}`} title={talk.title} date={talk.date} path={`/talk/${talk.id}/`} />
             </article>
 
           {relatedPosts.length > 0 && (
