@@ -5,7 +5,92 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 
+import { optimizedSrc, optimizedSrcSet } from "../lib/image-loader";
+
 type Img = { src: string; alt?: string; title?: string };
+
+// 相簿格子：文章欄最寬約 760px，兩欄各佔一半
+const GRID_SIZES = "(min-width: 640px) 380px, 50vw";
+const SINGLE_SIZES = "(min-width: 800px) 760px, 100vw";
+const LIGHTBOX_SIZES = "94vw";
+
+// 先把上一張／下一張抓進快取，翻頁時就不用等
+function preload(img: Img) {
+  const el = new Image();
+  const srcSet = optimizedSrcSet(img.src);
+  if (srcSet) {
+    el.sizes = LIGHTBOX_SIZES;
+    el.srcset = srcSet;
+  }
+  el.src = optimizedSrc(img.src, 1600);
+}
+
+function LightboxImage({ img, index, total }: { img: Img; index: number; total: number }) {
+  const [loaded, setLoaded] = useState(false);
+  const [failed, setFailed] = useState(false);
+
+  // 已在快取內的圖片可能在 onLoad 綁上前就完成，掛載時補檢查 complete
+  const attach = useCallback((el: HTMLImageElement | null) => {
+    if (el?.complete && el.naturalWidth > 0) setLoaded(true);
+  }, []);
+
+  const caption = captionOf(img);
+  if (failed) return (
+    <div role="status" className="max-w-sm rounded-xl bg-black/80 p-6 text-center text-white" onClick={event => event.stopPropagation()}>
+      <p>圖片暫時無法載入。</p>
+      <a href={img.src} target="_blank" rel="noopener noreferrer" className="mt-4 inline-block underline">開啟原圖</a>
+    </div>
+  );
+
+  return (
+    <figure onClick={event => event.stopPropagation()} className="m-0 flex max-h-[92vh] max-w-[94vw] flex-col items-center">
+      <div className="relative flex max-h-[86vh] max-w-[94vw] items-center justify-center">
+        {!loaded && (
+          <>
+            {/* 先用相簿已載好的小圖當模糊底圖，避免整片黑等待 */}
+            <img
+              src={optimizedSrc(img.src, 480)}
+              alt=""
+              aria-hidden="true"
+              className="max-h-[86vh] max-w-[94vw] rounded-lg object-contain opacity-60 blur-md"
+            />
+            <span
+              role="status"
+              aria-label="圖片載入中"
+              className="absolute grid h-12 w-12 place-items-center rounded-full bg-black/55"
+            >
+              <span className="h-6 w-6 animate-spin rounded-full border-2 border-white/25 border-t-white" />
+            </span>
+          </>
+        )}
+        <img
+          ref={attach}
+          src={optimizedSrc(img.src, 1600)}
+          srcSet={optimizedSrcSet(img.src)}
+          sizes={LIGHTBOX_SIZES}
+          alt={img.alt ?? ""}
+          decoding="async"
+          onLoad={() => setLoaded(true)}
+          onError={() => setFailed(true)}
+          onClick={(e) => e.stopPropagation()}
+          className={[
+            "max-h-[86vh] max-w-[94vw] rounded-lg object-contain shadow-2xl transition-opacity duration-200",
+            loaded ? "opacity-100" : "absolute inset-0 h-full w-full opacity-0",
+          ].join(" ")}
+        />
+      </div>
+      <figcaption className="mt-3 flex items-center gap-3 text-sm text-white/80">
+          {caption && <span>{caption}</span>}
+          {total > 1 && (
+            <span className="rounded-full bg-white/10 px-2.5 py-0.5">
+              {index + 1} / {total}
+            </span>
+          )}
+          <a href={img.src} target="_blank" rel="noopener noreferrer" onClick={event => event.stopPropagation()} className="shrink-0 underline">原圖 ↗</a>
+        </figcaption>
+    </figure>
+  );
+}
 
 function sizeToClass(title?: string) {
   const size = /(?:^|\s)size=(small|medium|wide)(?:\s|$)/.exec(title ?? "")?.[1];
@@ -45,7 +130,7 @@ export default function ArticleImages({ images }: { images: Img[] }) {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") close();
       if (e.key === "Tab") {
-        const buttons = dialog?.querySelectorAll<HTMLButtonElement>("button");
+        const buttons = dialog?.querySelectorAll<HTMLElement>("button, a[href]");
         const first = buttons?.[0];
         const last = buttons?.[buttons.length - 1];
         if (e.shiftKey && document.activeElement === first) {
@@ -73,6 +158,12 @@ export default function ArticleImages({ images }: { images: Img[] }) {
       previousFocus?.focus();
     };
   }, [isOpen, images.length, close]);
+
+  useEffect(() => {
+    if (active === null || images.length < 2) return;
+    const adjacent = [images[(active + 1) % images.length], images[(active - 1 + images.length) % images.length]];
+    for (const image of new Map(adjacent.map(image => [image.src, image])).values()) preload(image);
+  }, [active, images]);
 
   if (!images.length) return null;
 
@@ -102,7 +193,10 @@ export default function ArticleImages({ images }: { images: Img[] }) {
                     className="group relative block aspect-[4/3] w-full cursor-zoom-in overflow-hidden rounded-xl border border-[rgb(var(--line)/0.12)] bg-[rgb(var(--panel2)/0.5)] shadow-md transition-[border-color,transform] duration-300 hover:-translate-y-0.5 hover:border-[rgb(var(--accent)/0.32)] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent)/0.5)] sm:rounded-2xl"
                   >
                     <img
-                      src={img.src}
+                      src={optimizedSrc(img.src, 480)}
+                      srcSet={optimizedSrcSet(img.src)}
+                      sizes={GRID_SIZES}
+                      decoding="async"
                       alt={img.alt ?? ""}
                       loading="lazy"
                       className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.025]"
@@ -134,7 +228,10 @@ export default function ArticleImages({ images }: { images: Img[] }) {
             className="group flex w-full cursor-zoom-in justify-center focus:outline-none"
           >
             <img
-              src={images[0].src}
+              src={optimizedSrc(images[0].src, 960)}
+              srcSet={optimizedSrcSet(images[0].src)}
+              sizes={SINGLE_SIZES}
+              decoding="async"
               alt={images[0].alt ?? ""}
               loading="lazy"
               className="h-auto max-h-[70vh] w-auto max-w-full rounded-xl border border-[rgb(var(--line)/0.12)] object-contain shadow-lg transition-opacity group-hover:opacity-95"
@@ -161,7 +258,7 @@ export default function ArticleImages({ images }: { images: Img[] }) {
             type="button"
             onClick={close}
             aria-label="關閉"
-            className="absolute right-4 top-4 grid h-10 w-10 place-items-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"
+            className="absolute right-4 top-4 z-20 grid h-10 w-10 place-items-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"
           >
             <X className="h-5 w-5" />
           </button>
@@ -177,7 +274,7 @@ export default function ArticleImages({ images }: { images: Img[] }) {
                     i === null ? i : (i - 1 + images.length) % images.length,
                   );
                 }}
-                className="absolute left-3 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 sm:left-6"
+                className="absolute left-3 top-1/2 z-10 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 sm:left-6"
               >
                 <ChevronLeft className="h-6 w-6" />
               </button>
@@ -188,33 +285,14 @@ export default function ArticleImages({ images }: { images: Img[] }) {
                   e.stopPropagation();
                   setActive((i) => (i === null ? i : (i + 1) % images.length));
                 }}
-                className="absolute right-3 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 sm:right-6"
+                className="absolute right-3 top-1/2 z-10 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 sm:right-6"
               >
                 <ChevronRight className="h-6 w-6" />
               </button>
             </>
           )}
 
-          <figure className="m-0 flex max-h-[92vh] max-w-[94vw] flex-col items-center">
-            <img
-              src={images[active].src}
-              alt={images[active].alt ?? ""}
-              onClick={(e) => e.stopPropagation()}
-              className="max-h-[86vh] max-w-[94vw] rounded-lg object-contain shadow-2xl"
-            />
-            {(captionOf(images[active]) || images.length > 1) && (
-              <figcaption className="mt-3 flex items-center gap-3 text-sm text-white/80">
-                {captionOf(images[active]) && (
-                  <span>{captionOf(images[active])}</span>
-                )}
-                {images.length > 1 && (
-                  <span className="rounded-full bg-white/10 px-2.5 py-0.5">
-                    {active + 1} / {images.length}
-                  </span>
-                )}
-              </figcaption>
-            )}
-          </figure>
+          <LightboxImage key={active} img={images[active]} index={active} total={images.length} />
         </div>,
         document.body,
       )}

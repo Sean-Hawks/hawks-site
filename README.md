@@ -123,6 +123,12 @@ statusVisibility: draft
 
 Blog 與 Talk 的 `status: draft`、`status: private`，以及 Library 的對應 `statusVisibility` 值，會讓內容排除於公開頁面。**省略公開狀態的內容會視為公開**。這些欄位只控制網站顯示，不會隱藏 Git 儲存庫中的原始檔；`public/` 下的檔案也會隨網站發布。
 
+## 靜態圖片最佳化
+
+`npm run dev` 和 `npm run build` 會先將本機圖片產生多尺寸 WebP，原圖保留。`npm run images` 可以單獨執行。產生檔與 manifest 放在 `public/_img/`，不提交 Git；首次建置較久，後續會快取沒有變更的來源。設定或產生腳本變更時會重建。
+
+圖片載入器只使用 manifest 確認存在的尺寸，不放大小圖；動態 WebP、GIF、外部網址與未列入的來源保留原檔。壓縮失敗會停止建置，避免發布指向不存在資源的頁面。新增圖片後若開發伺服器正在運行，請重新啟動，讓 manifest 更新。
+
 ## 寫作方式
 
 - **直接編輯 Markdown**：修改 `content/` 下的檔案，在本機預覽後提交。

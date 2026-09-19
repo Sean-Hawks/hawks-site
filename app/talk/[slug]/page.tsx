@@ -1,3 +1,4 @@
+import { optimizedSrc, optimizedSrcSet } from "../../lib/image-loader";
 import Link from "next/link";
 import { ArrowLeft, ArrowUpRight, FileText, Presentation, Rss, Video } from "lucide-react";
 import { getSortedTalksData } from "../../lib/talks";
@@ -105,7 +106,10 @@ export default async function TalkDetailPage({ params }: PageProps) {
               <div className="overflow-hidden border-b border-[rgb(var(--line)/0.10)]">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={talk.banner}
+                  src={optimizedSrc(talk.banner, 960)}
+                      srcSet={optimizedSrcSet(talk.banner)}
+                      sizes="(min-width: 800px) 780px, 100vw"
+                      decoding="async"
                   alt={talk.title}
                   className="max-h-[500px] w-full object-cover"
                 />

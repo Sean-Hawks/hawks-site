@@ -7,11 +7,12 @@ import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import ts from 'typescript';
 
-function loadComponent(name) {
-  const url = new URL(`../app/components/${name}.tsx`, import.meta.url);
+function loadComponent(name, from = new URL('../app/components/', import.meta.url)) {
+  const base = new URL(name, from);
+  const url = ['.tsx', '.ts'].map(ext => new URL(base.href + ext)).find(candidate => fs.existsSync(candidate));
   const compiled = ts.transpileModule(fs.readFileSync(url, 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX, esModuleInterop: true } }).outputText;
   const exports = {}, require = createRequire(url);
-  vm.runInNewContext(compiled, { exports, process, require: id => id === 'lucide-react' ? new Proxy({}, { get: () => () => React.createElement('svg') }) : id.startsWith('./') ? loadComponent(id.slice(2)) : require(id) });
+  vm.runInNewContext(compiled, { exports, process, require: id => id === 'lucide-react' ? new Proxy({}, { get: () => () => React.createElement('svg') }) : id.startsWith('.') ? loadComponent(id, url) : require(id) });
   return exports;
 }
 const MarkdownContent = loadComponent('MarkdownContent').default;

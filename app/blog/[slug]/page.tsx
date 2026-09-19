@@ -1,3 +1,4 @@
+import { optimizedSrc, optimizedSrcSet } from "../../lib/image-loader";
 import Link from "next/link";
 import { ArrowLeft, FileText, Mic2 } from "lucide-react";
 import { getSortedPostsData, getPostBySlug, tagToSlug } from "../../lib/posts";
@@ -153,7 +154,10 @@ export default async function PostPage({ params }: PageProps) {
                   <div className="-mx-6 -mt-6 mb-8 sm:-mx-10 sm:-mt-10 border-b border-[rgb(var(--line)/0.10)]">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={post.banner}
+                      src={optimizedSrc(post.banner, 960)}
+                      srcSet={optimizedSrcSet(post.banner)}
+                      sizes="(min-width: 800px) 780px, 100vw"
+                      decoding="async"
                       alt={post.title}
                       className="aspect-[16/9] w-full object-cover sm:aspect-[16/7]"
                     />
