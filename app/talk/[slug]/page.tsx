@@ -1,3 +1,4 @@
+import SaveForLater from "../../components/SaveForLater";
 import Link from "next/link";
 import { ArrowLeft, ArrowUpRight, FileText, Presentation, Rss, Video } from "lucide-react";
 import { getSortedTalksData } from "../../lib/talks";
@@ -135,6 +136,7 @@ export default async function TalkDetailPage({ params }: PageProps) {
               <h1 className="font-serif text-3xl font-bold leading-tight tracking-tight text-[rgb(var(--text))] sm:text-4xl">
                 {talk.title}
               </h1>
+                <SaveForLater id={`talk:${talk.id}`} />
 
               <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-[rgb(var(--muted))]">
                 <time className="flex items-center gap-1.5">

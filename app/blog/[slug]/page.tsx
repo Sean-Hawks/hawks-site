@@ -1,3 +1,4 @@
+import SaveForLater from "../../components/SaveForLater";
 import Link from "next/link";
 import { ArrowLeft, FileText, Mic2 } from "lucide-react";
 import { getSortedPostsData, getPostBySlug, tagToSlug } from "../../lib/posts";
@@ -180,6 +181,7 @@ export default async function PostPage({ params }: PageProps) {
                 <h1 className="font-serif text-3xl font-bold leading-tight tracking-tight text-[rgb(var(--text))] sm:text-4xl">
                   {post.title}
                 </h1>
+                <SaveForLater id={`post:${post.slug}`} />
                 <div className="mt-4 flex items-center gap-4 text-sm text-[rgb(var(--muted))]">
                   <time className="flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-[rgb(var(--muted))] opacity-50"></span>

@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { Menu, Moon, Sun, X } from "lucide-react";
+import { Bookmark, Menu, Moon, Sun, X } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 type ThemeMode = "light" | "dark";
@@ -111,6 +111,7 @@ export default function Header() {
               );
             })}
           </nav>
+          <Link href="/saved/" aria-label="稍後閱讀" title="稍後閱讀" className="grid h-10 w-10 place-items-center border border-[rgb(var(--line)/0.12)] text-[rgb(var(--muted))] hover:text-[rgb(var(--accent))]"><Bookmark className="h-4 w-4" /></Link>
           {renderThemeButton()}
           <button
             type="button"
