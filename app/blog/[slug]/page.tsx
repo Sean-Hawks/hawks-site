@@ -5,7 +5,9 @@ import { getSortedPostsData, getPostBySlug, tagToSlug } from "../../lib/posts";
 import { getSortedTalksData } from "../../lib/talks";
 import ThemeStyles from "../../components/ThemeStyles";
 import Header from "../../components/Header";
-import MarkdownContent, { headingId } from "../../components/MarkdownContent";
+import MarkdownContent from "../../components/MarkdownContent";
+import ArticleContents from "../../components/ArticleContents";
+import { getArticleHeadings } from "../../lib/headings";
 import Comments from "../../components/Comments";
 import type { Metadata } from "next";
 import { excerpt, stripMarkdown } from "../../lib/content";
@@ -62,22 +64,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-function buildToc(content?: string) {
-  if (!content) return [];
-  const lines = content.split("\n");
-  return lines
-    .map((line) => {
-      const match = /^(#{1,3})\s+(.*)$/.exec(line.trim());
-      if (!match) return null;
-      const level = match[1].length; // 1~3
-      const title = match[2].trim();
-      const id = headingId(title);
-      if (!id) return null;
-      return { id, title, level };
-    })
-    .filter(Boolean) as { id: string; title: string; level: number }[];
-}
-
 export default async function PostPage({ params }: PageProps) {
   const { slug } = await params;
   const post = getPostBySlug(slug);
@@ -88,7 +74,7 @@ export default async function PostPage({ params }: PageProps) {
   const nextPost = postIndex > 0 ? posts[postIndex - 1] : undefined;
   const readingMinutes = Math.max(1, Math.ceil(stripMarkdown(post?.content ?? "").length / 500));
   const relatedTalks = post ? getRelatedTalksForPost(post, talks) : [];
-  const toc = buildToc(post?.content);
+  const toc = getArticleHeadings(post?.content);
 
   if (!post) {
     return (
@@ -120,12 +106,12 @@ export default async function PostPage({ params }: PageProps) {
               <h3 className="text-xs font-bold uppercase tracking-wider text-[rgb(var(--muted))]">
                 目錄
               </h3>
-              <nav className="space-y-1">
+              <nav aria-label="文章目錄" className="max-h-[calc(100vh-12rem)] space-y-1 overflow-y-auto">
                 {toc.map((item) => (
                   <a
                     key={item.id}
                     href={`#${item.id}`}
-                    className={`block text-sm text-[rgb(var(--muted))] hover:text-[rgb(var(--accent))] transition-colors truncate ${
+                    className={`block text-sm text-[rgb(var(--muted))] hover:text-[rgb(var(--accent))] transition-colors break-words py-1 ${
                       item.level > 1 ? "ml-3" : ""
                     } ${item.level > 2 ? "ml-6" : ""}`}
                   >
@@ -195,6 +181,7 @@ export default async function PostPage({ params }: PageProps) {
 
               <div className="p-6 sm:p-10">
                 <div className="mx-auto max-w-[760px]">
+                  <ArticleContents headings={toc} />
                   <MarkdownContent
                     content={post.content}
                     assetBasePath={`/images/posts/${post.slug}`}

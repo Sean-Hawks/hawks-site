@@ -11,6 +11,7 @@ import { visit } from "unist-util-visit";
 import type { Plugin } from "unified";
 import CopyButton from "./CopyButton";
 import ArticleImages from "./ArticleImages";
+import { remarkHeadingIds } from "../lib/headings";
 
 type HastNode = {
   type?: string;
@@ -149,14 +150,6 @@ function textFromChildren(children: React.ReactNode): string {
       return "";
     })
     .join("");
-}
-
-export function headingId(value: string) {
-  return value
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9\u4e00-\u9fa5]+/g, "-")
-    .replace(/^-+|-+$/g, "");
 }
 
 type MarkdownVariant = "default" | "talk" | "libraryReview";
@@ -303,33 +296,32 @@ export default function MarkdownContent({
     },
 
     h1: ({ children, ...props }) => (
-      <h1 id={headingId(textFromChildren(children))} className="scroll-mt-24 mt-12 mb-6 border-b border-[rgb(var(--line)/0.10)] pb-4 font-serif text-3xl font-extrabold tracking-tight text-[rgb(var(--text))] sm:text-4xl" {...props}>
+      <h1 className="scroll-mt-24 mt-12 mb-6 border-b border-[rgb(var(--line)/0.10)] pb-4 font-serif text-3xl font-extrabold tracking-tight text-[rgb(var(--text))] sm:text-4xl" {...props}>
         {children}
       </h1>
     ),
     h2: ({ children, ...props }) => (
-      <h2 id={headingId(textFromChildren(children))} className="scroll-mt-24 mt-12 mb-5 border-l-4 border-[rgb(var(--accent))] pl-4 font-serif text-2xl font-bold tracking-tight text-[rgb(var(--text))] sm:text-3xl" {...props}>
+      <h2 className="scroll-mt-24 mt-12 mb-5 border-l-4 border-[rgb(var(--accent))] pl-4 font-serif text-2xl font-bold tracking-tight text-[rgb(var(--text))] sm:text-3xl" {...props}>
         {children}
       </h2>
     ),
     h3: ({ children, ...props }) => {
-      const text = textFromChildren(children);
       if (isTalk) {
         return (
-          <h3 id={headingId(text)} className="talk-section-heading scroll-mt-24 mt-12 grid grid-cols-[2.5rem_1fr] items-baseline gap-3 font-serif text-2xl font-extrabold leading-tight text-[rgb(var(--text))] sm:mt-14 sm:grid-cols-[3.25rem_1fr] sm:text-[1.8rem]" {...props}>
+          <h3 className="talk-section-heading scroll-mt-24 mt-12 grid grid-cols-[2.5rem_1fr] items-baseline gap-3 font-serif text-2xl font-extrabold leading-tight text-[rgb(var(--text))] sm:mt-14 sm:grid-cols-[3.25rem_1fr] sm:text-[1.8rem]" {...props}>
             <span>{children}</span>
           </h3>
         );
       }
 
       return (
-        <h3 id={headingId(text)} className="scroll-mt-24 mt-8 mb-3 font-serif text-xl font-bold tracking-tight text-[rgb(var(--text))] sm:text-2xl" {...props}>
+        <h3 className="scroll-mt-24 mt-8 mb-3 font-serif text-xl font-bold tracking-tight text-[rgb(var(--text))] sm:text-2xl" {...props}>
           {children}
         </h3>
       );
     },
     h4: ({ children, ...props }) => (
-      <h4 id={headingId(textFromChildren(children))} className="scroll-mt-24 text-lg sm:text-xl font-bold mt-6 mb-2 text-[rgb(var(--text))]" {...props}>
+      <h4 className="scroll-mt-24 text-lg sm:text-xl font-bold mt-6 mb-2 text-[rgb(var(--text))]" {...props}>
         {children}
       </h4>
     ),
@@ -486,6 +478,7 @@ export default function MarkdownContent({
           remarkPlugins={[
             remarkGfm,
             remarkDirective,
+            remarkHeadingIds,
             remarkAdmonitions,
             ...(isTalk ? [remarkTalkSectionBlocks] : []),
           ]}
