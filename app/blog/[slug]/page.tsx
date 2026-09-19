@@ -10,6 +10,7 @@ import ArticleContents from "../../components/ArticleContents";
 import { getArticleHeadings } from "../../lib/headings";
 import Comments from "../../components/Comments";
 import type { Metadata } from "next";
+import ArticleShare from "../../components/ArticleShare";
 import { excerpt, stripMarkdown } from "../../lib/content";
 import { getRelatedTalksForPost } from "../../lib/related";
 
@@ -134,7 +135,7 @@ export default async function PostPage({ params }: PageProps) {
               <span>回到列表</span>
             </Link>
 
-            <article className="overflow-hidden rounded-2xl border border-[rgb(var(--accent)/0.16)] bg-[rgb(var(--panel)/0.90)] shadow-[0_24px_80px_rgba(90,76,55,0.16)]">
+            <article data-print-article className="overflow-hidden rounded-2xl border border-[rgb(var(--accent)/0.16)] bg-[rgb(var(--panel)/0.90)] shadow-[0_24px_80px_rgba(90,76,55,0.16)]">
               <div className="border-b border-[rgb(var(--accent)/0.12)] bg-gradient-to-br from-[rgb(var(--panel2)/0.92)] via-[rgb(var(--panel)/0.72)] to-[rgb(var(--accent)/0.06)] p-6 sm:p-10">
                 {post.banner && (
                   <div className="-mx-6 -mt-6 mb-8 sm:-mx-10 sm:-mt-10 border-b border-[rgb(var(--line)/0.10)]">
@@ -188,6 +189,7 @@ export default async function PostPage({ params }: PageProps) {
                   />
                 </div>
               </div>
+              <ArticleShare title={post.title} date={post.date} path={`/blog/${post.slug}/`} />
             </article>
 
             <nav className="mt-6 grid gap-3 sm:grid-cols-2">
