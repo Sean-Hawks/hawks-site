@@ -6,6 +6,7 @@ import ThemeStyles from "../../components/ThemeStyles";
 import Header from "../../components/Header";
 import MarkdownContent from "../../components/MarkdownContent";
 import type { Metadata } from "next";
+import ArticleShare from "../../components/ArticleShare";
 import { getRelatedPostsForTalk } from "../../lib/related";
 
 export async function generateStaticParams() {
@@ -100,7 +101,7 @@ export default async function TalkDetailPage({ params }: PageProps) {
             <span>回到 Talk Archive</span>
           </Link>
 
-          <article className="talk-article-shell overflow-hidden rounded-2xl border shadow-[0_24px_80px_rgba(90,76,55,0.16)]">
+          <article data-print-article className="talk-article-shell overflow-hidden rounded-2xl border shadow-[0_24px_80px_rgba(90,76,55,0.16)]">
             {talk.banner && (
               <div className="overflow-hidden border-b border-[rgb(var(--line)/0.10)]">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -173,7 +174,8 @@ export default async function TalkDetailPage({ params }: PageProps) {
             <div className="p-6 sm:p-10">
               <MarkdownContent content={content} variant="talk" />
             </div>
-          </article>
+            <ArticleShare title={talk.title} date={talk.date} path={`/talk/${talk.id}/`} />
+            </article>
 
           {relatedPosts.length > 0 && (
             <section className="mt-14 border-t border-[rgb(var(--line)/0.10)] pt-7">

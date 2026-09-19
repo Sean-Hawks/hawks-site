@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "./article-print.css";
 
 const siteUrl = "https://hawks.tw";
 const siteTitle = "hawks.tw";

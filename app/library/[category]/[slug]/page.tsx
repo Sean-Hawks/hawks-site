@@ -13,6 +13,7 @@ import {
 } from "../../../lib/library";
 import { excerpt, stripMarkdown } from "../../../lib/content";
 import type { Metadata } from "next";
+import ArticleShare from "../../../components/ArticleShare";
 
 type PageProps = { params: Promise<{ category: string; slug: string }> };
 
@@ -149,7 +150,7 @@ export default async function LibraryReviewPage({ params }: PageProps) {
   const RecommendationIcon = recommendation.Icon;
   const recommendedWorksSection =
     item.recommendedWorks.length > 0 ? (
-      <section className="mt-6 rounded-2xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.78)] p-5 shadow-[0_18px_60px_rgba(90,76,55,0.07)]">
+      <section data-print-article className="mt-6 rounded-2xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.78)] p-5 shadow-[0_18px_60px_rgba(90,76,55,0.07)]">
         <div className="mb-4 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <div className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[rgb(var(--accent))]">
@@ -270,7 +271,7 @@ export default async function LibraryReviewPage({ params }: PageProps) {
               <span>回到 {currentCategory.title}</span>
             </Link>
 
-            <article className="overflow-hidden rounded-2xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.88)] shadow-[0_22px_70px_rgba(90,76,55,0.12)]">
+            <article data-print-article className="overflow-hidden rounded-2xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.88)] shadow-[0_22px_70px_rgba(90,76,55,0.12)]">
               <header
                 className={[
                   "grid border-b border-[rgb(var(--line)/0.08)] bg-[rgb(var(--panel2)/0.58)]",
@@ -415,6 +416,7 @@ export default async function LibraryReviewPage({ params }: PageProps) {
                   </section>
                 </div>
               )}
+              <ArticleShare title={item.title} date={item.date} path={`/library/${item.category}/${item.slug}/`} />
             </article>
 
             {recommendedWorksSection}
