@@ -46,7 +46,7 @@ export default function TalkPage() {
 
           {/* Latest Talk Highlight */}
           {latestTalk && (
-            <div className="mb-16 rounded-2xl border border-[rgb(var(--accent)/0.22)] bg-[rgb(var(--accent)/0.07)] p-6 shadow-[0_22px_70px_rgba(90,76,55,0.10)] sm:p-8 relative overflow-hidden transition-all hover:border-[rgb(var(--accent)/0.36)] hover:bg-[rgb(var(--accent)/0.09)] group">
+            <div id={latestTalk.id} className="scroll-mt-24 mb-16 rounded-2xl border border-[rgb(var(--accent)/0.22)] bg-[rgb(var(--accent)/0.07)] p-6 shadow-[0_22px_70px_rgba(90,76,55,0.10)] sm:p-8 relative overflow-hidden transition-all hover:border-[rgb(var(--accent)/0.36)] hover:bg-[rgb(var(--accent)/0.09)] group">
               <div className="absolute top-0 right-0 p-4 opacity-10">
                 <Sparkles className="w-32 h-32 text-[rgb(var(--accent))]" />
               </div>
