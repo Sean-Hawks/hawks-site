@@ -1,6 +1,10 @@
-.article-print-source { display: none; }
+.article-print-source {
+  display: none;
+}
 @media print {
-  @page { margin: 18mm; }
+  @page {
+    margin: 18mm;
+  }
   body:has([data-print-article]) {
     background: white !important;
     color: #222 !important;
@@ -12,7 +16,10 @@
     --panel2: 255 255 255;
   }
   /* Keep the article and its ancestors in flow; remove unrelated page sections. */
-  body:has([data-print-article]) *:not(:has([data-print-article])):not([data-print-article]):not([data-print-article] *) {
+  body:has([data-print-article])
+    *:not(:has([data-print-article])):not([data-print-article]):not(
+      [data-print-article] *
+    ) {
     display: none !important;
   }
   body:has([data-print-article]) :has([data-print-article]),
@@ -30,22 +37,57 @@
   }
   body:has([data-print-article]) .site-shell::before,
   body:has([data-print-article]) .site-shell::after,
-  [data-print-article] :is([data-print-hide], nav, button, figure, img, [role="region"]),
-  [data-print-article] :has(> img) { display: none !important; }
-  [data-print-article] { font-size: 11pt; line-height: 1.6; }
+  [data-print-article]
+    :is([data-print-hide], nav, button, figure, img, [role="region"]),
+  [data-print-article] details:has(nav[aria-label="文章目錄"]),
+  [data-print-article] :has(> img) {
+    display: none !important;
+  }
+  [data-print-article] {
+    font-size: 11pt;
+    line-height: 1.6;
+  }
   [data-print-article] * {
     color: #222 !important;
     background: transparent !important;
     text-shadow: none !important;
     box-shadow: none !important;
   }
-  [data-print-article] :is(header, .grid) { display: block !important; }
-  [data-print-article] :is(p, li) { orphans: 3; widows: 3; }
-  [data-print-article] :is(h1, h2, h3, h4) { break-after: avoid; }
-  [data-print-article] pre { white-space: pre-wrap !important; overflow: visible !important; overflow-wrap: anywhere; }
-  [data-print-article] [class*="line-clamp"] { display: block !important; -webkit-line-clamp: unset !important; overflow: visible !important; }
-  [data-print-article] .overflow-x-auto { overflow: visible !important; }
-  [data-print-article] table { font-size: 9pt; }
-  [data-print-article] a { text-decoration: underline; overflow-wrap: anywhere; }
-  [data-print-article] .article-print-source { display: block !important; margin: 1.5rem 0 !important; border-top: 1px solid #aaa; padding-top: 1rem; font-size: 9pt; }
+  [data-print-article] :is(header, .grid) {
+    display: block !important;
+  }
+  [data-print-article] :is(p, li) {
+    orphans: 3;
+    widows: 3;
+  }
+  [data-print-article] :is(h1, h2, h3, h4) {
+    break-after: avoid;
+  }
+  [data-print-article] pre {
+    white-space: pre-wrap !important;
+    overflow: visible !important;
+    overflow-wrap: anywhere;
+  }
+  [data-print-article] [class*="line-clamp"] {
+    display: block !important;
+    -webkit-line-clamp: unset !important;
+    overflow: visible !important;
+  }
+  [data-print-article] .overflow-x-auto {
+    overflow: visible !important;
+  }
+  [data-print-article] table {
+    font-size: 9pt;
+  }
+  [data-print-article] a {
+    text-decoration: underline;
+    overflow-wrap: anywhere;
+  }
+  [data-print-article] .article-print-source {
+    display: block !important;
+    margin: 1.5rem 0 !important;
+    border-top: 1px solid #aaa;
+    padding-top: 1rem;
+    font-size: 9pt;
+  }
 }
