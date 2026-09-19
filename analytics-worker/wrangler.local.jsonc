@@ -1,0 +1,41 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "hawks-analytics",
+  "main": "src/index.js",
+  "compatibility_date": "2026-09-18",
+  "workers_dev": true,
+  "preview_urls": false,
+  "observability": {
+    "enabled": false
+  },
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "run_worker_first": true
+  },
+  "vars": {
+    "SITE_HOST": "hawks.tw",
+    "TIME_ZONE": "Asia/Taipei",
+    "CF_ACCOUNT_ID": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "CF_SITE_TAG": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "ARCHIVE_START_DATE": "2026-08-12"
+  },
+  "ratelimits": [
+    {
+      "name": "REPORT_LIMIT",
+      "namespace_id": "47103",
+      "simple": {
+        "limit": 60,
+        "period": 60
+      }
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "ANALYTICS_DB",
+      "database_name": "hawks-analytics-local",
+      "database_id": "local-only-analytics",
+      "migrations_dir": "migrations"
+    }
+  ]
+}

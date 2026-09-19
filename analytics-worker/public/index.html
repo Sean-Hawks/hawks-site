@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>流量紀錄 · hawks.tw</title><link rel="stylesheet" href="/style.css"><script src="/app.js" defer></script></head>
+<body>
+<header><a href="https://hawks.tw/">HAWKS.TW</a><span>私人流量紀錄</span><button id="logout" hidden>登出</button></header>
+<main>
+  <section id="login"><p class="eyebrow">THE LONG VIEW</p><h1>讓每一天，<br>留下紀錄。</h1><p class="intro">從第一篇文章到下一個年度，慢慢看見網站的成長。</p>
+    <form id="login-form"><label for="token">報表存取金鑰</label><input id="token" type="password" autocomplete="off" required minlength="32"><button type="submit">開啟流量紀錄</button><p class="hint">金鑰只在這個分頁使用，重新整理後需重新輸入。</p></form>
+  </section>
+  <p id="message" role="status" aria-live="polite"></p>
+  <div id="dashboard" hidden>
+    <div class="title-row"><div><p class="eyebrow">THE LONG VIEW</p><h1>流量紀錄</h1></div><button id="export" class="secondary">匯出每日 CSV</button></div>
+    <form id="range"><label>從<input type="date" id="from" required></label><label>到<input type="date" id="to" required></label><button type="submit">查看</button><button type="button" id="year" class="secondary">今年</button><button type="button" id="all" class="secondary">全部紀錄</button></form>
+    <p id="coverage" class="hint"></p><p id="sync" class="notice" role="status"></p>
+    <div class="metrics"><section><h2>頁面瀏覽</h2><p id="pageviews">—</p></section><section><h2>造訪次數</h2><p id="visits">—</p></section><section><h2>已保存天數</h2><p id="days">—</p></section></div>
+    <section class="panel"><div class="title-row"><h2>每月瀏覽趨勢</h2><span class="hint">依台灣時間</span></div><div id="chart" role="img" aria-label="每月頁面瀏覽趨勢，下方表格有完整數值"></div><div class="table-scroll"><table><caption>每月統計</caption><thead><tr><th>月份</th><th>頁面瀏覽</th><th>造訪次數</th><th>已存／應存天數</th></tr></thead><tbody id="months"></tbody></table></div></section>
+    <section class="panel"><div class="title-row"><h2>每日明細</h2><label>日期<select id="detail-day" aria-label="每日明細日期"></select></label><button id="export-day" class="secondary">匯出當日 JSON</button></div><p id="detail-note" class="hint"></p><div class="details"><div><h3>頁面</h3><div class="table-scroll"><table><thead><tr><th>路徑</th><th>瀏覽</th></tr></thead><tbody id="pages"></tbody></table></div></div><div><h3>來源網站</h3><div class="table-scroll"><table><thead><tr><th>來源</th><th>造訪</th></tr></thead><tbody id="sources"></tbody></table></div></div></div></section>
+    <p class="hint">造訪次數不等於不重複人數。資料來自 Cloudflare Web Analytics，排除已辨識的機器人；抽樣、阻擋追蹤與收集延遲都可能影響數值。各明細與總數可能因抽樣而有差異。今天尚未結束，不列入每日歸檔。</p>
+  </div>
+</main><footer>HAWKS.TW · 長期保存每日摘要，不保存訪客 IP。</footer>
+</body></html>
