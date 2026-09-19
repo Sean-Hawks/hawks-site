@@ -1,9 +1,9 @@
-import SaveForLater from "../../components/SaveForLater";
 import Link from "next/link";
 import { ArrowLeft, ArrowUpRight, FileText, Presentation, Rss, Video } from "lucide-react";
 import { getSortedTalksData } from "../../lib/talks";
 import { getSortedPostsData } from "../../lib/posts";
 import ThemeStyles from "../../components/ThemeStyles";
+import SaveForLater from "../../components/SaveForLater";
 import Header from "../../components/Header";
 import MarkdownContent from "../../components/MarkdownContent";
 import type { Metadata } from "next";

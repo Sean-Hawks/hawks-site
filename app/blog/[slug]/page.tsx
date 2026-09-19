@@ -1,9 +1,9 @@
-import SaveForLater from "../../components/SaveForLater";
 import Link from "next/link";
 import { ArrowLeft, FileText, Mic2 } from "lucide-react";
 import { getSortedPostsData, getPostBySlug, tagToSlug } from "../../lib/posts";
 import { getSortedTalksData } from "../../lib/talks";
 import ThemeStyles from "../../components/ThemeStyles";
+import SaveForLater from "../../components/SaveForLater";
 import Header from "../../components/Header";
 import MarkdownContent, { headingId } from "../../components/MarkdownContent";
 import Comments from "../../components/Comments";
