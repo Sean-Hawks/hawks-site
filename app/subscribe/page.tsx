@@ -1,10 +1,11 @@
 import Link from "next/link";
+import FeedPicker from "./FeedPicker";
+import { getFeedItems } from "../lib/feed-data";
 import type { Metadata } from "next";
 import {
   ArrowUpRight,
   BookOpenText,
   Mail,
-  Radio,
   Rss,
   Sparkles,
 } from "lucide-react";
@@ -43,6 +44,8 @@ const readerLinks = [
 ];
 
 export default function SubscribePage() {
+  const items = getFeedItems();
+  const counts = { all: items.length, blog: items.filter(item => item.channel === "blog").length, talk: items.filter(item => item.channel === "talk").length, library: items.filter(item => item.channel === "library").length };
   return (
     <div className="site-shell min-h-screen text-[rgb(var(--text))]">
       <ThemeStyles />
@@ -52,9 +55,9 @@ export default function SubscribePage() {
         <SignalPageHeader
           code="05 / BROADCAST"
           title="訂閱 hawks.tw"
-          description="用 RSS reader 追蹤 Blog、Talk 和 Library Review；也可以直接訂閱 email 更新。"
-          statLabel="Feeds"
-          statValue="02"
+          description="只訂閱你感興趣的文章、近況或評論，也可以用 email 收到全部更新。"
+          statLabel="RSS Channels"
+          statValue="04"
         />
 
         <section className="home-panel p-5 sm:p-7">
@@ -63,26 +66,7 @@ export default function SubscribePage() {
             Choose a channel
           </div>
           <div className="grid gap-3 md:grid-cols-2">
-            <a
-              href="/rss.xml"
-              className="group rounded-2xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.035)] p-5 transition-colors hover:border-[rgb(var(--accent)/0.28)] hover:bg-[rgb(var(--line)/0.055)]"
-            >
-              <div className="mb-4 grid h-11 w-11 place-items-center rounded-xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.62)] text-[rgb(var(--accent))]">
-                <Radio className="h-5 w-5" />
-              </div>
-              <div className="flex items-center justify-between gap-4">
-                <h2 className="text-lg font-bold transition-colors group-hover:text-[rgb(var(--accent))]">
-                  RSS Feed
-                </h2>
-                <ArrowUpRight className="h-4 w-4 text-[rgb(var(--muted))]" />
-              </div>
-              <p className="mt-2 text-sm leading-7 text-[rgb(var(--muted))]">
-                把 feed URL 加到 RSS reader，就會自動看到新的公開內容。
-              </p>
-              <code className="mt-4 block overflow-hidden text-ellipsis rounded-xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.70)] px-3 py-2 text-xs text-[rgb(var(--muted))]">
-                {feedUrl}
-              </code>
-            </a>
+            <FeedPicker counts={counts} />
 
             <div className="rounded-2xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.035)] p-5">
               <div className="mb-4 grid h-11 w-11 place-items-center rounded-xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.62)] text-[rgb(var(--accent))]">
@@ -103,6 +87,7 @@ export default function SubscribePage() {
                 className="mt-4 grid gap-2"
               >
                 <input
+                  aria-label="電子郵件地址"
                   type="email"
                   name="email"
                   required
@@ -147,7 +132,7 @@ export default function SubscribePage() {
           <div className="rounded-2xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.78)] p-5">
             <div className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[rgb(var(--muted))]">
               <Sparkles className="h-3.5 w-3.5 text-[rgb(var(--accent))]" />
-              Open in reader
+              全部更新 · 快速訂閱
             </div>
             <div className="grid gap-2">
               {readerLinks.map((reader) => (

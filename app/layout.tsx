@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { feedChannels } from "./lib/feed-channels";
 import "./globals.css";
 
 const siteUrl = "https://hawks.tw";
@@ -65,9 +66,7 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: siteUrl,
-    types: {
-      "application/rss+xml": "/rss.xml",
-    },
+
   },
   icons: {
     icon: [
@@ -110,6 +109,7 @@ export default function RootLayout({
   return (
     <html lang="zh-TW" suppressHydrationWarning>
       <head>
+        {feedChannels.map(feed => <link key={feed.id} rel="alternate" type="application/rss+xml" title={`hawks.tw · ${feed.title}`} href={feed.path} />)}
         <script
           dangerouslySetInnerHTML={{
             __html: `
