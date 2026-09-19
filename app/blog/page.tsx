@@ -125,6 +125,7 @@ export default function BlogPage() {
             <h1 className="now-desk-title mt-5 font-serif font-bold tracking-[-0.06em]">
               部落格
             </h1>
+            <Link href="/explore/" className="mt-5 inline-flex min-h-11 items-center gap-2 text-sm font-medium text-[rgb(var(--accent))]">不知道從哪裡讀起？隨機挑一篇 <ArrowRight className="h-4 w-4" /></Link>
           </div>
         </header>
 

@@ -27,6 +27,7 @@ export default function Header() {
     { label: "README", href: "/" },
     { label: "Blog", href: "/blog" },
     { label: "Library", href: "/library" },
+    { label: "Explore", href: "/explore" },
     { label: "Project", href: "/project" },
     { label: "Search", href: "/search" },
     { label: "Subscribe", href: "/subscribe" },
@@ -85,7 +86,7 @@ export default function Header() {
         </Link>
 
         <div className="flex items-center gap-2">
-          <nav aria-label="主要導覽" className="hidden items-center gap-2 lg:flex">
+          <nav aria-label="主要導覽" className="hidden items-center gap-2 xl:flex">
             {navItems.map((item) => {
               // 簡單的路由匹配邏輯
               const isActive = 
@@ -120,7 +121,7 @@ export default function Header() {
             aria-expanded={isOpen}
             aria-label={isOpen ? "Close navigation" : "Open navigation"}
             onClick={() => setMenuPath(isOpen ? null : pathname)}
-            className="grid h-10 w-10 place-items-center border border-[rgb(var(--line)/0.12)] bg-[rgb(var(--line)/0.04)] text-[rgb(var(--text))] transition-colors hover:border-[rgb(var(--accent)/0.40)] lg:hidden"
+            className="grid h-10 w-10 place-items-center border border-[rgb(var(--line)/0.12)] bg-[rgb(var(--line)/0.04)] text-[rgb(var(--text))] transition-colors hover:border-[rgb(var(--accent)/0.40)] xl:hidden"
           >
             {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
@@ -133,7 +134,7 @@ export default function Header() {
         aria-hidden={!isOpen}
         inert={!isOpen}
         className={[
-          "mx-auto grid max-w-7xl gap-2 px-4 pb-4 transition-[grid-template-rows,opacity] sm:px-6 lg:hidden",
+          "mx-auto grid max-w-7xl gap-2 px-4 pb-4 transition-[grid-template-rows,opacity] sm:px-6 xl:hidden",
           isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0",
         ].join(" ")}
       >
