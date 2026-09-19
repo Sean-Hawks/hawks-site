@@ -3,29 +3,12 @@
 import React from "react";
 import Link from "next/link";
 import { ArrowRight, Search, X } from "lucide-react";
-import { SearchItem } from "../lib/search";
+import { type SearchItem, compactSearchTerm } from "../lib/search";
 import type { SiteTag } from "../lib/site-tags";
-import { stripMarkdown } from "../lib/content";
+import { tagToSlug } from "../lib/tags";
+import { useQueryParams } from "../lib/use-query-params";
 
 type SearchType = "all" | SearchItem["type"];
-
-function searchTerm(value: string) {
-  return stripMarkdown(value)
-    .toLowerCase()
-    .replace(/\s+/g, "");
-}
-
-function tagSlug(value: string) {
-  return value
-    .trim()
-    .replace(/^#+/, "")
-    .normalize("NFKD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/&/g, " and ")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
 
 export default function SearchClient({
   items,
@@ -34,15 +17,19 @@ export default function SearchClient({
   items: SearchItem[];
   tags: SiteTag[];
 }) {
-  const [query, setQuery] = React.useState("");
-  const [type, setType] = React.useState<SearchType>("all");
-  const [selectedTag, setSelectedTag] = React.useState<string | null>(null);
+  const [params, update] = useQueryParams();
+  const query = params.get("q") ?? "";
+  const requestedType = params.get("type");
+  const type: SearchType = requestedType === "post" || requestedType === "talk" || requestedType === "library" ? requestedType : "all";
+  const selectedTag = tags.some(tag => tag.slug === params.get("tag")) ? params.get("tag") : null;
+  const [showAllTags, setShowAllTags] = React.useState(false);
+  const reset = () => update({ q: null, type: null, tag: null });
 
   const filteredItems = React.useMemo(() => {
     const terms = query
       .trim()
       .split(/\s+/)
-      .map((term) => searchTerm(term.replace(/^#+/, "")))
+      .map((term) => compactSearchTerm(term.replace(/^#+/, "")))
       .filter(Boolean);
 
     return items
@@ -50,7 +37,7 @@ export default function SearchClient({
       .filter(
         (item) =>
           !selectedTag ||
-          item.tags.some((tag) => tagSlug(tag) === selectedTag)
+          item.tags.some((tag) => tagToSlug(tag) === selectedTag)
       )
       .filter((item) => terms.every((term) => item.haystack.includes(term)));
   }, [items, query, selectedTag, type]);
@@ -65,8 +52,7 @@ export default function SearchClient({
             type="search"
             value={query}
             onChange={(event) => {
-              setQuery(event.target.value);
-              setSelectedTag(null);
+              update({ q: event.target.value, tag: null });
             }}
             placeholder="搜尋文章、Talk、Library、tag、內文..."
             className="w-full bg-transparent text-base text-[rgb(var(--text))] outline-none placeholder:text-[rgb(var(--muted))]"
@@ -76,8 +62,7 @@ export default function SearchClient({
               type="button"
               aria-label="清除搜尋"
               onClick={() => {
-                setQuery("");
-                setSelectedTag(null);
+                update({ q: null, tag: null });
               }}
               className="grid h-8 w-8 flex-shrink-0 place-items-center rounded-lg text-[rgb(var(--muted))] transition-colors hover:bg-[rgb(var(--line)/0.06)] hover:text-[rgb(var(--text))]"
             >
@@ -97,7 +82,7 @@ export default function SearchClient({
               key={option.value}
               type="button"
               aria-pressed={type === option.value}
-              onClick={() => setType(option.value as SearchType)}
+              onClick={() => update({ type: option.value === "all" ? null : option.value })}
               className={[
                 "rounded-full border px-3 py-1.5 text-sm transition-colors",
                 type === option.value
@@ -114,16 +99,14 @@ export default function SearchClient({
           <div className="mb-2 text-xs font-bold uppercase tracking-[0.16em] text-[rgb(var(--muted))]">
             Tags
           </div>
-          <div className="flex flex-wrap gap-2">
-            {tags.slice(0, 28).map((tag) => (
+          <div id="search-tags" className="flex flex-wrap gap-2">
+            {(showAllTags ? tags : tags.slice(0, 28)).map((tag) => (
               <button
                 key={tag.slug}
                 aria-pressed={selectedTag === tag.slug}
                 type="button"
                 onClick={() => {
-                  setQuery(tag.tag);
-                  setSelectedTag(tag.slug);
-                  setType("all");
+                  update({ q: null, tag: tag.slug, type: null });
                 }}
                 className={[
                   "rounded-full border px-3 py-1.5 text-sm transition-colors",
@@ -137,11 +120,19 @@ export default function SearchClient({
               </button>
             ))}
           </div>
+          {tags.length > 28 && (
+            <button type="button" aria-expanded={showAllTags} aria-controls="search-tags" onClick={() => setShowAllTags(value => !value)} className="mt-3 px-2 py-2 text-sm text-[rgb(var(--accent))]">
+              {showAllTags ? "收起標籤" : `顯示全部 ${tags.length} 個標籤`}
+            </button>
+          )}
         </div>
       </div>
 
+      {(query || type !== "all" || selectedTag) && (
+        <button type="button" onClick={reset} className="rounded-full border border-[rgb(var(--accent)/0.3)] px-4 py-2 text-sm text-[rgb(var(--accent))]">清除所有篩選</button>
+      )}
       <div role="status" className="text-sm text-[rgb(var(--muted))]">
-        {filteredItems.length} result{filteredItems.length === 1 ? "" : "s"}
+        {filteredItems.length} 筆結果{selectedTag ? ` · ${tags.find(tag => tag.slug === selectedTag)?.tag}` : ""}
       </div>
 
       {filteredItems.length === 0 && (

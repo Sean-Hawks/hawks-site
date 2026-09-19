@@ -18,9 +18,12 @@ function displayTag(tag: string) {
   return value ? `#${value}` : "";
 }
 
-function compactSearchTerm(value: string) {
-  return stripMarkdown(value)
-    .toLowerCase()
+export function normalizeSearchText(value: string) {
+  return value.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+}
+
+export function compactSearchTerm(value: string) {
+  return normalizeSearchText(stripMarkdown(value))
     .replace(/\s+/g, "");
 }
 
@@ -33,7 +36,7 @@ function compactHyphenatedTerms(value: string) {
 
 function searchHaystack(parts: Array<string | number | null | undefined>) {
   const raw = parts.filter((part) => part !== null && part !== undefined).join(" ");
-  return `${stripMarkdown(raw).toLowerCase()} ${compactHyphenatedTerms(raw)}`;
+  return `${normalizeSearchText(stripMarkdown(raw))} ${compactHyphenatedTerms(raw)}`;
 }
 
 export function buildSearchIndex(
@@ -57,7 +60,7 @@ export function buildSearchIndex(
 
   const talkItems = talks.map((talk) => {
     const desc = excerpt(talk.desc);
-    const tags = [talk.event, talk.year, "talk", "now"].filter(Boolean) as string[];
+    const tags = [...(talk.tags ?? []), talk.event, talk.year, "talk", "now"].filter(Boolean) as string[];
     return {
       id: `talk-${talk.id}`,
       type: "talk" as const,
@@ -75,12 +78,12 @@ export function buildSearchIndex(
     const tags = item.tags.map(displayTag).filter(Boolean);
     const hasDetail = item.hasReview || item.recommendedWorks.length > 0;
     return {
-      id: `library-${item.slug}`,
+      id: `library-${item.category}-${item.slug}`,
       type: "library" as const,
       title: item.hasReview ? `評論：${item.title}` : item.title,
       desc,
       date: item.date,
-      href: hasDetail ? `/library/${item.category}/${item.slug}` : `/library/${item.category}`,
+      href: hasDetail ? `/library/${item.category}/${item.slug}` : `/library/${item.category}?q=${encodeURIComponent(item.title)}#item-${item.slug}`,
       tags,
       haystack: searchHaystack([
         item.title,
