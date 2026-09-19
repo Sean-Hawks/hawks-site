@@ -2,10 +2,25 @@
 
 import React from "react";
 import Link from "next/link";
-import { Bookmark, Menu, Moon, Sun, X } from "lucide-react";
+import { ArrowUpRight, Bookmark, ChevronDown, Compass, Menu, Moon, Rss, Search, Sun, X } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 type ThemeMode = "light" | "dark";
+
+const mainLinks = [
+  { label: "Blog", detail: "文章與近況", href: "/blog/" },
+  { label: "Library", detail: "收藏與評論", href: "/library/" },
+  { label: "Project", detail: "程式與作品", href: "/project/" },
+];
+const readingLinks = [
+  { label: "隨機探索", href: "/explore/", icon: Compass },
+  { label: "稍後閱讀", href: "/saved/", icon: Bookmark },
+  { label: "訂閱更新", href: "/subscribe/", icon: Rss },
+];
+const aboutLinks = [
+  { label: "經歷時間軸", href: "/timeline/" },
+  { label: "聯絡我", href: "/contact/" },
+];
 
 function subscribeTheme(onChange: () => void) {
   const observer = new MutationObserver(onChange);
@@ -18,34 +33,64 @@ function themeSnapshot(): ThemeMode {
 
 export default function Header() {
   const pathname = usePathname();
+  const headerRef = React.useRef<HTMLElement>(null);
+  const desktopNavRef = React.useRef<HTMLElement>(null);
+  const panelRef = React.useRef<HTMLElement>(null);
   const menuButtonRef = React.useRef<HTMLButtonElement>(null);
   const [menuPath, setMenuPath] = React.useState<string | null>(null);
   const isOpen = menuPath === pathname;
   const theme = React.useSyncExternalStore(subscribeTheme, themeSnapshot, () => "light" as ThemeMode);
 
-  const navItems = [
-    { label: "README", href: "/" },
-    { label: "Blog", href: "/blog" },
-    { label: "Library", href: "/library" },
-    { label: "Explore", href: "/explore" },
-    { label: "Project", href: "/project" },
-    { label: "Search", href: "/search" },
-    { label: "Subscribe", href: "/subscribe" },
-    { label: "Contact", href: "/contact" },
-    { label: "Timeline", href: "/timeline" },
-  ];
+  const isActive = (href: string) => {
+    const section = href.replace(/\/$/, "");
+    return pathname === section || pathname.startsWith(`${section}/`) ||
+      (href === "/blog/" && (pathname === "/talk" || pathname.startsWith("/talk/")));
+  };
+  const current = (href: string) => !isActive(href) ? undefined :
+    pathname.replace(/\/$/, "") === href.replace(/\/$/, "") ? "page" as const : "location" as const;
+  const moreActive = [...readingLinks, ...aboutLinks].some(item => isActive(item.href));
+  const closeMenu = () => setMenuPath(null);
 
   React.useEffect(() => {
     if (!isOpen) return;
+    const closeAndFocus = () => {
+      setMenuPath(null);
+      menuButtonRef.current?.focus();
+    };
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
+        event.preventDefault();
+        closeAndFocus();
+      }
+    };
+    const onOutside = (event: Event) => {
+      if (event.target instanceof Node && !headerRef.current?.contains(event.target)) {
         setMenuPath(null);
-        menuButtonRef.current?.focus();
       }
     };
     document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
+    document.addEventListener("pointerdown", onOutside);
+    document.addEventListener("focusin", onOutside);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      document.removeEventListener("pointerdown", onOutside);
+      document.removeEventListener("focusin", onOutside);
+    };
   }, [isOpen]);
+
+  React.useEffect(() => {
+    const breakpoint = window.matchMedia("(min-width: 768px)");
+    const onBreakpoint = (event: MediaQueryListEvent) => {
+      // Keep focus visible when a panel closes or the desktop links disappear.
+      if (panelRef.current?.contains(document.activeElement) ||
+          (!event.matches && desktopNavRef.current?.contains(document.activeElement))) {
+        menuButtonRef.current?.focus();
+      }
+      setMenuPath(null);
+    };
+    breakpoint.addEventListener("change", onBreakpoint);
+    return () => breakpoint.removeEventListener("change", onBreakpoint);
+  }, []);
 
   const toggleTheme = React.useCallback(() => {
     const nextTheme: ThemeMode = themeSnapshot() === "dark" ? "light" : "dark";
@@ -60,112 +105,78 @@ export default function Header() {
   const themeLabel = theme === "dark" ? "切換到淺色模式" : "切換到深色模式";
   const ThemeIcon = theme === "dark" ? Sun : Moon;
 
-  const renderThemeButton = () => (
-    <button
-      type="button"
-      aria-label={themeLabel}
-      aria-pressed={theme === "dark"}
-      title={themeLabel}
-      onClick={toggleTheme}
-      className="grid h-10 w-10 place-items-center border border-[rgb(var(--line)/0.12)] bg-[rgb(var(--line)/0.04)] text-[rgb(var(--text))] transition-colors hover:border-[rgb(var(--accent)/0.40)] hover:text-[rgb(var(--accent))]"
-    >
-      <ThemeIcon className="h-4 w-4" />
-    </button>
-  );
-
   return (
-    <header className="sticky top-0 z-20 w-full border-b border-[rgb(var(--line)/0.12)] bg-[rgb(var(--bg)/0.88)] backdrop-blur-xl">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
-        <Link
-          href="/"
-          aria-label="hawks.tw README"
-          className="header-wordmark group text-[rgb(var(--text))]"
-        >
-          <span>HAWKS</span>
-          <span className="header-wordmark-outline">.TW</span>
+    <header ref={headerRef} className="site-header sticky top-0 z-20 w-full border-b border-[rgb(var(--line)/0.12)] bg-[rgb(var(--bg)/0.94)] backdrop-blur-xl">
+      <div className="relative mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
+        <Link href="/" aria-label="hawks.tw 首頁" onClick={closeMenu} className="header-wordmark shrink-0 text-[rgb(var(--text))]">
+          <span>HAWKS</span><span className="header-wordmark-outline">.TW</span>
         </Link>
 
-        <div className="flex items-center gap-2">
-          <nav aria-label="主要導覽" className="hidden items-center gap-2 xl:flex">
-            {navItems.map((item) => {
-              // 簡單的路由匹配邏輯
-              const isActive = 
-                item.href === "/" 
-                  ? pathname === "/" 
-                  : pathname.startsWith(item.href);
-              
-              return (
-                <Link
-                  key={item.label}
-                  href={item.href}
-                  onClick={() => setMenuPath(null)}
-                  aria-current={isActive ? "page" : undefined}
-                  className={[
-                    "border-b px-3 py-2 font-mono text-xs font-semibold tracking-[0.04em] transition-colors",
-                    isActive
-                      ? "border-[rgb(var(--accent))] bg-[rgb(var(--accent)/0.07)] text-[rgb(var(--accent))]"
-                      : "border-transparent text-[rgb(var(--muted))] hover:border-[rgb(var(--accent)/0.3)] hover:text-[rgb(var(--text))]",
-                  ].join(" ")}
-                >
-                  {item.label}
-                </Link>
-              );
-            })}
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+          <nav ref={desktopNavRef} aria-label="主要導覽" className="mr-3 hidden items-center gap-1 md:flex">
+            {mainLinks.map(item => (
+              <Link key={item.href} href={item.href} onClick={closeMenu} aria-current={current(item.href)} className="header-main-link">
+                {item.label}
+              </Link>
+            ))}
           </nav>
-          <Link href="/saved/" aria-label="稍後閱讀" title="稍後閱讀" className="grid h-10 w-10 place-items-center border border-[rgb(var(--line)/0.12)] text-[rgb(var(--muted))] hover:text-[rgb(var(--accent))]"><Bookmark className="h-4 w-4" /></Link>
-          {renderThemeButton()}
+          <Link href="/search/" aria-label="搜尋全站" title="搜尋全站" aria-current={current("/search/")} onClick={closeMenu} className="header-icon-button">
+            <Search aria-hidden="true" className="h-[18px] w-[18px]" />
+          </Link>
+          <button type="button" aria-label={themeLabel} aria-pressed={theme === "dark"} title={themeLabel} onClick={toggleTheme} className="header-icon-button">
+            <ThemeIcon aria-hidden="true" className="h-[18px] w-[18px]" />
+          </button>
           <button
             type="button"
             ref={menuButtonRef}
-            aria-controls="mobile-nav"
+            aria-controls="site-navigation-panel"
             aria-expanded={isOpen}
-            aria-label={isOpen ? "Close navigation" : "Open navigation"}
+            aria-label={isOpen ? "關閉更多導覽" : "開啟更多導覽"}
             onClick={() => setMenuPath(isOpen ? null : pathname)}
-            className="grid h-10 w-10 place-items-center border border-[rgb(var(--line)/0.12)] bg-[rgb(var(--line)/0.04)] text-[rgb(var(--text))] transition-colors hover:border-[rgb(var(--accent)/0.40)] xl:hidden"
+            className="header-icon-button header-menu-button"
+            data-active={moreActive || undefined}
           >
-            {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            <span className="hidden md:inline">更多</span>
+            <ChevronDown aria-hidden="true" className={`hidden h-4 w-4 md:block ${isOpen ? "rotate-180" : ""}`} />
+            {isOpen ? <X aria-hidden="true" className="h-5 w-5 md:hidden" /> : <Menu aria-hidden="true" className="h-5 w-5 md:hidden" />}
           </button>
         </div>
-      </div>
 
-      <nav
-        id="mobile-nav"
-        aria-label="手機導覽"
-        aria-hidden={!isOpen}
-        inert={!isOpen}
-        className={[
-          "mx-auto grid max-w-7xl gap-2 px-4 pb-4 transition-[grid-template-rows,opacity] sm:px-6 xl:hidden",
-          isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0",
-        ].join(" ")}
-      >
-        <div className="overflow-hidden">
-          <div className="grid gap-px border border-[rgb(var(--line)/0.12)] bg-[rgb(var(--line)/0.12)] p-px shadow-[0_18px_60px_rgba(0,0,0,0.12)]">
-            {navItems.map((item) => {
-              const isActive =
-                item.href === "/"
-                  ? pathname === "/"
-                  : pathname.startsWith(item.href);
-
-              return (
-                <Link
-                  key={item.label}
-                  href={item.href}
-                  onClick={() => setMenuPath(null)}
-                  aria-current={isActive ? "page" : undefined}
-                  className={[
-                    "bg-[rgb(var(--panel))] px-3 py-2 font-mono text-xs tracking-[0.04em] transition-colors",
-                    isActive
-                      ? "text-[rgb(var(--accent))]"
-                      : "text-[rgb(var(--muted))] hover:text-[rgb(var(--text))]",
-                  ].join(" ")}
-                >
-                  {item.label}
+        <nav id="site-navigation-panel" ref={panelRef} aria-label="網站導覽" hidden={!isOpen} className="header-navigation-panel">
+          <div className="header-nav-group header-mobile-content md:hidden">
+            <h2 className="header-nav-heading">瀏覽內容</h2>
+            <div className="grid grid-cols-3 gap-2">
+              {mainLinks.map(item => (
+                <Link key={item.href} href={item.href} onClick={closeMenu} aria-current={current(item.href)} className="header-content-link">
+                  <span className="font-mono text-sm font-bold">{item.label}</span>
+                  <span className="mt-1 text-[11px] text-[rgb(var(--muted))]">{item.detail}</span>
                 </Link>
-              );
-            })}
+              ))}
+            </div>
           </div>
-        </div>
-      </nav>
+          <div className="header-nav-group">
+            <h2 className="header-nav-heading">閱讀工具</h2>
+            <div className="grid grid-cols-3 gap-2">
+              {readingLinks.map(({ label, href, icon: Icon }) => (
+                <Link key={href} href={href} onClick={closeMenu} aria-current={current(href)} className="header-tool-link">
+                  <Icon aria-hidden="true" className="h-[18px] w-[18px]" />
+                  <span>{label}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+          <div className="header-nav-group">
+            <h2 className="header-nav-heading">關於我</h2>
+            <div className="grid grid-cols-2 gap-2">
+              {aboutLinks.map(item => (
+                <Link key={item.href} href={item.href} onClick={closeMenu} aria-current={current(item.href)} className="header-about-link">
+                  <span>{item.label}</span><ArrowUpRight aria-hidden="true" className="h-3.5 w-3.5" />
+                </Link>
+              ))}
+            </div>
+          </div>
+        </nav>
+      </div>
     </header>
   );
 }
