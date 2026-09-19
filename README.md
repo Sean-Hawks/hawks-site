@@ -170,3 +170,11 @@ npm run build
 
 - [部署指南](DEPLOYMENT.md)：靜態輸出、GitHub Pages 與自訂網域設定。
 - [Discord 網域設定](docs/DISCORD_DOMAINS.md)：邀請頁及 `discord.hawks.tw`、`dc.hawks.tw` 的設定。
+
+## 自動品質檢查
+
+每個 PR 的 Site quality 工作流程會執行 lint、網站和寫作工具測試、套件安全檢查、完整靜態建置，以及匯出 HTML／RSS／sitemap 的本機連結檢查。Deploy 在上傳前也會執行網站回歸測試和輸出檢查。
+
+本機執行 `npm test`、`npm run test:export`、`npm run build`、`npm run check:export`（輸出檢查使用 Python 3 標準函式庫，不連線爬取外站）。GitHub Actions 已固定 commit SHA，Dependabot 每週提供套件和 Action 更新。若要禁止合併失敗的 PR，仍需在 GitHub 分支保護把 Site quality 設為必要檢查。
+
+完整檢查範圍、已修正項目及外部設定限制，見 [2026-09-19 網站檢查紀錄](docs/SITE_AUDIT_2026-09-19.md)。
