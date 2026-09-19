@@ -66,7 +66,12 @@ export const metadata: Metadata = {
   alternates: {
     canonical: siteUrl,
     types: {
-      "application/rss+xml": "/rss.xml",
+      "application/rss+xml": [
+        { url: "/rss.xml", title: "hawks.tw · 全部更新" },
+        { url: "/feeds/blog/rss.xml", title: "hawks.tw · Blog 文章" },
+        { url: "/feeds/talk/rss.xml", title: "hawks.tw · Talk 近況" },
+        { url: "/feeds/library/rss.xml", title: "hawks.tw · Library 評論" },
+      ],
     },
   },
   icons: {

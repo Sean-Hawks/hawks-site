@@ -236,11 +236,12 @@
 
           <section class="hero">
             <div class="eyebrow">RSS Feed</div>
-            <h1>Subscribe to hawks.tw</h1>
+            <h1><xsl:value-of select="/rss/channel/title" /></h1>
             <p>
               這是一個給 RSS reader 讀取的更新流。你可以把這個網址貼到 Feedly、Inoreader、
-              NetNewsWire、Reeder、Thunderbird 或其他 RSS reader，之後就能收到 Blog、Talk 和 Library Review 的更新。
+              NetNewsWire、Reeder、Thunderbird 或其他 RSS reader，之後就能收到這個分類的更新。
             </p>
+            <p><xsl:value-of select="/rss/channel/description" /></p>
             <div class="actions">
               <a class="button primary" href="/subscribe/">訂閱說明</a>
               <a class="button" href="/subscribe/">Email 訂閱</a>
