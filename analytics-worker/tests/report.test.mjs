@@ -28,3 +28,15 @@ test('weekly comparison requires two complete weeks and handles a zero baseline'
  assert.equal(weeklyComparison(data(days.slice(1)),now),null);
  assert.equal(weeklyComparison(data(days,{from:'2026-01-08'}),now),null);
 });
+
+test('ranked links cannot leave the site or normalize hostile paths into a different destination',async()=>{
+ const {pageLink,pageInfo,popularRows}=await import('../public/report.js');
+ for(const key of ['https://evil.example/','//evil.example/','/\\evil.example/','/a/../secret/','/a?token=x','/a#x','/a\n'])assert.equal(pageLink(key),null);
+ assert.equal(pageLink('/blog/hello/'),'https://hawks.tw/blog/hello/');
+ assert.equal(pageInfo('/unknown/',{}).title,'/unknown/');
+ const catalog={'/blog/hello/':{title:'你好世界',kind:'文章'},'/':{title:'首頁',kind:'導覽'}};
+ const pages=[{key:'/',pageviews:99},{key:'/blog/hello/',pageviews:15}];
+ assert.equal(popularRows(pages,catalog,'你好',true)[0].pageviews,15);
+ assert.equal(popularRows(pages,catalog,'',true).length,1);
+ assert.equal(popularRows(pages,catalog,'not found').length,0);
+});

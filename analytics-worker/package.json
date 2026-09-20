@@ -12,7 +12,9 @@
     "deploy": "wrangler deploy --config wrangler.production.jsonc",
     "db:local": "wrangler d1 migrations apply ANALYTICS_DB --local --config wrangler.local.jsonc",
     "db:production": "wrangler d1 migrations apply ANALYTICS_DB --remote --config wrangler.production.jsonc",
-    "backfill": "node scripts/backfill.mjs"
+    "backfill": "node scripts/backfill.mjs",
+    "predev": "node scripts/build-page-catalog.mjs",
+    "predeploy": "node scripts/build-page-catalog.mjs"
   },
   "devDependencies": {
     "miniflare": "5.20260918.0-alpha",
