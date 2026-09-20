@@ -67,3 +67,11 @@ D1 備份不包含 Worker secrets，兩個 token 須另行保管。還原時匯�
 API schema 已依 Cloudflare GraphQL introspection 核對：`AccountRumPageloadEventsAdaptiveGroupsFilter_InputObject`、`count`、`sum.visits`、`avg.sampleInterval`、`requestPath`、`refererHost` 與對應排序／游標欄位。正式啟用前須用實際帳號驗證查詢。
 
 依據：[Web Analytics 保留期及抽樣](https://developers.cloudflare.com/web-analytics/faq/)、[分析 API 讀取權限](https://developers.cloudflare.com/analytics/graphql-api/getting-started/authentication/api-token-auth/)、[Cron Triggers](https://developers.cloudflare.com/workers/configuration/cron-triggers/)。
+
+## 報表閱讀與情境試算
+
+- 預設顯示每日瀏覽，跨 400 天以上改為每月，可手動切換；缺日不畫成零，月份只加總所選日期。
+- 平均值以已保存天數為分母；兩週比較僅在區間最後 14 天皆完整時顯示。
+- 漏記試算預設 0%，公式是已保存瀏覽數 ÷（1 − 假設漏記比例）。這不是實測修正、可信區間或保證下限，不會改動資料庫或匯出數字。
+- Cloudflare GraphQL 的抽樣數值已是估計，不能再次乘上 sampleInterval。參考 https://developers.cloudflare.com/analytics/graphql-api/sampling/ 。
+- 歸檔請求使用 Workers 支援的 `redirect: manual` 並拒絕非 2xx；不跟隨重新導向、不轉送權杖。部署驗證應包含 Cloudflare 遠端 scheduled 執行，僅在 Node.js 手動呼叫不足以覆蓋平台相容性。
