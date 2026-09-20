@@ -18,6 +18,15 @@
       <section><h2>平均每日瀏覽</h2><p id="average">—</p><span id="average-note">依已保存天數計算</span></section>
       <section><h2>最高單日瀏覽</h2><p id="peak">—</p><span id="peak-note">—</span></section>
     </div>
+    <section class="panel popular-panel" aria-labelledby="popular-title">
+      <div class="title-row"><div><p class="eyebrow">WHAT PEOPLE READ</p><h2 id="popular-title">大家都在看哪些頁面？</h2></div><label class="content-toggle"><input id="content-only" type="checkbox">只看內容頁面</label></div>
+      <p id="popular-note" class="hint"></p>
+      <label class="page-search">搜尋頁面<input id="page-search" type="search" placeholder="文章名稱或網址路徑" autocomplete="off"></label>
+      <p id="popular-status" class="hint" role="status" aria-live="polite"></p>
+      <ol id="popular-list" class="popular-list"></ol>
+      <button id="popular-more" class="secondary" hidden>看更多頁面</button>
+      <p class="hint">比例以這段期間的頁面明細總和計算，可能因抽樣與上方總瀏覽數略有不同。這是瀏覽次數，不是不重複讀者數。</p>
+    </section>
     <section class="panel trend-panel">
       <div class="title-row"><div><p class="eyebrow">TRAFFIC OVER TIME</p><h2 id="trend-title">每日瀏覽趨勢</h2></div><label>顯示方式<select id="granularity"><option value="day">每日</option><option value="month">每月</option></select></label></div>
       <p id="comparison" class="trend-summary"></p>

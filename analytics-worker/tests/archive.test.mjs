@@ -154,3 +154,23 @@ test('analytics redirects are rejected without forwarding credentials or replaci
   assert.equal(calls,1);
   assert.equal((await db.prepare('SELECT pageviews FROM daily_stats WHERE day=?').bind(DAY).first()).pageviews,12);
 });
+
+test('popular pages aggregate the selected days, merge slash aliases and preserve sampled estimates',async()=>{
+  const sample=await collectDay(env(),DAY,options());
+  await storeDay(db,env(),{...sample,day:'2026-09-17',pages:[{key:'/blog/hello',pageviews:20},{key:'/blog/other/',pageviews:5}]});
+  await storeDay(db,env(),{...sample,pages:[{key:'/blog/hello/',pageviews:30},{key:'/',pageviews:8}]});
+  let response=await call('/api/report?from=2026-09-17&to=2026-09-18');
+  const data=await response.json();
+  assert.deepEqual(data.popularPages,{rows:[{key:'/blog/hello/',pageviews:50},{key:'/',pageviews:8},{key:'/blog/other/',pageviews:5}],total:63,count:3});
+  response=await call('/api/report?from=2026-09-18&to=2026-09-18');
+  assert.equal((await response.json()).popularPages.rows[0].pageviews,30);
+  response=await call('/api/report?from=2026-09-14&to=2026-09-14');
+  assert.deepEqual((await response.json()).popularPages,{rows:[],total:0,count:0});
+});
+
+test('popular page limit retains the full denominator and reports omitted paths',async()=>{
+  const sample=await collectDay(env(),DAY,options());
+  await storeDay(db,env(),{...sample,pages:Array.from({length:502},(_,i)=>({key:'/page-'+i,pageviews:1}))});
+  const response=await call();const {popularPages}=await response.json();
+  assert.equal(popularPages.rows.length,500);assert.equal(popularPages.count,502);assert.equal(popularPages.total,502);
+});

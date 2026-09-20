@@ -24,7 +24,7 @@ export function createHandler({ now = () => Date.now() } = {}) {
       const url = new URL(request.url);
       if (!['GET', 'HEAD'].includes(request.method)) return json({ error: 'method_not_allowed' }, 405);
       if (!url.pathname.startsWith('/api/')) {
-        if (!['/', '/app.js', '/report.js', '/style.css'].includes(url.pathname)) return json({ error: 'not_found' }, 404);
+        if (!['/', '/app.js', '/report.js', '/page-catalog.js', '/style.css'].includes(url.pathname)) return json({ error: 'not_found' }, 404);
         const response = await env.ASSETS.fetch(request);
         const headers = new Headers(response.headers);
         for (const [key, value] of Object.entries(security)) headers.set(key, value);
@@ -51,16 +51,27 @@ export function createHandler({ now = () => Date.now() } = {}) {
         if (!validDay(from) || !validDay(to) || from > to || (Date.parse(to) - Date.parse(from)) / DAY > 36600) {
           return json({ error: 'invalid_range' }, 400);
         }
-        const [{ results: days }, status] = await Promise.all([
+        const [{ results: days }, status, { results: pages }] = await Promise.all([
           env.ANALYTICS_DB.prepare('SELECT day,pageviews,visits,sample_interval,captured_at FROM daily_stats WHERE day >= ? AND day <= ? ORDER BY day').bind(from, to).all(),
           env.ANALYTICS_DB.prepare('SELECT last_attempt,last_success,last_error FROM sync_state WHERE id=1').first(),
+          // Sum all saved daily page estimates before limiting results. Preserve case and
+          // merge trailing-slash aliases; do not multiply already estimated counts.
+          env.ANALYTICS_DB.prepare(`WITH grouped AS (
+            SELECT CASE WHEN rtrim(json_extract(p.value,'$.key'),'/') = '' THEN '/'
+              ELSE rtrim(json_extract(p.value,'$.key'),'/') || '/' END AS key,
+              SUM(json_extract(p.value,'$.pageviews')) AS pageviews
+            FROM daily_stats d, json_each(d.payload,'$.pages') p
+            WHERE d.day >= ? AND d.day <= ?
+            GROUP BY 1 HAVING SUM(json_extract(p.value,'$.pageviews')) > 0
+          ) SELECT key,pageviews,COUNT(*) OVER() AS page_count,SUM(pageviews) OVER() AS page_total
+            FROM grouped ORDER BY pageviews DESC,key ASC LIMIT 500`).bind(from,to).all(),
         ]);
         const end = to < today(now()) ? to : shiftDay(today(now()), -1);
         const start = from > env.ARCHIVE_START_DATE ? from : env.ARCHIVE_START_DATE;
         const expectedDays = end >= start ? Math.floor((Date.parse(end) - Date.parse(start)) / DAY) + 1 : 0;
         const total = days.reduce((a, d) => ({ pageviews: a.pageviews + d.pageviews, visits: a.visits + d.visits }), { pageviews: 0, visits: 0 });
         return json({ host: env.SITE_HOST, timeZone: env.TIME_ZONE, archiveStart: env.ARCHIVE_START_DATE,
-          from, to, days, total, expectedDays, missingDays: Math.max(0, expectedDays - days.length),
+          from, to, days, total, popularPages: { rows: pages.map(({key,pageviews}) => ({key,pageviews})), total: pages[0]?.page_total || 0, count: pages[0]?.page_count || 0 }, expectedDays, missingDays: Math.max(0, expectedDays - days.length),
           sampledDays: days.filter(d => d.sample_interval > 1).length,
           scheduleConfigured: Boolean(env.CF_ANALYTICS_TOKEN), status });
       } catch { return json({ error: 'archive_unavailable' }, 503); }

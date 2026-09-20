@@ -75,3 +75,9 @@ API schema 已依 Cloudflare GraphQL introspection 核對：`AccountRumPageloadE
 - 漏記試算預設 0%，公式是已保存瀏覽數 ÷（1 − 假設漏記比例）。這不是實測修正、可信區間或保證下限，不會改動資料庫或匯出數字。
 - Cloudflare GraphQL 的抽樣數值已是估計，不能再次乘上 sampleInterval。參考 https://developers.cloudflare.com/analytics/graphql-api/sampling/ 。
 - 歸檔請求使用 Workers 支援的 `redirect: manual` 並拒絕非 2xx；不跟隨重新導向、不轉送權杖。部署驗證應包含 Cloudflare 遠端 scheduled 執行，僅在 Node.js 手動呼叫不足以覆蓋平台相容性。
+
+## 所選期間熱門頁面
+
+報表會在 D1 內加總所選日期的每日頁面明細，合併結尾斜線相異的路徑，依瀏覽次數排序。最多傳回前 500 個頁面，比例分母仍為全部頁面明細總和；缺日、抽樣與資料截取上限會顯示在介面中。搜尋及「只看內容頁面」僅篩選已載入的排行。
+
+`npm run dev` 與 `npm run deploy` 會先用網站既有 `getReadingCatalog()` 產生公開文章名稱對照表（需要先在專案根目錄 `npm ci`）。不輸出草稿、私人內容或任何流量／金鑰。未知或已移除頁面仍保留原路徑；無法安全驗證為本站的路徑不產生連結。

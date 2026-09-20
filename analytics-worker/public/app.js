@@ -1,4 +1,5 @@
-import { calendarRows, periodSummary, estimateViews, weeklyComparison } from './report.js';
+import { pageCatalog } from './page-catalog.js';
+import { calendarRows, periodSummary, estimateViews, weeklyComparison, popularRows } from './report.js';
 /* This page deliberately keeps its credential in memory only. */
 const byId = id => document.getElementById(id);
 const number = n => new Intl.NumberFormat('zh-TW').format(n);
@@ -71,6 +72,34 @@ function renderEstimate() {
   byId('estimate-formula').textContent = `${number(report.total.pageviews)} ÷ ${(1-missed/100).toFixed(2)}；假設有 ${100-missed}% 的瀏覽被記錄。`;
   byId('estimate-coverage').textContent = report.missingDays ? `所選期間尚缺 ${report.missingDays} 天，僅試算已保存的 ${report.days.length} 天，不補猜缺日。` : `僅適用於 ${report.from} 至 ${report.to} 已保存的期間。`;
 }
+let popularLimit = 10;
+function renderPopular() {
+  if (!report) return;
+  const pages = report.popularPages || {rows:[],total:0,count:0};
+  const rows = popularRows(pages.rows,pageCatalog,byId('page-search').value,byId('content-only').checked);
+  const visible=rows.slice(0,popularLimit), maximum=Math.max(1,...rows.map(row=>row.pageviews));
+  byId('popular-note').textContent=`${report.from} — ${report.to} · 已保存 ${report.days.length} 天${report.missingDays ? `，尚缺 ${report.missingDays} 天` : ''} · 同頁面的結尾斜線已合併。`;
+  byId('popular-status').textContent=rows.length ? `顯示 ${visible.length} / ${rows.length} 個頁面${pages.count>pages.rows.length ? `（僅載入瀏覽最多的 ${pages.rows.length} 個，共 ${pages.count} 個頁面）` : ''}` : pages.rows.length ? '沒有符合條件的頁面，試試其他名稱或取消篩選。' : '這段期間尚無頁面瀏覽紀錄。';
+  byId('popular-list').replaceChildren();
+  for (const [index,item] of visible.entries()) {
+    const li=document.createElement('li');
+    const rank=document.createElement('span');rank.className='page-rank';rank.textContent=String(index+1).padStart(2,'0');rank.setAttribute('aria-hidden','true');
+    const main=document.createElement('div');main.className='rank-content';
+    const heading=document.createElement('div');heading.className='rank-heading';
+    const title=document.createElement(item.href?'a':'span');title.textContent=item.title;
+    if(item.href){title.href=item.href;title.target='_blank';title.rel='noopener noreferrer';title.setAttribute('aria-label',`${item.title}（開新分頁）`);}
+    const count=document.createElement('strong');count.textContent=`${number(item.pageviews)} 次`;
+    heading.append(title,count);
+    const info=document.createElement('div');info.className='rank-meta';
+    const path=document.createElement('span');path.textContent=`${item.kind} · ${item.key}`;
+    const share=document.createElement('span');const percentage=pages.total?item.pageviews/pages.total*100:0;share.textContent=percentage>0 && percentage<0.1 ? '<0.1%' : `${percentage.toFixed(1)}%`;
+    info.append(path,share);
+    const bar=svgNode('svg',{viewBox:'0 0 1000 5',preserveAspectRatio:'none','aria-hidden':'true',class:'rank-bar'});
+    bar.append(svgNode('rect',{width:1000,height:5,class:'rank-track'}),svgNode('rect',{width:Math.round(item.pageviews/maximum*1000),height:5,class:'rank-fill'}));
+    main.append(heading,info,bar);li.append(rank,main);byId('popular-list').append(li);
+  }
+  byId('popular-more').hidden=visible.length>=rows.length;
+}
 function render(data) {
   report = data;
   byId('from').value = data.from; byId('to').value = data.to;
@@ -91,7 +120,7 @@ function render(data) {
   byId('sync').classList.toggle('warning', warnings.length > 0);
   byId('sync').textContent = warnings.join(' ') || (data.status?.last_success ? `最近歸檔成功：${new Date(data.status.last_success).toLocaleString('zh-TW',{timeZone:'Asia/Taipei'})} · 每天 04:00 更新` : '尚未有成功歸檔紀錄。');
   byId('granularity').value = data.expectedDays > 400 ? 'month' : 'day';
-  renderTrend(); renderEstimate();
+  popularLimit=10; renderPopular(); renderTrend(); renderEstimate();
   byId('detail-day').replaceChildren();
   for (const day of [...data.days].reverse()) { const option=document.createElement('option'); option.value=day.day; option.textContent=day.day; byId('detail-day').append(option); }
   byId('export').disabled = !data.days.length;
@@ -129,7 +158,7 @@ byId('login-form').addEventListener('submit',async event=>{
   const button=event.submitter; button.disabled=true;
   try { await load(); } catch(error) { token=''; message(error.message); } finally { button.disabled=false; }
 });
-byId('logout').addEventListener('click',()=>{ token=''; report=null; detail=null; detailRequest++; reportRequest++; byId('dashboard').hidden=true; byId('login').hidden=false; byId('logout').hidden=true; for(const id of ['pages','sources','months','chart','detail-day']) byId(id).replaceChildren(); message('已登出。'); });
+byId('logout').addEventListener('click',()=>{ token=''; report=null; detail=null; detailRequest++; reportRequest++; byId('dashboard').hidden=true; byId('login').hidden=false; byId('logout').hidden=true; for(const id of ['pages','sources','months','chart','detail-day','popular-list']) byId(id).replaceChildren(); message('已登出。'); });
 byId('range').addEventListener('submit',async event=>{event.preventDefault();try{await load(byId('from').value,byId('to').value);}catch(error){message(error.message);}});
 byId('all').addEventListener('click',async()=>{try{await load();}catch(error){message(error.message);}});
 byId('year').addEventListener('click',async()=>{try{await load(new Date(Date.now()+8*3600000).getUTCFullYear()+'-01-01');}catch(error){message(error.message);}});
@@ -143,3 +172,7 @@ byId('recent').addEventListener('click',async()=>{const end=Date.now()+8*3600000
 
 let resizeFrame;
 window.addEventListener('resize',()=>{cancelAnimationFrame(resizeFrame);resizeFrame=requestAnimationFrame(()=>{if(report)chart(calendarRows(report,byId('granularity').value));});});
+
+byId('page-search').addEventListener('input',()=>{popularLimit=10;renderPopular();});
+byId('content-only').addEventListener('change',()=>{popularLimit=10;renderPopular();});
+byId('popular-more').addEventListener('click',()=>{popularLimit+=20;renderPopular();});

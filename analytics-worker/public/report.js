@@ -38,3 +38,25 @@ export function weeklyComparison(data, now = Date.now()) {
   const current = rows.slice(7).reduce((sum, row) => sum + row.pageviews, 0);
   return { previous, current, change: previous ? (current - previous) / previous * 100 : null };
 }
+
+// Links must remain on hawks.tw even if a stored request path is hostile or malformed.
+export function pageLink(key) {
+  if (typeof key !== 'string' || !key.startsWith('/') || key.startsWith('//') || /[\\\u0000-\u0020?#]/.test(key)) return null;
+  try {
+    const url=new URL(key,'https://hawks.tw');
+    if (url.origin !== 'https://hawks.tw' || url.pathname !== key) return null;
+    return url.href;
+  } catch { return null; }
+}
+export function pageInfo(key, catalog) {
+  const known=Object.hasOwn(catalog,key) ? catalog[key] : null;
+  let label=key;
+  try { label=decodeURIComponent(key); } catch { /* Keep the original path readable. */ }
+  return {title:known?.title || label,kind:known?.kind || '其他',href:pageLink(key)};
+}
+export function popularRows(pages, catalog, query='', contentOnly=false) {
+  const term=query.trim().toLocaleLowerCase('zh-TW');
+  return pages.map(page=>({...page,...pageInfo(page.key,catalog)})).filter(page=>
+    (!contentOnly || ['文章','近況','收藏'].includes(page.kind)) &&
+    (!term || `${page.title} ${page.key}`.toLocaleLowerCase('zh-TW').includes(term)));
+}
