@@ -24,7 +24,7 @@ export function createHandler({ now = () => Date.now() } = {}) {
       const url = new URL(request.url);
       if (!['GET', 'HEAD'].includes(request.method)) return json({ error: 'method_not_allowed' }, 405);
       if (!url.pathname.startsWith('/api/')) {
-        if (!['/', '/app.js', '/style.css'].includes(url.pathname)) return json({ error: 'not_found' }, 404);
+        if (!['/', '/app.js', '/report.js', '/style.css'].includes(url.pathname)) return json({ error: 'not_found' }, 404);
         const response = await env.ASSETS.fetch(request);
         const headers = new Headers(response.headers);
         for (const [key, value] of Object.entries(security)) headers.set(key, value);

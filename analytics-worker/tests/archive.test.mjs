@@ -30,7 +30,7 @@ function row(count=12, dimension, key='/', visits=3) {return {count,sum:{visits}
 function fakeFetch({failDimension,empty=false,seen=[]}={}) {
   return async(url,options)=>{
     assert.equal(url,'https://api.cloudflare.com/client/v4/graphql');
-    assert.equal(options.redirect,'error');
+    assert.equal(options.redirect,'manual');
     const request=JSON.parse(options.body);seen.push(request);
     const dimension=/dimensions \{ (\w+) \}/.exec(request.query)?.[1];
     if(dimension===failDimension && failDimension)return result([], [{message:'do not expose upstream text'}]);
@@ -140,4 +140,17 @@ test('reports cross calendar years and preserve the original sampling estimate',
   await archiveDay(settings,'2026-01-01',{now:clock,fetcher:sampled});
   const response=await createHandler({now:()=>clock}).fetch(new Request('https://analytics.example/api/report?from=2025-01-01&to=2026-12-31',{headers:{Authorization:`Bearer ${SECRET}`}}),settings);
   const data=await response.json();assert.equal(data.total.pageviews,40);assert.equal(data.sampledDays,2);assert.equal(data.expectedDays,3);assert.equal(data.missingDays,1);
+});
+
+test('analytics redirects are rejected without forwarding credentials or replacing an archived day',async()=>{
+  await archiveDay(env(),DAY,options());
+  let calls=0;
+  const fetcher=async(url,init)=>{
+    calls++; assert.equal(init.redirect,'manual');
+    assert.equal(url,'https://api.cloudflare.com/client/v4/graphql');
+    return new Response(null,{status:302,headers:{Location:'https://untrusted.example/'}});
+  };
+  await assert.rejects(()=>archiveDay(env(),DAY,options({fetcher})),/analytics_http_302/);
+  assert.equal(calls,1);
+  assert.equal((await db.prepare('SELECT pageviews FROM daily_stats WHERE day=?').bind(DAY).first()).pageviews,12);
 });

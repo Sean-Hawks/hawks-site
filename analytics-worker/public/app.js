@@ -1,3 +1,4 @@
+import { calendarRows, periodSummary, estimateViews, weeklyComparison } from './report.js';
 /* This page deliberately keeps its credential in memory only. */
 const byId = id => document.getElementById(id);
 const number = n => new Intl.NumberFormat('zh-TW').format(n);
@@ -16,53 +17,81 @@ function download(name, text, type) {
   const link = document.createElement('a'); link.href = url; link.download = name; link.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
-function monthlyRows(data) {
-  const months = new Map();
-  const dayMap = new Map(data.days.map(day => [day.day, day]));
-  const start = data.from > data.archiveStart ? data.from : data.archiveStart;
-  const yesterday = new Date(Date.now() + 8 * 3600000 - 86400000).toISOString().slice(0,10);
-  const end = data.to < yesterday ? data.to : yesterday;
-  for (let date = Date.parse(start); date <= Date.parse(end); date += 86400000) {
-    const key = new Date(date).toISOString().slice(0,10), month = key.slice(0,7);
-    if (!months.has(month)) months.set(month, { month, pageviews:0, visits:0, saved:0, expected:0 });
-    const value = months.get(month), day = dayMap.get(key); value.expected++;
-    if (day) { value.saved++; value.pageviews += day.pageviews; value.visits += day.visits; }
-  }
-  return [...months.values()];
+function svgNode(name, attributes = {}, text) {
+  const node = document.createElementNS('http://www.w3.org/2000/svg', name);
+  for (const [key, value] of Object.entries(attributes)) node.setAttribute(key, value);
+  if (text !== undefined) node.textContent = text;
+  return node;
 }
-function chart(months) {
+function chart(rows) {
   byId('chart').replaceChildren();
-  if (!months.some(month => month.saved === month.expected)) {
-    const note = document.createElement('p'); note.className='hint'; note.textContent='所選月份尚有缺日，請先在下表查看已保存的數值。'; byId('chart').append(note); return;
+  if (!rows.some(row => row.saved === row.expected)) {
+    const note = document.createElement('p'); note.className='hint'; note.textContent='尚無完整紀錄可繪製，請在下表查看已保存的數值。'; byId('chart').append(note); return;
   }
-  const ns = 'http://www.w3.org/2000/svg';
-  const svg = document.createElementNS(ns,'svg'); svg.setAttribute('viewBox','0 0 960 180');
-  const max = Math.max(1, ...months.map(m => m.pageviews));
+  const width = Math.max(280, byId('chart').clientWidth), left = 48, right = width - 12;
+  const svg = svgNode('svg', { viewBox:`0 0 ${width} 260` });
+  const max = Math.max(1, ...rows.filter(row => row.saved === row.expected).map(row => row.pageviews));
+  const xAt = index => rows.length === 1 ? (left + right) / 2 : left + index / (rows.length - 1) * (right-left);
+  for (let i = 0; i <= 3; i++) {
+    const y = 216 - i * 64;
+    svg.append(svgNode('line', { x1:left, x2:right, y1:y, y2:y }));
+    svg.append(svgNode('text', { x:44, y:y+4, 'text-anchor':'end' }, number(Math.round(max*i/3))));
+  }
   let points = [];
-  const line = () => { if (!points.length) return; const path = document.createElementNS(ns,'polyline'); path.setAttribute('points',points.join(' ')); svg.append(path); points=[]; };
-  months.forEach((m,i) => {
-    // Missing periods are gaps, never plotted as measured zeroes.
-    if (m.saved !== m.expected) { line(); return; }
-    const x = 12 + i / Math.max(1,months.length-1) * 936, y = 165 - m.pageviews / max * 145;
+  const line = () => { if (!points.length) return; svg.append(svgNode('polyline', { points:points.join(' ') })); points=[]; };
+  rows.forEach((row, index) => {
+    if (row.saved !== row.expected) { line(); return; }
+    const x = xAt(index), y = 216 - row.pageviews / max * 192;
     points.push(`${x},${y}`);
-    const dot = document.createElementNS(ns,'circle'); dot.setAttribute('cx',x); dot.setAttribute('cy',y); dot.setAttribute('r','3'); dot.setAttribute('fill','#3d654d');
-    const title = document.createElementNS(ns,'title'); title.textContent=`${m.month}：${number(m.pageviews)} 次瀏覽`; dot.append(title); svg.append(dot);
-  }); line(); byId('chart').append(svg);
+    const dot = svgNode('circle', { cx:x, cy:y, r:rows.length > 100 ? 2 : 3 });
+    dot.append(svgNode('title', {}, `${row.key}：${number(row.pageviews)} 次瀏覽${row.sampled ? '（含抽樣估計）' : ''}`)); svg.append(dot);
+  });
+  line();
+  const labels = [...new Set(width < 500 ? [0, rows.length-1] : [0, Math.floor((rows.length-1)/2), rows.length-1])];
+  for (const i of labels) svg.append(svgNode('text', { x:xAt(i), y:247, 'text-anchor':i===0?'start':i===rows.length-1?'end':'middle' }, rows[i].key));
+  byId('chart').append(svg);
+}
+function renderTrend() {
+  if (!report) return;
+  const mode = byId('granularity').value;
+  const rows = calendarRows(report, mode);
+  byId('trend-title').textContent = mode === 'day' ? '每日瀏覽趨勢' : '每月瀏覽趨勢';
+  byId('table-caption').textContent = mode === 'day' ? '每日統計' : '每月統計（僅計所選日期範圍）';
+  byId('chart-note').textContent = mode === 'day' ? '缺少紀錄的日期以斷線呈現，不視為零瀏覽。完整數值可在下方展開。' : '月份只加總所選日期，不一定是整月；缺日月份以斷線呈現。';
+  chart(rows); byId('months').replaceChildren();
+  for (const item of [...rows].reverse()) {
+    const row=document.createElement('tr'); cell(row,item.key); cell(row,item.saved?number(item.pageviews):'—'); cell(row,item.saved?number(item.visits):'—'); cell(row,`${item.saved} / ${item.expected}`); byId('months').append(row);
+  }
+}
+function renderEstimate() {
+  if (!report) return;
+  const missed = Number(byId('missed').value), estimate = estimateViews(report.total.pageviews, missed);
+  byId('missed-label').textContent = `${missed}%`;
+  byId('estimate').textContent = report.days.length && estimate !== null ? number(estimate) : '—';
+  byId('estimate-formula').textContent = `${number(report.total.pageviews)} ÷ ${(1-missed/100).toFixed(2)}；假設有 ${100-missed}% 的瀏覽被記錄。`;
+  byId('estimate-coverage').textContent = report.missingDays ? `所選期間尚缺 ${report.missingDays} 天，僅試算已保存的 ${report.days.length} 天，不補猜缺日。` : `僅適用於 ${report.from} 至 ${report.to} 已保存的期間。`;
 }
 function render(data) {
   report = data;
   byId('from').value = data.from; byId('to').value = data.to;
   byId('pageviews').textContent = number(data.total.pageviews);
   byId('visits').textContent = number(data.total.visits);
-  byId('days').textContent = number(data.days.length);
+  const { average, peak } = periodSummary(data);
+  byId('average').textContent = average === null ? '—' : number(Math.round(average * 10) / 10);
+  byId('average-note').textContent = `依已保存的 ${data.days.length} 天計算${data.missingDays ? '，不含缺日' : ''}`;
+  byId('peak').textContent = peak ? number(peak.pageviews) : '—';
+  byId('peak-note').textContent = peak ? `${peak.day}${data.missingDays ? ' · 已保存部分' : ''}` : '所選期間尚無紀錄';
+  const comparison = weeklyComparison(data);
+  byId('comparison').textContent = comparison ? `區間最後 7 天 ${number(comparison.current)} 次瀏覽，前 7 天 ${number(comparison.previous)} 次${comparison.change === null ? '；前期為零，不計算成長率。' : `，${comparison.change >= 0 ? '增加' : '減少'} ${number(Math.abs(Math.round(comparison.change * 10) / 10))}%。`}` : '累積連續 14 天完整紀錄後，可比較區間最後兩週的變化。';
   byId('coverage').textContent = `${data.from} — ${data.to} · 台灣時間 · ${data.missingDays ? `缺少 ${data.missingDays} 天，總數為已保存部分` : '所選期間已完整歸檔'} · ${data.sampledDays} 天包含抽樣估計。`;
   const warnings = [];
   if (!data.scheduleConfigured) warnings.push('自動歸檔尚未啟用，需要設定 Cloudflare 統計讀取權杖。');
   if (data.status?.last_error) warnings.push('最近一次歸檔失敗，既有資料仍保留。');
   if (data.scheduleConfigured && (!data.status?.last_success || Date.now()-Date.parse(data.status.last_success)>48*3600000)) warnings.push('超過 48 小時未確認歸檔成功，請檢查排程。');
-  byId('sync').textContent = warnings.join(' ') || `最近歸檔成功：${new Date(data.status.last_success).toLocaleString('zh-TW',{timeZone:'Asia/Taipei'})}`;
-  const months = monthlyRows(data); chart(months); byId('months').replaceChildren();
-  for (const month of months) { const row = document.createElement('tr'); cell(row,month.month); cell(row,month.saved ? number(month.pageviews) : '—'); cell(row,month.saved ? number(month.visits) : '—'); cell(row,`${month.saved} / ${month.expected}`); byId('months').append(row); }
+  byId('sync').classList.toggle('warning', warnings.length > 0);
+  byId('sync').textContent = warnings.join(' ') || (data.status?.last_success ? `最近歸檔成功：${new Date(data.status.last_success).toLocaleString('zh-TW',{timeZone:'Asia/Taipei'})} · 每天 04:00 更新` : '尚未有成功歸檔紀錄。');
+  byId('granularity').value = data.expectedDays > 400 ? 'month' : 'day';
+  renderTrend(); renderEstimate();
   byId('detail-day').replaceChildren();
   for (const day of [...data.days].reverse()) { const option=document.createElement('option'); option.value=day.day; option.textContent=day.day; byId('detail-day').append(option); }
   byId('export').disabled = !data.days.length;
@@ -89,10 +118,11 @@ async function loadDetail() {
 }
 async function load(from='',to='') {
   const sequence = ++reportRequest;
+  detailRequest++; detail=null; byId('export-day').disabled=true;
   message('正在讀取紀錄…');
   const data = await api(`/api/report?${new URLSearchParams({ ...(from?{from}:{}),...(to?{to}:{}) })}`);
   if (sequence !== reportRequest || !token) return;
-  render(data); byId('dashboard').hidden=false; byId('login').hidden=true; byId('logout').hidden=false; message(''); await loadDetail();
+  byId('dashboard').hidden=false; byId('login').hidden=true; byId('logout').hidden=false; render(data); message(''); await loadDetail();
 }
 byId('login-form').addEventListener('submit',async event=>{
   event.preventDefault(); token=byId('token').value.trim(); byId('token').value='';
@@ -106,3 +136,10 @@ byId('year').addEventListener('click',async()=>{try{await load(new Date(Date.now
 byId('detail-day').addEventListener('change',loadDetail);
 byId('export').addEventListener('click',()=>{if(!report)return; const rows=[['day_taipei','pageviews','visits','sample_interval','captured_at'],...report.days.map(d=>[d.day,d.pageviews,d.visits,d.sample_interval??'',d.captured_at])]; download(`hawks-traffic-${report.from}-${report.to}.csv`,'\ufeff'+rows.map(r=>r.join(',')).join('\r\n'),'text/csv;charset=utf-8');});
 byId('export-day').addEventListener('click',()=>{if(detail)download(`hawks-traffic-${detail.day}.json`,JSON.stringify(detail,null,2),'application/json');});
+
+byId('granularity').addEventListener('change',renderTrend);
+byId('missed').addEventListener('input',renderEstimate);
+byId('recent').addEventListener('click',async()=>{const end=Date.now()+8*3600000-86400000;try{await load(new Date(end-29*86400000).toISOString().slice(0,10),new Date(end).toISOString().slice(0,10));}catch(error){message(error.message);}});
+
+let resizeFrame;
+window.addEventListener('resize',()=>{cancelAnimationFrame(resizeFrame);resizeFrame=requestAnimationFrame(()=>{if(report)chart(calendarRows(report,byId('granularity').value));});});

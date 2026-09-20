@@ -69,7 +69,8 @@ export async function queryGroups(env, filter, dimension, fetcher = fetch) {
   let response;
   try {
     response = await fetcher('https://api.cloudflare.com/client/v4/graphql', {
-      method: 'POST', redirect: 'error', signal: AbortSignal.timeout(20000),
+      // Workers supports manual/follow only. Reject non-2xx below without forwarding the bearer token.
+      method: 'POST', redirect: 'manual', signal: AbortSignal.timeout(20000),
       headers: { Authorization: `Bearer ${env.CF_ANALYTICS_TOKEN}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ query, variables: { account: env.CF_ACCOUNT_ID, filter } }),
     });

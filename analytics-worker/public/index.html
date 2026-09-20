@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="zh-Hant">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>流量紀錄 · hawks.tw</title><link rel="stylesheet" href="/style.css"><script src="/app.js" defer></script></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>流量紀錄 · hawks.tw</title><link rel="stylesheet" href="/style.css"><script type="module" src="/app.js"></script></head>
 <body>
 <header><a href="https://hawks.tw/">HAWKS.TW</a><span>私人流量紀錄</span><button id="logout" hidden>登出</button></header>
 <main>
@@ -9,12 +9,31 @@
   </section>
   <p id="message" role="status" aria-live="polite"></p>
   <div id="dashboard" hidden>
-    <div class="title-row"><div><p class="eyebrow">THE LONG VIEW</p><h1>流量紀錄</h1></div><button id="export" class="secondary">匯出每日 CSV</button></div>
-    <form id="range"><label>從<input type="date" id="from" required></label><label>到<input type="date" id="to" required></label><button type="submit">查看</button><button type="button" id="year" class="secondary">今年</button><button type="button" id="all" class="secondary">全部紀錄</button></form>
+    <div class="title-row"><div><p class="eyebrow">THE LONG VIEW</p><h1>看見每一天的成長。</h1><p class="intro">hawks.tw 的流量筆記，從每日累積到跨年回望。</p></div><button id="export" class="secondary">匯出每日 CSV</button></div>
+    <form id="range"><label>從<input type="date" id="from" required></label><label>到<input type="date" id="to" required></label><button type="submit">查看</button><button type="button" id="recent" class="secondary">近 30 天</button><button type="button" id="year" class="secondary">今年</button><button type="button" id="all" class="secondary">全部紀錄</button></form>
     <p id="coverage" class="hint"></p><p id="sync" class="notice" role="status"></p>
-    <div class="metrics"><section><h2>頁面瀏覽</h2><p id="pageviews">—</p></section><section><h2>造訪次數</h2><p id="visits">—</p></section><section><h2>已保存天數</h2><p id="days">—</p></section></div>
-    <section class="panel"><div class="title-row"><h2>每月瀏覽趨勢</h2><span class="hint">依台灣時間</span></div><div id="chart" role="img" aria-label="每月頁面瀏覽趨勢，下方表格有完整數值"></div><div class="table-scroll"><table><caption>每月統計</caption><thead><tr><th>月份</th><th>頁面瀏覽</th><th>造訪次數</th><th>已存／應存天數</th></tr></thead><tbody id="months"></tbody></table></div></section>
-    <section class="panel"><div class="title-row"><h2>每日明細</h2><label>日期<select id="detail-day" aria-label="每日明細日期"></select></label><button id="export-day" class="secondary">匯出當日 JSON</button></div><p id="detail-note" class="hint"></p><div class="details"><div><h3>頁面</h3><div class="table-scroll"><table><thead><tr><th>路徑</th><th>瀏覽</th></tr></thead><tbody id="pages"></tbody></table></div></div><div><h3>來源網站</h3><div class="table-scroll"><table><thead><tr><th>來源</th><th>造訪</th></tr></thead><tbody id="sources"></tbody></table></div></div></div></section>
+    <div class="metrics">
+      <section class="metric-primary"><h2>所選期間瀏覽</h2><p id="pageviews">—</p><span>Cloudflare 統計，含抽樣估計</span></section>
+      <section><h2>造訪次數</h2><p id="visits">—</p><span>一次造訪可能瀏覽多個頁面</span></section>
+      <section><h2>平均每日瀏覽</h2><p id="average">—</p><span id="average-note">依已保存天數計算</span></section>
+      <section><h2>最高單日瀏覽</h2><p id="peak">—</p><span id="peak-note">—</span></section>
+    </div>
+    <section class="panel trend-panel">
+      <div class="title-row"><div><p class="eyebrow">TRAFFIC OVER TIME</p><h2 id="trend-title">每日瀏覽趨勢</h2></div><label>顯示方式<select id="granularity"><option value="day">每日</option><option value="month">每月</option></select></label></div>
+      <p id="comparison" class="trend-summary"></p>
+      <div id="chart" role="img" aria-label="瀏覽趨勢，下方可展開完整數值"></div>
+      <p id="chart-note" class="hint">缺少紀錄的日期以斷線呈現，不視為零瀏覽。</p>
+      <details><summary>查看趨勢數值</summary><div class="table-scroll trend-table"><table><caption id="table-caption">每日統計</caption><thead><tr><th>期間</th><th>頁面瀏覽</th><th>造訪次數</th><th>已存／應存天數</th></tr></thead><tbody id="months"></tbody></table></div></details>
+    </section>
+    <section class="panel estimate-panel">
+      <p class="eyebrow">UNDERSTAND THE NUMBERS</p><h2>實際瀏覽可能有多少？</h2>
+      <p>目前沒有量測到漏記比例。已保存的數字包含抽樣估計，也不代表網站成立至今的總量。</p>
+      <details id="estimate-details"><summary>試算沒有被追蹤到的瀏覽</summary>
+        <div class="estimate-grid"><div><label for="missed">假設漏記比例 <output id="missed-label" for="missed">0%</output></label><input id="missed" type="range" min="0" max="50" step="5" value="0" aria-describedby="estimate-disclaimer"><p id="estimate-formula" class="hint"></p></div><div class="scenario-result"><span>在這個假設下，約</span><strong id="estimate">—</strong><span>次瀏覽</span></div></div>
+        <p id="estimate-disclaimer" class="hint">這是情境試算，不是實測結果、可信區間或保證下限。抽樣估計可能高估或低估；請勿再乘上抽樣倍數。此試算不會寫入紀錄或匯出檔案。</p><p id="estimate-coverage" class="hint"></p>
+      </details>
+    </section>
+    <section class="panel"><div class="title-row"><h2>每日明細</h2><label>日期<select id="detail-day" aria-label="每日明細日期"></select></label><button id="export-day" class="secondary">匯出當日 JSON</button></div><p id="detail-note" class="hint"></p><div class="details"><div><h3>當日熱門頁面</h3><div class="table-scroll"><table><thead><tr><th>路徑</th><th>瀏覽</th></tr></thead><tbody id="pages"></tbody></table></div></div><div><h3>當日來源網站</h3><div class="table-scroll"><table><thead><tr><th>來源</th><th>造訪</th></tr></thead><tbody id="sources"></tbody></table></div></div></div></section>
     <p class="hint">造訪次數不等於不重複人數。資料來自 Cloudflare Web Analytics，排除已辨識的機器人；抽樣、阻擋追蹤與收集延遲都可能影響數值。各明細與總數可能因抽樣而有差異。今天尚未結束，不列入每日歸檔。</p>
   </div>
 </main><footer>HAWKS.TW · 長期保存每日摘要，不保存訪客 IP。</footer>
