@@ -108,7 +108,7 @@ export const resumeItems: ResumeItem[] = [
   {
     period: "2026.09.04 — 06",
     dateTime: "2026-09-04",
-    categories: ["專案"],
+    categories: ["競賽"],
     title: "BUILDMODE GEN-AI Hackathon 2026｜全場總排名第一名",
     organization: "FUTUREMODE × SITCON",
     summary:
@@ -257,6 +257,15 @@ export const resumeItems: ResumeItem[] = [
       { label: "學習紀錄", href: "/blog/machine-learning-2021" },
       external("GitHub", "https://github.com/Sean-Hawks/ML2021-Spring"),
     ],
+  },
+  {
+    period: "2026.05.25",
+    dateTime: "2026-05-25",
+    categories: ["競賽"],
+    title: "大安高工校內程式設計競賽｜第三名",
+    organization: "臺北市立大安高級工業職業學校",
+    summary: "參與大安高工校內程式設計競賽，獲得第三名。",
+    tags: ["Competitive Programming", "School Contest", "3rd Place"],
   },
   {
     period: "2026.05.16 — 18",
