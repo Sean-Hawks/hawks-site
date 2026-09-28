@@ -7,7 +7,7 @@
 
 `public/discord/index.html` 是完整、獨立、無需建置的邀請頁：
 
-- 初始 HTML 包含 Open Graph 與 Twitter Card，預覽標題為「魊窩｜Hawks Discord」。
+- 初始 HTML 包含 Open Graph 與 Twitter Card，預覽標題為「鯊窩｜Hawks Discord」。
 - 預覽圖片使用邀請對應的 Discord 伺服器圖示，並提供絕對 HTTPS 圖片網址。
 - 瀏覽器 3 秒後自動導向，提供「留在此頁」與手動加入按鈕。
 - 停用 JavaScript 時仍可使用加入按鈕。

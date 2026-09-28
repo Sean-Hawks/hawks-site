@@ -24,7 +24,7 @@ export default function ContactPage() {
     },
     {
       name: "Discord",
-      value: "魊窩 · 1awks",
+      value: "鯊窩 · 1awks",
       icon: MessageSquare,
       link: "/discord/",
       color: "text-indigo-400",
