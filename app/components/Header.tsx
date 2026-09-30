@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { ArrowUpRight, Bookmark, ChevronDown, Compass, Menu, Moon, Rss, Search, Sun, X } from "lucide-react";
+import { ArrowUpRight, Bookmark, ChevronDown, Compass, Menu, Moon, Rss, Search, Sun, Users, X } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 type ThemeMode = "light" | "dark";
@@ -15,6 +15,7 @@ const mainLinks = [
 const readingLinks = [
   { label: "隨機探索", href: "/explore/", icon: Compass },
   { label: "稍後閱讀", href: "/saved/", icon: Bookmark },
+  { label: "部落卷", href: "/blogroll/", icon: Users },
   { label: "訂閱更新", href: "/subscribe/", icon: Rss },
 ];
 const aboutLinks = [
@@ -156,7 +157,7 @@ export default function Header() {
           </div>
           <div className="header-nav-group">
             <h2 className="header-nav-heading">閱讀工具</h2>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 gap-2">
               {readingLinks.map(({ label, href, icon: Icon }) => (
                 <Link key={href} href={href} onClick={closeMenu} aria-current={current(href)} className="header-tool-link">
                   <Icon aria-hidden="true" className="h-[18px] w-[18px]" />
