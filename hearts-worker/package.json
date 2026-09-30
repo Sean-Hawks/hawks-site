@@ -12,7 +12,7 @@
     "db:production": "wrangler d1 migrations apply HEARTS_DB --remote --config wrangler.production.jsonc"
   },
   "devDependencies": {
-    "miniflare": "5.20260918.0-alpha",
-    "wrangler": "4.135.0"
+    "miniflare": "5.20260926.1-alpha",
+    "wrangler": "4.144.0"
   }
 }
