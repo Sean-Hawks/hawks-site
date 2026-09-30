@@ -1,5 +1,30 @@
 import type { ArticleHeading } from '../lib/headings';
 
+export function ArticleSidebar({ headings }: { headings: ArticleHeading[] }) {
+  if (headings.length < 2) return null;
+  const baseLevel = Math.min(...headings.map(heading => heading.level));
+
+  return (
+    <aside className="hidden min-w-0 lg:block">
+      <div className="sticky top-40 space-y-3">
+        <h3 className="text-xs font-bold uppercase tracking-wider text-[rgb(var(--muted))]">目錄</h3>
+        <nav aria-label="文章目錄" className="max-h-[calc(100vh-12rem)] space-y-1 overflow-y-auto">
+          {headings.map(heading => (
+            <a
+              key={heading.id}
+              href={`#${heading.id}`}
+              style={{ paddingLeft: `${Math.max(0, heading.level - baseLevel) * 0.75}rem` }}
+              className="block break-words py-1 text-sm leading-6 text-[rgb(var(--muted))] transition-colors hover:text-[rgb(var(--accent))]"
+            >
+              {heading.title || '段落'}
+            </a>
+          ))}
+        </nav>
+      </div>
+    </aside>
+  );
+}
+
 export default function ArticleContents({ headings, mobileOnly = true }: { headings: ArticleHeading[]; mobileOnly?: boolean }) {
   if (headings.length < 2) return null;
   return (

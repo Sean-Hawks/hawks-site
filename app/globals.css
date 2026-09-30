@@ -1402,55 +1402,14 @@ html {
   margin-bottom: 0;
 }
 
-.talk-prose {
-  counter-reset: talk-section;
-}
-
-.talk-article-shell {
-  background-color: rgba(24, 26, 32, 0.88);
-  border-color: rgba(251, 191, 36, 0.16);
-}
-
-.talk-article-header {
+/* Inline code keeps its highlight; fenced code inherits the scrollable block. */
+.article-prose pre code {
+  border: 0;
+  border-radius: 0;
+  padding: 0;
   background: transparent;
-}
-
-:root[data-theme="light"] .talk-article-shell {
-  background-color: rgba(255, 253, 248, 0.9);
-  border-color: rgba(180, 119, 22, 0.18);
-}
-
-.talk-section-block {
-  margin: 3.75rem 0 0;
-  padding: 3.25rem 0 0;
-  border-top: 1px solid rgb(var(--line) / 0.1);
-}
-
-.talk-prose > .talk-section-block:first-child {
-  margin-top: 0;
-  padding-top: 0;
-  border-top: 0;
-}
-
-.talk-section-block > .talk-section-heading {
-  margin-top: 0;
-}
-
-.talk-section-block > :last-child {
-  margin-bottom: 0;
-}
-
-.talk-section-heading {
-  counter-increment: talk-section;
-}
-
-.talk-section-heading::before {
-  content: counter(talk-section, decimal-leading-zero);
-  color: rgb(var(--accent));
+  color: inherit;
   font-size: 0.875rem;
-  font-variant-numeric: tabular-nums;
-  font-weight: 700;
-  letter-spacing: 0.16em;
 }
 
 @media print {

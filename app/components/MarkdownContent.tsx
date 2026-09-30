@@ -49,8 +49,6 @@ function imageOnlyParagraph(node: unknown): { src: string; alt: string; title: s
 type Directiveish = {
   type: string;
   name?: string;
-  depth?: number;
-  children?: Directiveish[];
   data?: {
     hName?: string;
     hProperties?: Record<string, unknown>;
@@ -86,55 +84,9 @@ const remarkAdmonitions: Plugin = () => {
   };
 };
 
-const remarkTalkSectionBlocks: Plugin = () => {
-  return (tree) => {
-    const root = tree as { children?: Directiveish[] };
-    if (!Array.isArray(root.children)) return;
-
-    const groupedChildren: Directiveish[] = [];
-
-    for (let index = 0; index < root.children.length; index += 1) {
-      const node = root.children[index];
-
-      if (node.type !== "heading" || node.depth !== 3) {
-        groupedChildren.push(node);
-        continue;
-      }
-
-      const sectionChildren = [node];
-      index += 1;
-
-      while (index < root.children.length) {
-        const nextNode = root.children[index];
-        if (nextNode.type === "heading" && typeof nextNode.depth === "number" && nextNode.depth <= 3) {
-          index -= 1;
-          break;
-        }
-
-        sectionChildren.push(nextNode);
-        index += 1;
-      }
-
-      groupedChildren.push({
-        type: "containerDirective",
-        name: "talk-section-block",
-        children: sectionChildren,
-        data: {
-          hName: "section",
-          hProperties: {
-            className: ["talk-section-block"],
-          },
-        },
-      });
-    }
-
-    root.children = groupedChildren;
-  };
-};
-
 // 修正：改用 React 原生屬性型別，避免 Parameters<string> 錯誤
 type PreProps = React.ComponentPropsWithoutRef<"pre">;
-type CodeProps = React.ComponentPropsWithoutRef<"code"> & { inline?: boolean };
+type CodeProps = React.ComponentPropsWithoutRef<"code">;
 
 function textFromChildren(children: React.ReactNode): string {
   return React.Children.toArray(children)
@@ -251,7 +203,6 @@ export default function MarkdownContent({
   assetBasePath?: string;
   className?: string;
 }) {
-  const isTalk = variant === "talk";
   const isLibraryReview = variant === "libraryReview";
   const transformedContent = content
     ? normalizeImageParagraphs(transformObsidianEmbeds(content, assetBasePath))
@@ -260,21 +211,6 @@ export default function MarkdownContent({
   const components: Components = {
     pre: ({ node, className, children, ...props }: PreProps & { node?: unknown }) => {
       void node;
-      if (isTalk) {
-        return (
-          <div
-            className={[
-              "my-5 overflow-visible whitespace-pre-wrap break-words border-l border-[rgb(var(--accent)/0.42)] py-1 pl-5 pr-0 font-sans text-base leading-8 text-[rgb(var(--text)/0.82)] [tab-size:1.25rem] sm:ml-[3.25rem] sm:text-[1.05rem] sm:leading-9",
-              className,
-            ]
-              .filter(Boolean)
-              .join(" ")}
-          >
-            {children}
-          </div>
-        );
-      }
-
       const codeText = textFromChildren(children);
 
       return (
@@ -305,21 +241,11 @@ export default function MarkdownContent({
         {children}
       </h2>
     ),
-    h3: ({ children, ...props }) => {
-      if (isTalk) {
-        return (
-          <h3 className="talk-section-heading scroll-mt-24 mt-12 grid grid-cols-[2.5rem_1fr] items-baseline gap-3 font-serif text-2xl font-extrabold leading-tight text-[rgb(var(--text))] sm:mt-14 sm:grid-cols-[3.25rem_1fr] sm:text-[1.8rem]" {...props}>
-            <span>{children}</span>
-          </h3>
-        );
-      }
-
-      return (
-        <h3 className="scroll-mt-24 mt-8 mb-3 font-serif text-xl font-bold tracking-tight text-[rgb(var(--text))] sm:text-2xl" {...props}>
-          {children}
-        </h3>
-      );
-    },
+    h3: ({ children, ...props }) => (
+      <h3 className="scroll-mt-24 mt-8 mb-3 font-serif text-xl font-bold tracking-tight text-[rgb(var(--text))] sm:text-2xl" {...props}>
+        {children}
+      </h3>
+    ),
     h4: ({ children, ...props }) => (
       <h4 className="scroll-mt-24 text-lg sm:text-xl font-bold mt-6 mb-2 text-[rgb(var(--text))]" {...props}>
         {children}
@@ -336,11 +262,9 @@ export default function MarkdownContent({
         }
       }
 
-      const paragraphClass = isTalk
-        ? "my-7 text-base leading-8 text-[rgb(var(--text)/0.82)] sm:text-[1.08rem] sm:leading-9"
-        : isLibraryReview
-          ? "my-4 rounded-xl border border-[rgb(var(--line)/0.08)] bg-[rgb(var(--panel2)/0.34)] px-4 py-3 text-base leading-8 text-[rgb(var(--text)/0.92)] shadow-[0_10px_30px_rgba(90,76,55,0.06)] sm:px-5 sm:py-4 sm:text-[1.06rem]"
-          : "my-5 leading-8 text-[rgb(var(--text)/0.84)] text-base sm:text-[1.05rem]";
+      const paragraphClass = isLibraryReview
+        ? "my-4 rounded-xl border border-[rgb(var(--line)/0.08)] bg-[rgb(var(--panel2)/0.34)] px-4 py-3 text-base leading-8 text-[rgb(var(--text)/0.92)] shadow-[0_10px_30px_rgba(90,76,55,0.06)] sm:px-5 sm:py-4 sm:text-[1.06rem]"
+        : "my-5 leading-8 text-[rgb(var(--text)/0.84)] text-base sm:text-[1.05rem]";
 
       return (
         <div className={paragraphClass} {...props}>
@@ -373,34 +297,8 @@ export default function MarkdownContent({
     ),
     hr: (props) => <hr className="border-[rgb(var(--line)/0.10)] my-8" {...props} />,
 
-    code: ({ node, inline, className, children, ...props }: CodeProps & { node?: unknown }) => {
+    code: ({ node, className, children, ...props }: CodeProps & { node?: unknown }) => {
       void node;
-
-      if (!inline) {
-        if (isTalk) {
-          return (
-            <span
-              className={[
-                "block font-sans",
-                className,
-              ]
-                .filter(Boolean)
-                .join(" ")}
-            >
-              {children}
-            </span>
-          );
-        }
-
-        return (
-          <code
-            className={className}
-            {...props}
-          >
-            {children}
-          </code>
-        );
-      }
 
       return (
         <code
@@ -465,8 +363,7 @@ export default function MarkdownContent({
   return (
     <div
       className={[
-        "max-w-none text-[rgb(var(--text))]",
-        isTalk ? "talk-prose" : "",
+        "article-prose min-w-0 max-w-none break-words text-[rgb(var(--text))]",
         isLibraryReview ? "library-review-prose" : "",
         className,
       ]
@@ -480,7 +377,6 @@ export default function MarkdownContent({
             remarkDirective,
             remarkHeadingIds,
             remarkAdmonitions,
-            ...(isTalk ? [remarkTalkSectionBlocks] : []),
           ]}
           components={components}
         >

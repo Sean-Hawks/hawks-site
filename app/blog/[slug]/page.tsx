@@ -6,7 +6,7 @@ import { getSortedTalksData } from "../../lib/talks";
 import ThemeStyles from "../../components/ThemeStyles";
 import Header from "../../components/Header";
 import MarkdownContent from "../../components/MarkdownContent";
-import ArticleContents from "../../components/ArticleContents";
+import ArticleContents, { ArticleSidebar } from "../../components/ArticleContents";
 import { getArticleHeadings } from "../../lib/headings";
 import Comments from "../../components/Comments";
 import type { Metadata } from "next";
@@ -99,32 +99,10 @@ export default async function PostPage({ params }: PageProps) {
       <Header />
 
       <div className="w-full px-4 sm:px-3">
-        <main id="main-content" tabIndex={-1} className="max-w-6xl mx-auto py-8 grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-10">
-          {/* 左側：目錄 */}
-          <aside className="hidden lg:block">
-            {/* 對應調整 sticky top：從 top-44 改為 top-40 */}
-            <div className="sticky top-40 space-y-3">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-[rgb(var(--muted))]">
-                目錄
-              </h3>
-              <nav aria-label="文章目錄" className="max-h-[calc(100vh-12rem)] space-y-1 overflow-y-auto">
-                {toc.map((item) => (
-                  <a
-                    key={item.id}
-                    href={`#${item.id}`}
-                    className={`block text-sm text-[rgb(var(--muted))] hover:text-[rgb(var(--accent))] transition-colors break-words py-1 ${
-                      item.level > 1 ? "ml-3" : ""
-                    } ${item.level > 2 ? "ml-6" : ""}`}
-                  >
-                    {item.title}
-                  </a>
-                ))}
-              </nav>
-            </div>
-          </aside>
+        <main id="main-content" tabIndex={-1} className={`mx-auto grid grid-cols-1 gap-10 py-8 ${toc.length >= 2 ? "max-w-6xl lg:grid-cols-[240px_minmax(0,1fr)]" : "max-w-[860px]"}`}>
+          <ArticleSidebar headings={toc} />
 
-          {/* 右側：文章 */}
-          <div>
+          <div className="min-w-0">
             <Link
               href="/blog"
               className="group inline-flex items-center gap-2 text-sm text-[rgb(var(--muted))] hover:text-[rgb(var(--accent))] transition-colors mb-6"
