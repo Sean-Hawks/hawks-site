@@ -24,6 +24,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/project/",
     "/search/",
     "/explore/",
+    "/blogroll/",
     "/subscribe/",
     "/contact/",
     "/talk/",
