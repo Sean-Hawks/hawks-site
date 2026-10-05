@@ -3,20 +3,22 @@
 :root {
   color-scheme: dark;
   --background: #0b1018;
-  --foreground: #f5f0eb;
+  --foreground: #edf3fa;
   --bg: 11 16 24;
-  --panel: 15 24 35;
-  --panel2: 20 33 46;
-  --text: 245 240 235;
-  --muted: 166 184 197;
-  --accent: 255 102 93;
+  --panel: 15 26 41;
+  --panel2: 20 36 55;
+  --text: 237 243 250;
+  --muted: 166 184 204;
+  --accent: 245 230 66;
   --accent-foreground: 245 245 245;
-  --purple: 91 224 231;
+  --purple: 105 183 255;
   --line: 57 73 84;
   --surface: 57 73 84;
   --border: #394954;
-  --brand: #ff665d;
-  --info: #5be0e7;
+  --brand: #f5e642;
+  --info: #69b7ff;
+  --info-border: #304f73;
+  --info-panel: #101f32;
   --status-ok: #4ade80;
   --status-warning: #fbbf24;
   --status-error: #f87171;
@@ -66,8 +68,8 @@ html {
   min-width: 0;
 }
 ::selection {
-  background: #3a3a3a;
-  color: #ffffff;
+  background: var(--brand);
+  color: var(--background);
 }
 a,
 button {
@@ -237,9 +239,9 @@ button {
   overflow-wrap: anywhere;
 }
 
-/* Coral brand marks and cyan metadata carry the reference's cyberpunk palette. */
+/* Electric yellow anchors the identity; cold blue carries information and links. */
 .status-home {
-  background: linear-gradient(135deg, #1c141c 0%, #0b141e 36%, #0b1018 72%);
+  background: linear-gradient(135deg, #191b17 0%, #0c1828 36%, #0b1018 72%);
   font-family: var(--font-sans);
 }
 .status-home .site-header > div {
@@ -293,7 +295,7 @@ button {
   border: 1px solid var(--border);
   border-top-color: var(--brand);
   border-radius: 6px;
-  background: linear-gradient(120deg, #23171e, #101e2b 65%, #101925);
+  background: linear-gradient(120deg, #22251b, #11243b 65%, #101c2d);
   display: grid;
   grid-template-columns: minmax(0, 1fr) 240px;
   gap: 64px;
@@ -351,7 +353,7 @@ button {
   font-size: 13px;
 }
 .identity-links a {
-  color: var(--brand);
+  color: var(--info);
   display: inline-flex;
   align-items: center;
   min-height: 44px;
@@ -387,10 +389,10 @@ button {
 }
 .content-index {
   margin-top: 24px;
-  background: #0d1a26;
+  background: var(--info-panel);
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  border: 1px solid #2e5360;
+  border: 1px solid var(--info-border);
   border-radius: 6px;
 }
 .content-index > a {
@@ -403,6 +405,9 @@ button {
 }
 .content-index > a:last-child {
   border-right: 0;
+}
+.content-index > a:hover {
+  background: #162c46;
 }
 .content-index > a:hover .index-label {
   color: rgb(var(--text));
@@ -527,7 +532,7 @@ button {
 }
 .recent-entries {
   padding-left: 32px;
-  border-left: 1px solid #2e5360;
+  border-left: 1px solid var(--info-border);
 }
 .recent-label {
   color: var(--info);
@@ -824,11 +829,11 @@ button {
   color: var(--info);
 }
 .status-home .header-main-link[aria-current] {
-  background: #ff665d;
+  background: var(--brand);
   color: #0b1018;
 }
 .status-home .header-icon-button[aria-current] {
-  background: #ff665d;
+  background: var(--brand);
   color: #0b1018;
 }
 .profile-eyebrow,
@@ -836,7 +841,6 @@ button {
 .entry-meta > span {
   color: var(--info);
 }
-.identity-links a:hover,
 .panel-heading > a,
 .feature-read,
 .subscribe-link {
@@ -847,7 +851,7 @@ button {
 }
 .status-home .feature-image,
 .status-home .pick-image {
-  border-color: #2e5360;
+  border-color: var(--info-border);
 }
 .status-home .status-footer a:hover {
   color: var(--info);
