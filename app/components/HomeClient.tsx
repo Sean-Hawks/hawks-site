@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight, Github, Mail, Rss } from "lucide-react";
-import { resumeItems, sortResumeItemsByDate } from "../data/resume";
+import { ArrowUpRight } from "lucide-react";
 import { projects } from "../data/projects";
 import type { Post, Talk } from "../types";
 import type { LibraryItem } from "../data/library";
@@ -57,7 +56,7 @@ function PanelHeading({
       <h2>{title}</h2>
       <Link href={href}>
         {note}
-        <ArrowUpRight size={14} aria-hidden="true" />
+        <ArrowUpRight size={13} aria-hidden="true" />
       </Link>
     </div>
   );
@@ -85,6 +84,7 @@ export default function HomeClient({
     })),
   ].sort((a, b) => b.date.localeCompare(a.date));
   const latest = entries[0];
+  const recent = entries.slice(1, 5);
   const picks = [...libraryItems]
     .sort(
       (a, b) =>
@@ -92,60 +92,18 @@ export default function HomeClient({
         (a.featuredOrder ?? Infinity) - (b.featuredOrder ?? Infinity) ||
         (b.rating ?? -1) - (a.rating ?? -1),
     )
-    .slice(0, 4);
-  const history = sortResumeItemsByDate(resumeItems).slice(0, 3);
+    .slice(0, 3);
   const metrics = [
-    {
-      label: "文章",
-      value: posts.length,
-      unit: "篇",
-      note: "學習筆記與活動心得",
-      href: "/blog/",
-      source: "文章目錄",
-    },
-    {
-      label: "近況",
-      value: talks.length,
-      unit: "則",
-      note: "生活裡的短更新",
-      href: "/talk/",
-      source: "近況目錄",
-    },
+    { label: "文章", value: posts.length, unit: "篇", href: "/blog/" },
+    { label: "近況", value: talks.length, unit: "則", href: "/talk/" },
     {
       label: "收藏",
       value: libraryItems.length,
       unit: "部 / 位",
-      note: "動畫、電影、音樂與遊戲",
       href: "/library/",
-      source: "收藏目錄",
     },
-    {
-      label: "專案",
-      value: projects.length,
-      unit: "個",
-      note: "程式實作與作品紀錄",
-      href: "/project/",
-      source: "專案清單",
-    },
+    { label: "專案", value: projects.length, unit: "個", href: "/project/" },
   ];
-  // Anchor the chart to the latest published entry, so static exports stay consistent.
-  const [year, month] = (latest?.date ?? "").split("-").map(Number);
-  const months = latest
-    ? Array.from({ length: 6 }, (_, i) => {
-        const date = new Date(Date.UTC(year, month - 6 + i, 1));
-        const key = date.toISOString().slice(0, 7);
-        return {
-          key,
-          label: `${date.getUTCMonth() + 1} 月`,
-          count: entries.filter((entry) => entry.date.startsWith(key)).length,
-        };
-      })
-    : [];
-  const maxCount = Math.max(1, ...months.map((item) => item.count));
-  const points = months
-    .map((item, i) => `${12 + i * 56},${66 - (item.count / maxCount) * 50}`)
-    .join(" ");
-  const total = posts.length + talks.length + libraryItems.length;
 
   return (
     <div className="status-home min-h-screen">
@@ -153,295 +111,171 @@ export default function HomeClient({
       <main id="main-content" tabIndex={-1} className="status-main">
         <div className="overview-summary">
           <span className={latest ? "status-ok" : "secondary"}>
-            {latest ? "● 有新內容" : "○ 尚無更新"}
+            {latest ? "● 內容已公開" : "○ 尚無更新"}
           </span>
-          {latest ? (
-            <Link href={latest.href}>
-              最近寫下了〈{latest.title}〉
-              <ArrowUpRight size={14} aria-hidden="true" />
-            </Link>
-          ) : (
-            <span>文章與近況會出現在這裡。</span>
-          )}
-          {latest && <time dateTime={latest.date}>{latest.date}</time>}
+          <span className="secondary">
+            {latest ? `最新${latest.type}已收錄` : "文章與近況會出現在這裡"}
+          </span>
+          {latest && <time dateTime={latest.date}>更新於 {latest.date}</time>}
         </div>
 
-        <div className="overview-grid">
-          <section
-            className="quiet-panel intro-panel"
-            aria-labelledby="intro-title"
-          >
-            <div className="panel-heading">
-              <span>關於這裡</span>
-              <span className="secondary">台北 · UTC+8</span>
-            </div>
-            <div className="intro-body">
-              <div className="profile-line">
-                <Image
-                  src="/avatar.jpg"
-                  alt="Hawks 的頭像"
-                  width={56}
-                  height={56}
-                  priority
-                />
-                <div>
-                  <span className="profile-name">Hawks</span>
-                  <p className="secondary">大安高工 · 程式 / 資安 / 打擊樂</p>
-                </div>
-              </div>
+        <section
+          className="quiet-panel home-masthead"
+          aria-labelledby="intro-title"
+        >
+          <div className="panel-heading">
+            <span>個人網站</span>
+            <span className="secondary">台北 · UTC+8</span>
+          </div>
+          <div className="masthead-body">
+            <div className="home-identity">
               <h1 id="intro-title">
-                把學到的、做過的，
-                <br />
-                慢慢寫下來。
+                Hawks<span className="secondary">.tw</span>
               </h1>
-              <p className="intro-description">
-                這裡記錄程式開發、機器學習與資安的學習歷程，也放著管樂生活和喜歡的作品。
+              <p className="identity-focus">程式 / 資安 / 打擊樂</p>
+              <p className="identity-description">
+                記錄學到的東西、做過的作品，
+                <br />
+                以及生活裡值得留下的片刻。
               </p>
-              <div className="intro-links">
-                <a href="https://github.com/Sean-Hawks">
-                  <Github size={15} aria-hidden="true" />
-                  GitHub
-                </a>
-                <a href="mailto:me@hawks.tw">
-                  <Mail size={15} aria-hidden="true" />
-                  聯絡我
-                </a>
-                <Link href="/subscribe/">
-                  <Rss size={15} aria-hidden="true" />
-                  訂閱更新
-                </Link>
+              <div className="identity-links">
+                <a href="https://github.com/Sean-Hawks">GitHub ↗</a>
+                <a href="mailto:me@hawks.tw">聯絡我 ↗</a>
+                <Link href="/subscribe/">訂閱更新 ↗</Link>
               </div>
             </div>
-            <Source>Hawks · 個人簡介</Source>
-          </section>
-
-          <section
-            className="quiet-panel activity-panel"
-            aria-labelledby="activity-title"
-          >
-            <div className="panel-heading">
-              <h2 id="activity-title">內容總覽</h2>
-              <span className="secondary">已公開的紀錄</span>
-            </div>
-            <div className="activity-body">
-              <div className="activity-total">
-                <span className="big-number">{total}</span>
-                <span className="number-unit">篇 / 則 / 部</span>
+            <div className="home-feature">
+              <div className="feature-meta">
+                <span>最新{latest?.type ?? "內容"}</span>
+                {latest && <time dateTime={latest.date}>{latest.date}</time>}
               </div>
-              <p className="secondary">每一篇筆記、每一則近況、每一部收藏。</p>
-              {months.length > 0 && (
-                <div className="writing-chart">
-                  <div className="chart-caption">
-                    <span>寫作紀錄</span>
-                    <span>
-                      {months.reduce((sum, item) => sum + item.count, 0)} 篇 /
-                      則 · 近六個月
-                    </span>
-                  </div>
-                  <svg
-                    viewBox="0 0 304 80"
-                    role="img"
-                    aria-label={`各月文章與近況數量：${months.map((item) => `${item.key}：${item.count}`).join("，")}`}
-                  >
-                    <line
-                      x1="12"
-                      y1="66"
-                      x2="292"
-                      y2="66"
-                      stroke="var(--border)"
-                    />
-                    <polyline
-                      points={points}
-                      fill="none"
-                      stroke="var(--foreground)"
-                      strokeWidth="1.5"
-                      strokeLinejoin="round"
-                    />
-                    {months.map((item, i) => (
-                      <circle
-                        key={item.key}
-                        cx={12 + i * 56}
-                        cy={66 - (item.count / maxCount) * 50}
-                        r="2.5"
-                        fill="var(--foreground)"
-                      />
-                    ))}
-                  </svg>
-                  <div className="chart-months">
-                    {months.map((item) => (
-                      <span key={item.key}>{item.label}</span>
-                    ))}
-                  </div>
-                </div>
+              {latest ? (
+                <>
+                  <h2>
+                    <Link href={latest.href}>{latest.title}</Link>
+                  </h2>
+                  <p>{latest.desc || "閱讀完整內容。"}</p>
+                  <Link className="feature-read" href={latest.href}>
+                    閱讀全文
+                    <ArrowUpRight size={16} aria-hidden="true" />
+                  </Link>
+                </>
+              ) : (
+                <p>還沒有公開的文章或近況。</p>
               )}
             </div>
-            <Source>
-              文章 + 近況 + 收藏目錄
-              {latest && <> · 最新文章 / 近況 {latest.date}</>}
-            </Source>
-          </section>
-        </div>
+          </div>
+          <nav className="content-index" aria-label="站內內容索引">
+            {metrics.map((metric) => (
+              <Link href={metric.href} key={metric.label}>
+                <span className="index-label">{metric.label}</span>
+                <span className="index-value">
+                  {metric.value}
+                  <small>{metric.unit}</small>
+                </span>
+                <ArrowUpRight size={13} aria-hidden="true" />
+              </Link>
+            ))}
+          </nav>
+          <Source>來源 · 個人簡介 / 已公開的文章、近況、收藏 / 專案清單</Source>
+        </section>
 
-        <div className="metric-grid" aria-label="站內內容數量">
-          {metrics.map((metric) => (
-            <Link
-              href={metric.href}
-              key={metric.label}
-              className="quiet-panel metric-panel"
-            >
-              <div className="panel-heading">
-                <h2>{metric.label}</h2>
-                <ArrowUpRight size={14} aria-hidden="true" />
-              </div>
-              <div className="metric-body">
-                <div>
-                  <span className="big-number">{metric.value}</span>
-                  <span className="number-unit">{metric.unit}</span>
-                </div>
-                <p className="secondary">{metric.note}</p>
-              </div>
-              <Source>{metric.source} · 已公開</Source>
-            </Link>
-          ))}
-        </div>
-
-        <div className="reading-grid">
-          <section className="quiet-panel">
-            <PanelHeading
-              title="最近寫下的"
-              href="/blog/"
-              note="全部文章與近況"
-            />
+        <div className="home-content-grid">
+          <section className="quiet-panel writing-panel">
+            <PanelHeading title="近期紀錄" href="/blog/" note="全部文章" />
             <div className="entry-table">
-              {entries.slice(0, 5).map((entry) => (
+              {recent.map((entry) => (
                 <Link href={entry.href} key={entry.href} className="entry-row">
                   <time dateTime={entry.date}>{entry.date}</time>
                   <div>
                     <span className="entry-type">{entry.type}</span>
                     <h3>{entry.title}</h3>
-                    <p>{entry.desc || "閱讀完整內容。"}</p>
                   </div>
-                  <ArrowUpRight size={16} aria-hidden="true" />
+                  <ArrowUpRight size={14} aria-hidden="true" />
                 </Link>
               ))}
-              {!entries.length && (
-                <p className="empty-copy">還沒有公開的文章或近況。</p>
+              {!recent.length && (
+                <p className="empty-copy">
+                  {latest
+                    ? "其他紀錄會陸續放在這裡。"
+                    : "還沒有公開的文章或近況。"}
+                </p>
               )}
             </div>
-            <Source>文章與近況目錄 · 依發布日期排序</Source>
+            <Source>文章 / 近況目錄 · 依發布日期排序</Source>
           </section>
-          <section className="quiet-panel project-panel">
-            <PanelHeading
-              title="做過的東西"
-              href="/project/"
-              note={`${projects.length} 個專案`}
-            />
-            <div>
-              {projects.slice(0, 3).map((project) => (
-                <a
-                  className="project-row"
-                  href={project.link}
-                  key={project.title}
-                  target="_blank"
-                  rel="noopener noreferrer"
+          <section className="quiet-panel library-panel">
+            <PanelHeading title="精選收藏" href="/library/" note="全部收藏" />
+            <div className="library-picks">
+              {picks.map((item) => (
+                <Link
+                  href={
+                    item.hasReview || item.recommendedWorks.length
+                      ? `/library/${item.category}/${item.slug}`
+                      : `/library/${item.category}`
+                  }
+                  key={item.id}
+                  className="library-pick"
                 >
-                  <div className="project-title">
-                    <h3>{project.title}</h3>
-                    <ArrowUpRight size={14} aria-hidden="true" />
+                  <div className="pick-image">
+                    <Image
+                      src={item.image.src}
+                      alt={item.image.alt || item.title}
+                      fill
+                      sizes="48px"
+                      className={
+                        item.image.fit === "contain"
+                          ? "object-contain"
+                          : "object-cover"
+                      }
+                    />
                   </div>
-                  <p>{project.desc}</p>
-                  <span className="project-tech">
-                    {project.tags.join(" / ")}
-                  </span>
-                </a>
+                  <div className="pick-content">
+                    <div className="pick-meta">
+                      <span>{categories[item.category]}</span>
+                      <span
+                        className={
+                          item.status === "watching" ||
+                          item.status === "playing"
+                            ? "status-ok"
+                            : "secondary"
+                        }
+                      >
+                        {statuses[item.status]}
+                      </span>
+                    </div>
+                    <h3>{item.title}</h3>
+                    {item.rating !== null && (
+                      <div className="pick-rating">
+                        <span className="rating-meter" aria-hidden="true">
+                          <span>{"━".repeat(Math.round(item.rating))}</span>
+                          <span>
+                            {"━".repeat(10 - Math.round(item.rating))}
+                          </span>
+                        </span>
+                        <span className="rating-value">
+                          <strong>{item.rating.toFixed(1)}</strong>
+                          <small> / 10</small>
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </Link>
               ))}
+              {!picks.length && (
+                <p className="empty-copy">還沒有公開的收藏。</p>
+              )}
             </div>
-            <Source>專案清單 · 原始碼連結至 GitHub</Source>
+            <Source>收藏目錄 · 個人評分</Source>
           </section>
         </div>
-
-        <section className="quiet-panel library-panel">
-          <PanelHeading
-            title="喜歡的作品"
-            href="/library/"
-            note="瀏覽全部收藏"
-          />
-          <div className="library-picks">
-            {picks.map((item) => (
-              <Link
-                href={
-                  item.hasReview || item.recommendedWorks.length
-                    ? `/library/${item.category}/${item.slug}`
-                    : `/library/${item.category}`
-                }
-                key={item.id}
-                className="library-pick"
-              >
-                <div className="pick-image">
-                  <Image
-                    src={item.image.src}
-                    alt={item.image.alt || item.title}
-                    fill
-                    sizes="(max-width: 639px) 40vw, (max-width: 1100px) 22vw, 250px"
-                    className={
-                      item.image.fit === "contain"
-                        ? "object-contain"
-                        : "object-cover"
-                    }
-                  />
-                </div>
-                <div className="pick-meta">
-                  <span>{categories[item.category]}</span>
-                  <span
-                    className={
-                      item.status === "watching" || item.status === "playing"
-                        ? "status-ok"
-                        : "secondary"
-                    }
-                  >
-                    {statuses[item.status]}
-                  </span>
-                </div>
-                <div className="pick-title">
-                  <h3>{item.title}</h3>
-                  {item.rating !== null && (
-                    <span>
-                      <strong>{item.rating.toFixed(1)}</strong>
-                      <small> / 10</small>
-                    </span>
-                  )}
-                </div>
-                <p>{item.note}</p>
-              </Link>
-            ))}
-            {!picks.length && <p className="empty-copy">還沒有公開的收藏。</p>}
-          </div>
-          <Source>收藏目錄 · 個人評分與心得</Source>
-        </section>
-
-        <section className="quiet-panel history-panel">
-          <PanelHeading title="走過的路" href="/timeline/" note="完整經歷" />
-          <div className="history-grid">
-            {history.map((item) => (
-              <div
-                key={`${item.title}-${item.period}`}
-                className="history-item"
-              >
-                <span className="secondary">{item.period}</span>
-                <h3>{item.title}</h3>
-                <p>{item.summary}</p>
-              </div>
-            ))}
-          </div>
-          <Source>經歷時間軸 · 最近三筆紀錄</Source>
-        </section>
       </main>
       <footer className="status-footer">
         <span>© Hawks · hawks.tw</span>
         <div>
+          <Link href="/timeline/">經歷</Link>
           <Link href="/blogroll/">部落卷</Link>
-          <Link href="/search/">搜尋</Link>
-          <Link href="/subscribe/">RSS 訂閱 ↗</Link>
+          <Link href="/subscribe/">RSS ↗</Link>
         </div>
       </footer>
     </div>
