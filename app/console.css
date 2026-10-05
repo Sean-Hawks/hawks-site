@@ -640,18 +640,6 @@ html[data-gui="console"] {
   font-size: 11px;
   color: rgb(var(--muted));
 }
-:root[data-gui="console"] .rating-meter {
-  display: flex;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  line-height: 1;
-}
-:root[data-gui="console"] .rating-meter > span:first-child {
-  color: var(--foreground);
-}
-:root[data-gui="console"] .rating-meter > span:last-child {
-  color: var(--border);
-}
 :root[data-gui="console"] .empty-copy {
   padding: 20px 0;
   font-size: 13px;
@@ -1312,70 +1300,30 @@ html[data-gui="console"] {
   }
 }
 
-/* Actual library coverage supplies the instrument readout, rather than decoration. */
-:root[data-gui="console"] .library-monitor {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 20px 40px;
-  margin-top: 24px;
-  padding-bottom: 24px;
-  border-bottom: 1px solid var(--border);
-}
-:root[data-gui="console"] .monitor-heading {
+/* Keep collection context compact so the works stay prominent. */
+:root[data-gui="console"] .library-summary {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  justify-content: space-between;
-  gap: 8px 16px;
-  font-size: 11px;
+  gap: 12px 24px;
+  margin-top: 20px;
+  font-size: 13px;
   color: rgb(var(--muted));
 }
-:root[data-gui="console"] .monitor-heading strong {
+:root[data-gui="console"] .library-summary > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+}
+:root[data-gui="console"] .library-summary dd {
+  margin: 0;
+}
+:root[data-gui="console"] .library-summary strong {
   color: var(--foreground);
   font-family: var(--font-mono);
   font-size: 16px;
   font-weight: 700;
-}
-:root[data-gui="console"] .monitor-heading small {
-  margin-left: 6px;
-  font-size: 11px;
-  font-weight: 400;
-}
-:root[data-gui="console"] .monitor-meter {
-  display: flex;
-  margin-top: 12px;
-  height: 8px;
-}
-:root[data-gui="console"] .monitor-meter span {
-  flex: 1;
-  text-align: center;
-  font-family: var(--font-mono);
-  font-size: 13px;
-  line-height: 8px;
-  color: var(--border);
-}
-:root[data-gui="console"] .monitor-meter .meter-used {
-  color: var(--foreground);
-}
-:root[data-gui="console"] .monitor-status {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 20px;
-  font-size: 11px;
-  color: rgb(var(--muted));
-}
-:root[data-gui="console"] .monitor-status strong {
-  margin-left: 6px;
-  color: var(--foreground);
-  font-family: var(--font-mono);
-  font-size: 16px;
-}
-@media (max-width: 699px) {
-  :root[data-gui="console"] .library-monitor {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
 }
 
 /* Console composition uses real site data and readable, restrained controls. */
@@ -1501,11 +1449,6 @@ html[data-gui="console"] {
 :root[data-gui="console"] .pick-content h3,
 :root[data-gui="console"] .pick-rating {
   margin-top: 0;
-}
-:root[data-gui="console"] .library-monitor {
-  gap: 20px;
-  margin-top: 20px;
-  padding-bottom: 20px;
 }
 @media screen and (min-width: 1280px) {
   :root[data-gui="console"] body {
@@ -2223,58 +2166,39 @@ html[data-gui="console"] {
 :root[data-gui="console"] .inventory-short-link:hover {
   color: var(--foreground);
 }
-:root[data-gui="console"] .monitor-status {
-  display: grid;
-  gap: 8px;
-}
-:root[data-gui="console"] .collection-distribution {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px 32px;
-  padding: 20px 0;
-  border-bottom: 1px solid var(--border);
-}
-:root[data-gui="console"] .collection-channel {
-  display: block;
-  min-height: 44px;
-}
-:root[data-gui="console"] .collection-channel > :first-child {
+:root[data-gui="console"] .collection-filters {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 4px 12px;
-  font-size: 11px;
-  color: rgb(var(--muted));
+  gap: 8px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border);
 }
-:root[data-gui="console"] .collection-channel strong {
+:root[data-gui="console"] .collection-filter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 13px;
+  color: rgb(var(--muted));
+  cursor: pointer;
+}
+:root[data-gui="console"] .collection-filter strong {
   color: var(--foreground);
   font-family: var(--font-mono);
   font-size: 16px;
 }
-:root[data-gui="console"] .collection-channel:hover > :first-child {
+:root[data-gui="console"] .collection-filter:is(:hover, [aria-pressed="true"]) {
+  border-color: var(--info);
   color: var(--foreground);
 }
-
-/* Clickable channels and quiet content changes make the instruments functional. */
-:root[data-gui="console"] button.collection-channel {
-  width: 100%;
-  padding: 10px 12px;
-  border: 1px solid transparent;
-  border-radius: 4px;
-  text-align: left;
-  cursor: pointer;
+:root[data-gui="console"] .collection-filter[aria-pressed="true"] > span {
+  text-decoration: underline;
+  text-underline-offset: 4px;
 }
-:root[data-gui="console"] button.collection-channel:is(:hover, [aria-pressed="true"]) {
-  border-color: var(--info-border);
-}
-:root[data-gui="console"] button.collection-channel[aria-pressed="true"] > :first-child {
-  color: var(--info);
-}
-:root[data-gui="console"] button.collection-channel[aria-pressed="true"] .meter-used {
-  color: var(--info);
-}
-:root[data-gui="console"] .collection-selection-row,
 :root[data-gui="console"] .collection-pager {
   display: flex;
   flex-wrap: wrap;
@@ -2283,23 +2207,6 @@ html[data-gui="console"] {
   gap: 8px 16px;
   font-size: 11px;
   color: rgb(var(--muted));
-}
-:root[data-gui="console"] .collection-selection-row {
-  padding-top: 12px;
-}
-:root[data-gui="console"] .collection-selection-row button {
-  min-height: 44px;
-  padding: 8px 12px;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  color: rgb(var(--muted));
-  cursor: pointer;
-}
-:root[data-gui="console"] .collection-selection-row button[aria-pressed="true"] {
-  border-color: var(--info-border);
-  color: var(--foreground);
-}
-:root[data-gui="console"] .collection-pager {
   margin-top: 16px;
   padding-top: 12px;
   border-top: 1px solid var(--border);
@@ -2386,7 +2293,7 @@ html[data-gui="console"] {
   :root[data-gui="console"] #console-library-picks {
     animation: console-arrive 180ms ease-out both;
   }
-  :root[data-gui="console"] :is(.collection-channel, .console-draw-button, .collection-pager button) {
+  :root[data-gui="console"] :is(.collection-filter, .console-draw-button, .collection-pager button) {
     transition: border-color 160ms ease, transform 160ms ease;
   }
   :root[data-gui="console"] :is(.console-draw-button, .collection-pager button):enabled:active {
@@ -2399,9 +2306,12 @@ html[data-gui="console"] {
   }
 }
 @media (max-width: 479px) {
-  :root[data-gui="console"] .collection-distribution {
-    grid-template-columns: 1fr;
-    gap: 12px;
+  :root[data-gui="console"] .collection-filters {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  :root[data-gui="console"] .collection-filter:first-child {
+    grid-column: 1 / -1;
   }
 }
 
