@@ -126,13 +126,11 @@ export default function HomeClient({
                 <h1 id="intro-title">
                   HAWKS<span>.TW</span>
                 </h1>
-                <p className="identity-focus">寫程式，也打擊樂。</p>
+                <p className="identity-focus">嗨早安，我是 Hawks！</p>
                 <p className="identity-description">
-                  在程式開發、機器學習與資安之間探索。
+                  我喜歡寫程式、打擊樂跟動畫。
                   <br />
-                  這裡放著我的學習紀錄、管樂生活，
-                  <br />
-                  以及喜歡的動畫、電影、音樂與遊戲。
+                  這裡放一些學到的東西、參加活動的心得，還有平常的碎念和喜歡的作品。
                 </p>
                 <div className="identity-links">
                   <a href="https://github.com/Sean-Hawks">GitHub ↗</a>
