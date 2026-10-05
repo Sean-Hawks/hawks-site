@@ -2,19 +2,21 @@
 
 :root {
   color-scheme: dark;
-  --background: #151515;
-  --foreground: #f5f5f5;
-  --bg: 21 21 21;
-  --panel: 26 26 26;
-  --panel2: 31 31 31;
-  --text: 245 245 245;
-  --muted: 170 170 170;
-  --accent: 255 255 255;
+  --background: #0b1018;
+  --foreground: #f5f0eb;
+  --bg: 11 16 24;
+  --panel: 15 24 35;
+  --panel2: 20 33 46;
+  --text: 245 240 235;
+  --muted: 166 184 197;
+  --accent: 255 102 93;
   --accent-foreground: 245 245 245;
-  --purple: 245 245 245;
-  --line: 58 58 58;
-  --surface: 58 58 58;
-  --border: #3a3a3a;
+  --purple: 91 224 231;
+  --line: 57 73 84;
+  --surface: 57 73 84;
+  --border: #394954;
+  --brand: #ff665d;
+  --info: #5be0e7;
   --status-ok: #4ade80;
   --status-warning: #fbbf24;
   --status-error: #f87171;
@@ -235,12 +237,9 @@ button {
   overflow-wrap: anywhere;
 }
 
-/* Homepage: a personal dossier inspired by the reference's condensed display type. */
+/* Coral brand marks and cyan metadata carry the reference's cyberpunk palette. */
 .status-home {
-  --background: #101010;
-  --bg: 16 16 16;
-  --panel: 20 20 20;
-  background: var(--background);
+  background: linear-gradient(135deg, #1c141c 0%, #0b141e 36%, #0b1018 72%);
   font-family: var(--font-sans);
 }
 .status-home .site-header > div {
@@ -290,11 +289,16 @@ button {
   font-family: var(--font-mono);
 }
 .home-profile {
+  margin-top: 28px;
+  border: 1px solid var(--border);
+  border-top-color: var(--brand);
+  border-radius: 6px;
+  background: linear-gradient(120deg, #23171e, #101e2b 65%, #101925);
   display: grid;
   grid-template-columns: minmax(0, 1fr) 240px;
   gap: 64px;
   align-items: center;
-  padding: 64px 0 56px;
+  padding: 56px 40px;
 }
 .profile-eyebrow {
   display: flex;
@@ -310,6 +314,7 @@ button {
   letter-spacing: 0;
 }
 .profile-copy h1 {
+  color: var(--brand);
   margin-top: 20px;
   font-family: var(--font-display), sans-serif;
   font-size: 44px;
@@ -318,7 +323,7 @@ button {
   line-height: 1;
 }
 .profile-copy h1 span {
-  color: rgb(var(--muted));
+  color: var(--info);
   font-size: 26px;
   font-weight: 600;
   letter-spacing: 0.03em;
@@ -333,7 +338,7 @@ button {
 .identity-description {
   margin-top: 20px;
   padding-left: 20px;
-  border-left: 1px solid var(--border);
+  border-left: 2px solid var(--info);
   font-size: 13px;
   line-height: 1.9;
   color: rgb(var(--muted));
@@ -346,6 +351,7 @@ button {
   font-size: 13px;
 }
 .identity-links a {
+  color: var(--brand);
   display: inline-flex;
   align-items: center;
   min-height: 44px;
@@ -363,7 +369,7 @@ button {
   overflow: hidden;
 }
 .profile-portrait img {
-  filter: grayscale(1);
+  filter: none;
 }
 .profile-portrait figcaption {
   display: flex;
@@ -380,9 +386,11 @@ button {
   letter-spacing: 0.06em;
 }
 .content-index {
+  margin-top: 24px;
+  background: #0d1a26;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  border: 1px solid var(--border);
+  border: 1px solid #2e5360;
   border-radius: 6px;
 }
 .content-index > a {
@@ -400,7 +408,7 @@ button {
   color: rgb(var(--text));
 }
 .index-label {
-  color: rgb(var(--muted));
+  color: var(--info);
   font-size: 13px;
 }
 .index-value {
@@ -420,7 +428,7 @@ button {
 }
 .content-index svg {
   margin-left: auto;
-  color: rgb(var(--muted));
+  color: var(--brand);
 }
 .home-writing {
   margin-top: 56px;
@@ -432,9 +440,10 @@ button {
   flex-wrap: wrap;
   gap: 12px 24px;
   padding-bottom: 20px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--brand);
 }
 .panel-heading h2 {
+  color: var(--brand);
   font-size: 26px;
   font-weight: 600;
   line-height: 1.4;
@@ -500,7 +509,7 @@ button {
   border-radius: 6px;
 }
 .feature-image img {
-  filter: grayscale(1);
+  filter: none;
 }
 .feature-read {
   display: inline-flex;
@@ -518,10 +527,10 @@ button {
 }
 .recent-entries {
   padding-left: 32px;
-  border-left: 1px solid var(--border);
+  border-left: 1px solid #2e5360;
 }
 .recent-label {
-  color: rgb(var(--muted));
+  color: var(--info);
   font-size: 11px;
   letter-spacing: 0.08em;
 }
@@ -593,7 +602,7 @@ button {
   background: rgb(var(--panel2));
 }
 .pick-image img {
-  filter: grayscale(1);
+  filter: none;
 }
 .pick-meta {
   display: flex;
@@ -634,10 +643,10 @@ button {
   line-height: 1;
 }
 .rating-meter > span:first-child {
-  color: #f5f5f5;
+  color: var(--info);
 }
 .rating-meter > span:last-child {
-  color: #3a3a3a;
+  color: #394954;
 }
 .empty-copy {
   padding: 20px 0;
@@ -674,6 +683,8 @@ button {
 @media (max-width: 899px) {
   .home-profile {
     gap: 32px;
+    padding-left: 28px;
+    padding-right: 28px;
   }
   .writing-layout {
     gap: 24px;
@@ -700,7 +711,7 @@ button {
 }
 @media (max-width: 699px) {
   .home-profile {
-    padding: 40px 0;
+    padding: 32px 24px;
     grid-template-columns: minmax(0, 1fr) 160px;
   }
   .profile-portrait > div {
@@ -740,6 +751,7 @@ button {
 @media (max-width: 599px) {
   .home-profile {
     grid-template-columns: minmax(0, 1fr) 92px;
+    padding: 28px 20px;
     gap: 20px;
     align-items: start;
   }
@@ -768,6 +780,17 @@ button {
   }
 }
 @media (max-width: 479px) {
+  .home-profile {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .profile-portrait {
+    grid-row: 1;
+    margin-top: 0;
+  }
+  .profile-portrait > div {
+    width: 92px;
+  }
   .status-main {
     padding: 20px 16px 40px;
   }
@@ -788,6 +811,46 @@ button {
     margin-left: 16px;
     margin-right: 16px;
   }
+}
+
+/* Interactive and informational roles are separate from health status colors. */
+.status-home .header-wordmark {
+  color: var(--brand);
+}
+.status-home .header-icon-button {
+  color: var(--info);
+}
+.status-home .header-main-link:hover {
+  color: var(--info);
+}
+.status-home .header-main-link[aria-current] {
+  background: #ff665d;
+  color: #0b1018;
+}
+.status-home .header-icon-button[aria-current] {
+  background: #ff665d;
+  color: #0b1018;
+}
+.profile-eyebrow,
+.feature-meta > span,
+.entry-meta > span {
+  color: var(--info);
+}
+.identity-links a:hover,
+.panel-heading > a,
+.feature-read,
+.subscribe-link {
+  color: var(--info);
+}
+.status-home :focus-visible {
+  outline-color: var(--info);
+}
+.status-home .feature-image,
+.status-home .pick-image {
+  border-color: #2e5360;
+}
+.status-home .status-footer a:hover {
+  color: var(--info);
 }
 
 /* Shared inner-page panels. */
