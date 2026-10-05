@@ -10,7 +10,7 @@ export default function NotFound() {
       <Header />
       <main id="main-content" tabIndex={-1} className="mx-auto max-w-3xl px-4 py-16 sm:py-24">
         <p className="font-mono text-sm tracking-[0.18em] text-[var(--status-error)]">404 · 找不到頁面</p>
-        <h1 className="mt-5 font-serif text-4xl font-bold leading-tight sm:text-5xl">這個頁面走丟了</h1>
+        <h1 className="site-page-title mt-5 font-serif text-4xl font-bold leading-tight sm:text-5xl">這個頁面走丟了</h1>
         <p className="mt-5 max-w-xl text-base leading-8 text-[rgb(var(--muted))]">網址可能有誤，或內容已經搬家。你可以從文章列表重新找起，也可以搜尋標題或關鍵字。</p>
         <Link href="/search/" className="mt-8 inline-flex min-h-12 items-center gap-3 border border-[rgb(var(--accent)/0.35)] bg-[rgb(var(--accent)/0.10)] px-5 py-3 font-semibold text-[rgb(var(--accent))] hover:bg-[rgb(var(--accent)/0.18)]">
           <Search className="h-5 w-5" aria-hidden="true" />搜尋站內內容

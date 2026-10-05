@@ -20,9 +20,9 @@ export default function SavedPage() {
         className="mx-auto max-w-3xl px-4 py-12 sm:px-6"
       >
         <p className="text-xs font-bold tracking-widest text-[rgb(var(--accent))]">
-          YOUR READING SHELF
+          稍後閱讀
         </p>
-        <h1 className="mt-3 font-serif text-4xl font-bold tracking-tight">
+        <h1 className="site-page-title mt-3 font-serif text-4xl font-bold tracking-tight">
           留著，下次讀
         </h1>
         <p className="mt-4 text-sm leading-7 text-[rgb(var(--muted))]">

@@ -83,7 +83,7 @@ export default async function PostPage({ params }: PageProps) {
         <ThemeStyles />
         <Header />
         <main id="main-content" tabIndex={-1} className="p-6 max-w-2xl mx-auto">
-          <h1 className="font-serif text-2xl font-bold tracking-tight">文章未找到</h1>
+          <h1 className="site-page-title font-serif text-2xl font-bold tracking-tight">文章未找到</h1>
           <Link href="/blog" className="mt-4 text-[rgb(var(--accent))] hover:underline inline-flex items-center gap-2">
             <ArrowLeft className="h-4 w-4" />
             回到 Blog
@@ -114,7 +114,7 @@ export default async function PostPage({ params }: PageProps) {
             </Link>
 
             <article data-print-article className="overflow-hidden rounded-2xl border border-[rgb(var(--accent)/0.16)] bg-[rgb(var(--panel)/0.90)] shadow-[0_24px_80px_rgba(90,76,55,0.16)]">
-              <div className="border-b border-[rgb(var(--accent)/0.12)] bg-gradient-to-br from-[rgb(var(--panel2)/0.92)] via-[rgb(var(--panel)/0.72)] to-[rgb(var(--accent)/0.06)] p-6 sm:p-10">
+              <div className="reading-header border-b border-[rgb(var(--accent)/0.12)] bg-gradient-to-br from-[rgb(var(--panel2)/0.92)] via-[rgb(var(--panel)/0.72)] to-[rgb(var(--accent)/0.06)] p-6 sm:p-10">
                 {post.banner && (
                   <div className="-mx-6 -mt-6 mb-8 sm:-mx-10 sm:-mt-10 border-b border-[rgb(var(--line)/0.10)]">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -146,7 +146,7 @@ export default async function PostPage({ params }: PageProps) {
                   ))}
                 </div>
                 
-                <h1 className="font-serif text-3xl font-bold leading-tight tracking-tight text-[rgb(var(--text))] sm:text-4xl">
+                <h1 className="site-page-title font-serif text-3xl font-bold leading-tight tracking-tight text-[rgb(var(--text))] sm:text-4xl">
                   {post.title}
                 </h1>
                 <div className="mt-4 flex items-center gap-4 text-sm text-[rgb(var(--muted))]">

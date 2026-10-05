@@ -29,7 +29,7 @@ export default function SignalPageHeader({
         }
       >
         <div className="p-5 sm:p-7">
-          <h1 className="signal-page-title">{title}</h1>
+          <h1 className="site-page-title signal-page-title">{title}</h1>
           <p className="mt-4 max-w-3xl text-sm leading-7 text-[rgb(var(--muted))] sm:text-base sm:leading-8">
             {description}
           </p>

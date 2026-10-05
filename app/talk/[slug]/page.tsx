@@ -78,7 +78,7 @@ export default async function TalkDetailPage({ params }: PageProps) {
         <ThemeStyles />
         <Header />
         <main id="main-content" tabIndex={-1} className="p-6 max-w-2xl mx-auto">
-          <h1 className="font-serif text-2xl font-bold tracking-tight">Talk 未找到</h1>
+          <h1 className="site-page-title font-serif text-2xl font-bold tracking-tight">Talk 未找到</h1>
           <Link href="/talk" className="mt-4 text-[rgb(var(--accent))] hover:underline inline-flex items-center gap-2">
             <ArrowLeft className="h-4 w-4" />
             回到 Talks
@@ -122,7 +122,7 @@ export default async function TalkDetailPage({ params }: PageProps) {
                 </div>
               )}
 
-              <header className="border-b border-[rgb(var(--accent)/0.12)] bg-gradient-to-br from-[rgb(var(--panel2)/0.92)] via-[rgb(var(--panel)/0.72)] to-[rgb(var(--accent)/0.06)] p-6 sm:p-10">
+              <header className="reading-header border-b border-[rgb(var(--accent)/0.12)] bg-gradient-to-br from-[rgb(var(--panel2)/0.92)] via-[rgb(var(--panel)/0.72)] to-[rgb(var(--accent)/0.06)] p-6 sm:p-10">
                 <div className="mb-6 inline-flex items-center gap-3 text-xs font-bold uppercase tracking-[0.2em] text-[rgb(var(--accent))]">
                   <span className="h-px w-8 bg-[rgb(var(--accent)/0.55)]" />
                   <FileText className="h-3.5 w-3.5" />
@@ -142,7 +142,7 @@ export default async function TalkDetailPage({ params }: PageProps) {
                   </div>
                 )}
 
-                <h1 className="font-serif text-3xl font-bold leading-tight tracking-tight text-[rgb(var(--text))] sm:text-4xl">
+                <h1 className="site-page-title font-serif text-3xl font-bold leading-tight tracking-tight text-[rgb(var(--text))] sm:text-4xl">
                   {talk.title}
                 </h1>
 

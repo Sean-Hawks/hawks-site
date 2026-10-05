@@ -122,7 +122,7 @@ export default function BlogPage() {
         <header className="now-desk-hero">
           <div className="md:col-span-2">
             <div className="now-desk-kicker">文章與近況</div>
-            <h1 className="now-desk-title mt-5 font-serif font-bold tracking-[-0.06em]">
+            <h1 className="site-page-title now-desk-title mt-5 font-serif font-bold tracking-[-0.06em]">
               部落格
             </h1>
             <Link href="/explore/" className="mt-5 inline-flex min-h-11 items-center gap-2 text-sm font-medium text-[rgb(var(--accent))]">不知道從哪裡讀起？隨機挑一篇 <ArrowRight className="h-4 w-4" /></Link>
@@ -153,17 +153,18 @@ export default function BlogPage() {
           {latestEssay && (
             <Link href={latestEssay.href} className="now-desk-feature now-desk-feature-essay group">
               {latestEssay.image && (
-                <Image
-                  src={latestEssay.image}
-                  alt=""
-                  fill
-                  sizes="(min-width: 1024px) 500px, 100vw"
-                  className="object-cover opacity-35 transition duration-500 group-hover:scale-[1.02] group-hover:opacity-45"
-                  priority
-                />
+                <div className="now-desk-cover">
+                  <Image
+                    src={latestEssay.image}
+                    alt=""
+                    fill
+                    sizes="(min-width: 1024px) 500px, 100vw"
+                    className="object-cover"
+                    priority
+                  />
+                </div>
               )}
-              <div className="absolute inset-0 bg-gradient-to-t from-[rgb(var(--panel))] via-[rgb(var(--panel)/0.82)] to-[rgb(var(--panel)/0.25)]" />
-              <div className="relative flex h-full flex-col">
+              <div className="relative flex flex-1 flex-col">
                 <div className="flex items-center justify-between gap-4">
                   <span className="now-desk-label"><BookOpen className="h-3.5 w-3.5" />最近文章</span>
                   <time className="now-desk-date" dateTime={latestEssay.date}>{longDate(latestEssay.date)}</time>

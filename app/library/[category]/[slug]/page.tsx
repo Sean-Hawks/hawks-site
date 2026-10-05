@@ -322,7 +322,7 @@ export default async function LibraryReviewPage({ params }: PageProps) {
                   )}
                 </div>
 
-                <div className="p-6 sm:p-10">
+                <div className="reading-header p-6 sm:p-10">
                   <div className="mb-4 flex flex-wrap items-center gap-2">
                     <span className="rounded-md bg-[rgb(var(--accent)/0.10)] px-2.5 py-1 text-xs font-bold text-[rgb(var(--accent))]">
                       {item.hasReview ? "評論" : currentCategory.label}
@@ -339,7 +339,7 @@ export default async function LibraryReviewPage({ params }: PageProps) {
                     )}
                   </div>
 
-                  <h1 className="font-serif text-3xl font-bold leading-tight tracking-tight text-[rgb(var(--text))] sm:text-4xl">
+                  <h1 className="site-page-title font-serif text-3xl font-bold leading-tight tracking-tight text-[rgb(var(--text))] sm:text-4xl">
                     {item.hasReview ? `評論：${item.title}` : item.title}
                   </h1>
                   {item.subtitle && (

@@ -5,25 +5,6 @@ import { projects } from "../data/projects";
 import type { Post, Talk } from "../types";
 import type { LibraryItem } from "../data/library";
 import Header from "./Header";
-import localFont from "next/font/local";
-
-const displayFont = localFont({
-  src: [
-    {
-      path: "../../public/fonts/rajdhani/Rajdhani-SemiBold.ttf",
-      weight: "600",
-      style: "normal",
-    },
-    {
-      path: "../../public/fonts/rajdhani/Rajdhani-Bold.ttf",
-      weight: "700",
-      style: "normal",
-    },
-  ],
-  variable: "--font-display",
-  display: "swap",
-});
-
 interface HomeClientProps {
   posts: Post[];
   talks: Talk[];
@@ -109,7 +90,7 @@ export default function HomeClient({
   ];
 
   return (
-    <div className={`${displayFont.variable} status-home min-h-screen`}>
+    <div className="status-home min-h-screen">
       <Header />
       <main id="main-content" tabIndex={-1} className="status-main">
         <div className="overview-summary">
@@ -130,7 +111,7 @@ export default function HomeClient({
               個人檔案<span>台北 · UTC+8</span>
             </div>
             <h1 id="intro-title">
-              Hawks<span>.tw</span>
+              HAWKS<span>.TW</span>
             </h1>
             <p className="identity-focus">寫程式，也打擊樂。</p>
             <p className="identity-description">

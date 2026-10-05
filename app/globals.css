@@ -76,7 +76,7 @@ button {
   -webkit-tap-highlight-color: transparent;
 }
 .site-shell {
-  background: rgb(var(--bg));
+  background: linear-gradient(135deg, #0c1828, var(--background) 70%);
 }
 .home-panel,
 .quiet-panel {
@@ -100,15 +100,18 @@ button {
   border-color: var(--status-error);
 }
 
-/* Navigation uses inversion only for the current page. */
+/* Shared navigation uses yellow for identity and the current section. */
 .site-header {
   background: rgb(var(--bg));
   border-color: var(--border);
 }
 .header-wordmark {
+  color: var(--brand);
+  font-family: var(--font-display), var(--font-sans);
   font-size: 26px;
   font-weight: 700;
-  letter-spacing: -0.06em;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
   line-height: 1;
 }
 .header-icon-button {
@@ -119,8 +122,8 @@ button {
   width: 44px;
   height: 44px;
   border: 1px solid var(--border);
-  border-radius: 6px;
-  color: rgb(var(--muted));
+  border-radius: 3px;
+  color: var(--info);
   background: transparent;
 }
 .header-icon-button:hover,
@@ -134,7 +137,7 @@ button {
   align-items: center;
   min-height: 40px;
   padding: 8px 16px;
-  border-radius: 5px;
+  border-radius: 3px;
   color: rgb(var(--muted));
   font-size: 13px;
 }
@@ -144,8 +147,8 @@ button {
 .header-main-link[aria-current],
 .header-icon-button[aria-current],
 .header-navigation-panel a[aria-current] {
-  background: #f5f5f5;
-  color: #151515;
+  background: var(--brand);
+  color: var(--background);
 }
 .header-navigation-panel {
   position: absolute;
@@ -244,21 +247,8 @@ button {
   background: linear-gradient(135deg, #191b17 0%, #0c1828 36%, #0b1018 72%);
   font-family: var(--font-sans);
 }
-.status-home .site-header > div {
+.site-header > div {
   max-width: 1200px;
-}
-.status-home .header-wordmark {
-  font-family: var(--font-display), sans-serif;
-  font-size: 26px;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-}
-.status-home .header-main-link {
-  font-size: 13px;
-  border-radius: 3px;
-}
-.status-home .header-icon-button {
-  border-radius: 3px;
 }
 .status-main {
   max-width: 1200px;
@@ -317,18 +307,24 @@ button {
 }
 .profile-copy h1 {
   color: var(--brand);
-  margin-top: 20px;
+  margin-top: 24px;
   font-family: var(--font-display), sans-serif;
-  font-size: 44px;
+  font-size: clamp(64px, 12vw, 144px);
   font-weight: 700;
-  letter-spacing: 0.06em;
-  line-height: 1;
+  letter-spacing: -0.055em;
+  line-height: 0.85;
 }
 .profile-copy h1 span {
+  display: block;
   color: var(--info);
-  font-size: 26px;
-  font-weight: 600;
-  letter-spacing: 0.03em;
+  margin-top: 6px;
+  letter-spacing: -0.04em;
+}
+@supports (-webkit-text-stroke: 1px currentColor) {
+  .profile-copy h1 span {
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--info);
+  }
 }
 .identity-focus {
   margin-top: 24px;
@@ -722,9 +718,6 @@ button {
   .profile-portrait > div {
     width: 160px;
   }
-  .profile-copy h1 {
-    font-size: 44px;
-  }
   .identity-focus {
     font-size: 26px;
   }
@@ -819,22 +812,8 @@ button {
 }
 
 /* Interactive and informational roles are separate from health status colors. */
-.status-home .header-wordmark {
-  color: var(--brand);
-}
-.status-home .header-icon-button {
+.header-main-link:hover {
   color: var(--info);
-}
-.status-home .header-main-link:hover {
-  color: var(--info);
-}
-.status-home .header-main-link[aria-current] {
-  background: var(--brand);
-  color: #0b1018;
-}
-.status-home .header-icon-button[aria-current] {
-  background: var(--brand);
-  color: #0b1018;
 }
 .profile-eyebrow,
 .feature-meta > span,
@@ -916,7 +895,7 @@ button {
   font-size: 13px;
 }
 
-/* Compatibility for existing content views, using the same neutral surfaces. */
+/* Existing content cards share opaque blue surfaces and readable metadata. */
 @media screen {
   :where(
     [class*="border-[rgb(var(--line)"],
@@ -959,12 +938,108 @@ button {
   }
 }
 
+/* Shared page identity; long-form prose keeps its normal reading type. */
+.site-page-title {
+  color: var(--brand);
+  font-family: var(--font-display), var(--font-sans);
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+.signal-page-header,
+.reading-header {
+  background: linear-gradient(120deg, #20251d, #11243b 65%, #101c2d);
+  border-top: 1px solid var(--brand);
+}
+.signal-page-title {
+  font-size: 44px;
+}
+.signal-page-kicker {
+  color: var(--info);
+  border-bottom-color: var(--info-border);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+.signal-page-stat {
+  background: var(--info-panel);
+  border-color: var(--info-border);
+}
+.signal-page-stat > :first-child {
+  color: var(--info);
+}
+.header-nav-heading,
+.header-tool-link svg {
+  color: var(--info);
+}
+.header-navigation-panel a:hover {
+  border-color: var(--info);
+}
+.header-icon-button:hover,
+.header-menu-button[aria-expanded="true"],
+.header-menu-button[data-active] {
+  border-color: var(--info);
+  color: var(--info);
+}
+.header-main-link[aria-current]:hover,
+.header-icon-button[aria-current]:hover {
+  color: var(--background);
+}
+main a.group:hover {
+  border-color: var(--info);
+}
+main button[aria-pressed="true"]:not(.article-action-button) {
+  border-color: var(--info);
+  background: var(--info-panel);
+  color: var(--info);
+}
+main label:has(input:focus-visible),
+main label:has(input[type="radio"]:checked) {
+  border-color: var(--info);
+}
+main input,
+main select {
+  accent-color: var(--info);
+}
+.article-prose a,
+.article-prose code,
+.reading-header a,
+.reading-header time {
+  color: var(--info);
+}
+.article-prose pre {
+  background: #0a1422;
+  border-color: var(--info-border);
+}
+.article-prose blockquote {
+  border-left-color: var(--info);
+  background: var(--info-panel);
+}
+.article-prose h2 {
+  border-left-color: var(--brand);
+}
+.now-desk-section-heading h2 {
+  color: var(--brand);
+}
+.now-desk-cover {
+  position: relative;
+  height: 200px;
+  flex-shrink: 0;
+  margin: -24px -24px 24px;
+  border-bottom: 1px solid var(--info-border);
+  overflow: hidden;
+}
+@media (max-width: 639px) {
+  .signal-page-title {
+    font-size: 32px;
+  }
+}
+
 /* Now: a desk, not another archive page. */
 .now-desk {
   position: relative;
   isolation: isolate;
   overflow-x: clip;
-  background: rgb(var(--bg));
+  background: linear-gradient(135deg, #0c1828, var(--background) 70%);
 }
 
 .now-desk-hero {
@@ -972,17 +1047,16 @@ button {
   gap: 2.5rem;
   align-items: end;
   padding-bottom: 3.5rem;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--brand);
 }
 
 .now-desk-kicker,
 .now-desk-date {
-  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 400;
   letter-spacing: 0.16em;
-
-  color: rgb(var(--muted));
+  color: var(--info);
 }
 
 .now-desk-title {
@@ -1005,6 +1079,7 @@ button {
   overflow: hidden;
   border-radius: 8px;
   border: 1px solid var(--border);
+  border-top-color: var(--brand);
   background: rgb(var(--panel));
   padding: 1.5rem;
   transition:
@@ -1013,7 +1088,7 @@ button {
 }
 
 .now-desk-feature:hover {
-  border-color: var(--border);
+  border-color: var(--info);
 }
 
 .now-desk-feature-note {
@@ -1024,8 +1099,8 @@ button {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  color: rgb(var(--accent));
-  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  color: var(--info);
+  font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 400;
   letter-spacing: 0.12em;
@@ -1037,7 +1112,7 @@ button {
   justify-content: space-between;
   gap: 1rem;
   padding-bottom: 1.25rem;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--brand);
 }
 
 .now-desk-list {
@@ -1111,8 +1186,8 @@ button {
   border: 1px solid var(--border);
   background: transparent;
   padding: 0.15rem 0.4rem;
-  color: rgb(var(--accent));
-  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  color: var(--info);
+  font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 400;
   letter-spacing: 0.08em;
@@ -1267,7 +1342,7 @@ button {
   transform: translateY(0);
 }
 :focus-visible {
-  outline: 2px solid rgb(var(--accent));
+  outline: 2px solid var(--info);
   outline-offset: 4px;
 }
 main:focus {

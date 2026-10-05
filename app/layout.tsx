@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { feedChannels } from "./lib/feed-channels";
 import CloudflareAnalytics from "./components/CloudflareAnalytics";
+import { displayFont } from "./lib/display-font";
 import "./globals.css";
 import "./article-print.css";
 
@@ -118,7 +119,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body>
+      <body className={displayFont.variable}>
         <a href="#main-content" className="skip-link">跳到主要內容</a>
         {children}
         <CloudflareAnalytics />

@@ -13,21 +13,21 @@ export default function ContactPage() {
       value: "me@hawks.tw", // 請修改為你的 Email
       icon: Mail,
       link: "mailto:me@hawks.tw",
-      color: "text-red-400",
+      color: "text-[rgb(var(--purple))]",
     },
     {
       name: "GitHub",
       value: "@Sean-Hawks", // 請修改為你的 GitHub
       icon: Github,
       link: "https://github.com/Sean-Hawks",
-      color: "text-[rgb(var(--text))]",
+      color: "text-[rgb(var(--purple))]",
     },
     {
       name: "Discord",
       value: "鯊窩 · 1awks",
       icon: MessageSquare,
       link: "/discord/",
-      color: "text-indigo-400",
+      color: "text-[rgb(var(--purple))]",
     }
   ];
 
@@ -40,9 +40,9 @@ export default function ContactPage() {
         <main id="main-content" tabIndex={-1} className="mx-auto max-w-5xl py-10 sm:py-14">
           <SignalPageHeader
 
-            title="Contact"
+            title="聯絡我"
             description="有任何問題或合作邀約，歡迎透過以下方式聯繫我。"
-            statLabel="Channels"
+            statLabel="聯絡方式"
             statValue={String(contacts.length).padStart(2, "0")}
           />
 

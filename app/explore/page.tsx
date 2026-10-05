@@ -29,9 +29,9 @@ export default function ExplorePage() {
         className="mx-auto max-w-4xl px-4 py-12 sm:px-6 sm:py-16"
       >
         <p className="text-xs font-bold tracking-widest text-[rgb(var(--accent))]">
-          A LITTLE SERENDIPITY
+          隨機探索
         </p>
-        <h1 className="mt-4 font-serif text-4xl font-bold leading-tight tracking-tight sm:text-5xl">
+        <h1 className="site-page-title mt-4 font-serif text-4xl font-bold leading-tight tracking-tight sm:text-5xl">
           留幾分鐘，
           <br />
           讀點意外的。

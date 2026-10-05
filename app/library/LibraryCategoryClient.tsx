@@ -498,7 +498,7 @@ export default function LibraryCategoryClient({
 
   return (
     <div className="space-y-6">
-      <section className="rounded-2xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.88)] p-5 shadow-[0_22px_70px_rgb(var(--line)/0.10)] sm:p-7">
+      <section className="reading-header rounded-2xl border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--panel)/0.88)] p-5 shadow-[0_22px_70px_rgb(var(--line)/0.10)] sm:p-7">
         <Link
           href="/library"
           className="mb-5 inline-flex items-center gap-2 text-sm text-[rgb(var(--muted))] transition-colors hover:text-[rgb(var(--accent))]"
@@ -510,7 +510,7 @@ export default function LibraryCategoryClient({
           <CategoryIcon className="h-3.5 w-3.5" />
           {category.label}
         </div>
-        <h1 className="font-serif text-3xl font-bold leading-tight tracking-tight sm:text-5xl">
+        <h1 className="site-page-title font-serif text-3xl font-bold leading-tight tracking-tight sm:text-5xl">
           {category.title}
         </h1>
         <p className="mt-3 max-w-2xl text-base leading-8 text-[rgb(var(--muted))]">
