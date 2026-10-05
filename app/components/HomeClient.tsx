@@ -5,7 +5,7 @@ import { projects } from "../data/projects";
 import type { Post, Talk } from "../types";
 import type { LibraryItem } from "../data/library";
 import PublicationActivity from "./PublicationActivity";
-import ConsoleCommandButton from "./ConsoleCommandButton";
+import { consoleStatistics } from "../lib/console-stats";
 interface HomeClientProps {
   posts: Post[];
   talks: Talk[];
@@ -18,6 +18,7 @@ const categories = {
   artist: "音樂",
   game: "遊戲",
 };
+const readingKinds = { post: "文章", talk: "近況", library: "作品評論" };
 const statuses = {
   watched: "已看完",
   listened: "已聽過",
@@ -85,6 +86,7 @@ export default function HomeClient({
   const plannedCount = libraryItems.filter(
     (item) => item.status === "planned",
   ).length;
+  const { reading, collection, averageRating } = consoleStatistics(posts, talks, libraryItems);
   const ratingSegments = libraryItems.length
     ? Math.round((ratedCount / libraryItems.length) * 24)
     : 0;
@@ -115,26 +117,14 @@ export default function HomeClient({
           {updated && <time dateTime={updated.date}>{updated.date}</time>}
         </div>
 
-        <header className="console-masthead">
-          <h1 id="intro-title">HAWKS<span>.TW</span></h1>
-          <div className="console-masthead-controls">
-            <span>個人網站 · 台北 · UTC+8</span>
-            <ConsoleCommandButton />
-          </div>
-        </header>
-        <nav className="console-section-nav" aria-label="首頁區塊">
-          <a href="#main-content">總覽</a>
-          <a href="#console-writing">文章與近況</a>
-          <a href="#console-library">喜歡的作品</a>
-          {entries.length > 0 && <a href="#console-activity">發布活動</a>}
-        </nav>
         <div className="home-console">
           <aside className="home-dossier">
             <section className="home-profile" aria-labelledby="profile-title">
               <div className="profile-eyebrow">
-                <h2 id="profile-title">關於我</h2><span>Hawks</span>
+                <h2 id="profile-title">個人檔案</h2><span>台北 · UTC+8</span>
               </div>
               <div className="profile-copy">
+                <h1 id="intro-title">HAWKS<span>.TW</span></h1>
                 <p className="identity-focus">嗨早安，我是 Hawks！</p>
                 <p className="identity-description">
                   我喜歡寫程式、打擊樂跟動畫。
@@ -166,6 +156,27 @@ export default function HomeClient({
               <Source>個人資料 · GitHub / 經歷</Source>
             </section>
             <PublicationActivity dates={entries.map((entry) => entry.date)} />
+            {reading.count > 0 && (
+              <section className="reading-inventory" aria-labelledby="inventory-title">
+                <div className="console-title-row">
+                  <h2 id="inventory-title">閱讀存量</h2><span>{reading.count} 篇正文</span>
+                </div>
+                <div className="inventory-body">
+                  <p className="inventory-label">全部讀完，預估需要</p>
+                  <div className="inventory-total"><strong>{reading.minutes}</strong><small>分鐘</small></div>
+                  <dl className="inventory-breakdown">
+                    {reading.breakdown.map((item) => (
+                      <div key={item.kind}><dt>{readingKinds[item.kind]}</dt><dd><strong>{item.minutes}</strong> 分鐘</dd></div>
+                    ))}
+                  </dl>
+                  <Link href="/explore/" className="inventory-short-link">
+                    <span>五分鐘內可讀完 <strong>{reading.shortCount}</strong> 篇</span>
+                    <ArrowUpRight size={16} aria-hidden="true" />
+                  </Link>
+                </div>
+                <Source>公開正文 · 依文字估算，圖片與程式碼不計</Source>
+              </section>
+            )}
           </aside>
           <div className="home-stream">
             <nav className="content-index" aria-label="站內內容索引">
@@ -291,6 +302,9 @@ export default function HomeClient({
                     </div>
                   </div>
                   <div className="monitor-status">
+                    {averageRating !== null && (
+                      <span>平均個人評分<strong>{averageRating.toFixed(1)}</strong> / 10</span>
+                    )}
                     <span>
                       <span className={activeCount ? "status-ok" : "secondary"}>
                         {activeCount ? "●" : "○"} 進行中
@@ -301,6 +315,20 @@ export default function HomeClient({
                       ○ 待補<strong>{plannedCount}</strong> 件
                     </span>
                   </div>
+                </div>
+              )}
+              {libraryItems.length > 0 && (
+                <div className="collection-distribution" aria-label="收藏分類占比">
+                  {collection.map(({ category, count }) => (
+                    <Link href={`/library/${category}/`} key={category} className="collection-channel">
+                      <div><span>{categories[category]}</span><span><strong>{count}</strong> {category === "artist" ? "位 / 組" : category === "game" ? "款" : "部"}</span></div>
+                      <div className="monitor-meter" role="meter" aria-label={`${categories[category]}占全部收藏`} aria-valuemin={0} aria-valuemax={libraryItems.length} aria-valuenow={count} aria-valuetext={`${count} / ${libraryItems.length} 件`}>
+                        {Array.from({ length: 24 }, (_, index) => (
+                          <span key={index} className={index < Math.round(count / libraryItems.length * 24) ? "meter-used" : undefined} aria-hidden="true">━</span>
+                        ))}
+                      </div>
+                    </Link>
+                  ))}
                 </div>
               )}
               <div className="library-picks">
