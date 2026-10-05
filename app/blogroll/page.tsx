@@ -34,7 +34,7 @@ export default function BlogrollPage() {
 
       <main id="main-content" tabIndex={-1} className="mx-auto max-w-5xl px-4 py-10 sm:px-3">
         <SignalPageHeader
-          code="09 / NETWORK"
+
           title="部落卷"
           description="逛了很多人的部落格，整理出值得推薦的幾個，還有朋友們的網站。"
           statLabel="Links"

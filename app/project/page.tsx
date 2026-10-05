@@ -27,11 +27,11 @@ export default function ProjectPage() {
 
       <main id="main-content" tabIndex={-1} className="mx-auto max-w-6xl px-4 py-10 sm:px-3">
         <SignalPageHeader
-          code="03 / BUILDS"
-          title="Project"
+
+          title="專案"
           description="放一些正在做、做過，或之後想慢慢補完的東西。"
-          statLabel="Projects"
-          statValue={String(projects.length).padStart(2, "0")}
+          statLabel="專案數量"
+          statValue={projects.length}
         />
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -50,7 +50,7 @@ export default function ProjectPage() {
                 <ExternalLink className="h-4 w-4 text-[rgb(var(--muted))] transition-colors group-hover:text-[rgb(var(--accent))]" />
               </div>
               {project.award && (
-                <div className="mb-4 inline-flex items-center gap-2 rounded-md border border-amber-400/30 bg-amber-400/10 px-2.5 py-1.5 text-xs font-bold text-amber-700 dark:text-amber-300">
+                <div className="mb-4 inline-flex items-center gap-2 rounded-md border border-[rgb(var(--line))] px-2.5 py-1.5 text-xs font-bold text-[rgb(var(--text))]">
                   <Award className="h-3.5 w-3.5" />
                   {project.award}
                 </div>

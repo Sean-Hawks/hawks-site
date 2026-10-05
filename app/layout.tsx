@@ -108,21 +108,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="zh-TW" suppressHydrationWarning>
+    <html lang="zh-TW" data-theme="dark">
       <head>
         {feedChannels.map(feed => <link key={feed.id} rel="alternate" type="application/rss+xml" title={`hawks.tw · ${feed.title}`} href={feed.path} />)}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              try {
-                var theme = localStorage.getItem("theme-v2");
-                document.documentElement.dataset.theme = theme === "dark" ? "dark" : "light";
-              } catch (_) {
-                document.documentElement.dataset.theme = "light";
-              }
-            `,
-          }}
-        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

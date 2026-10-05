@@ -53,7 +53,7 @@ export default function SubscribePage() {
 
       <main id="main-content" tabIndex={-1} className="mx-auto max-w-5xl px-4 py-10 sm:px-3">
         <SignalPageHeader
-          code="05 / BROADCAST"
+
           title="訂閱 hawks.tw"
           description="只訂閱你感興趣的文章、近況或評論，也可以用 email 收到全部更新。"
           statLabel="RSS Channels"
@@ -97,7 +97,7 @@ export default function SubscribePage() {
                 />
                 <button
                   type="submit"
-                  className="h-11 rounded-xl bg-[rgb(var(--accent))] px-4 text-sm font-bold text-[#111114] transition-opacity hover:opacity-90"
+                  className="h-11 rounded-xl border border-[rgb(var(--line))] px-4 text-sm font-bold text-[rgb(var(--text))] transition-opacity hover:opacity-90"
                 >
                   Subscribe
                 </button>

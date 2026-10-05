@@ -113,10 +113,10 @@ function Rating({ rating }: { rating: number | null }) {
 }
 
 const recommendationMeta = {
-  brilliant: { label: "Brilliant", Icon: Award },
-  favorite: { label: "Favorite", Icon: Heart },
-  recommended: { label: "Recommended", Icon: Star },
-  casual: { label: "Casual", Icon: Sparkles },
+  brilliant: { label: "極推薦", Icon: Award },
+  favorite: { label: "很喜歡", Icon: Heart },
+  recommended: { label: "推薦", Icon: Star },
+  casual: { label: "普通", Icon: Sparkles },
 } as const;
 
 export default async function LibraryReviewPage({ params }: PageProps) {
@@ -305,7 +305,7 @@ export default async function LibraryReviewPage({ params }: PageProps) {
                     </div>
                   )}
                   {(item.image.credit || item.image.source) && (
-                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent p-3 text-[11px] leading-4 text-white/78">
+                    <div className="absolute inset-x-0 bottom-0 bg-[rgb(var(--panel))] p-3 text-[11px] leading-4 text-[rgb(var(--muted))]">
                       {item.image.source ? (
                         <a
                           href={item.image.source}

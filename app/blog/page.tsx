@@ -121,7 +121,7 @@ export default function BlogPage() {
       <main id="main-content" tabIndex={-1} className="mx-auto max-w-6xl px-4 pb-24 pt-10 sm:px-6 sm:pt-14">
         <header className="now-desk-hero">
           <div className="md:col-span-2">
-            <div className="now-desk-kicker">01 / WRITING</div>
+            <div className="now-desk-kicker">文章與近況</div>
             <h1 className="now-desk-title mt-5 font-serif font-bold tracking-[-0.06em]">
               部落格
             </h1>

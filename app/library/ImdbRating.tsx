@@ -11,7 +11,7 @@ export default function ImdbRating({
 }: ImdbRatingProps) {
   const content = (
     <>
-      <span className="rounded-[3px] bg-[#f5c518] px-1.5 py-0.5 font-sans text-[10px] font-black leading-none text-black">
+      <span className="font-sans text-xs leading-none text-[rgb(var(--muted))]">
         IMDb
       </span>
       <span className="font-semibold text-[rgb(var(--text))]">
@@ -33,7 +33,7 @@ export default function ImdbRating({
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className={`${className} transition-colors hover:border-[#f5c518]/70`}
+      className={`${className} transition-colors hover:border-[rgb(var(--muted))]`}
       aria-label={`Open IMDb rating: ${rating === null ? "not available" : rating.toFixed(1)}`}
     >
       {content}

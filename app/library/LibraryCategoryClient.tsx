@@ -40,21 +40,21 @@ const recommendationOptions: Array<{
   value: RecommendationFilter;
 }> = [
   { label: "全部", value: "all" },
-  { label: "Brilliant", value: "brilliant" },
-  { label: "Favorite", value: "favorite" },
-  { label: "Recommended", value: "recommended" },
-  { label: "Casual", value: "casual" },
+  { label: "極推薦", value: "brilliant" },
+  { label: "很喜歡", value: "favorite" },
+  { label: "推薦", value: "recommended" },
+  { label: "普通", value: "casual" },
 ];
 
 const statusOptions: Array<{ label: string; value: StatusFilter }> = [
   { label: "全部", value: "all" },
-  { label: "Watched", value: "watched" },
-  { label: "Listened", value: "listened" },
-  { label: "Watching", value: "watching" },
-  { label: "Playing", value: "playing" },
-  { label: "Played", value: "played" },
-  { label: "Planned", value: "planned" },
-  { label: "Recommended", value: "recommended" },
+  { label: "已看完", value: "watched" },
+  { label: "已聽過", value: "listened" },
+  { label: "● 觀看中", value: "watching" },
+  { label: "● 遊玩中", value: "playing" },
+  { label: "已玩過", value: "played" },
+  { label: "○ 待補", value: "planned" },
+  { label: "推薦", value: "recommended" },
 ];
 
 const sortOptions: Array<{ label: string; value: SortMode }> = [
@@ -68,24 +68,24 @@ const categoryMeta: Record<
   { label: string; Icon: typeof Tv; tone: string }
 > = {
   anime: {
-    label: "Anime",
+    label: "動畫",
     Icon: Tv,
-    tone: "border-violet-400/25 bg-violet-400/10",
+    tone: "border-[rgb(var(--line))]",
   },
   movie: {
-    label: "Movie",
+    label: "電影",
     Icon: Film,
-    tone: "border-amber-400/25 bg-amber-400/10",
+    tone: "border-[rgb(var(--line))]",
   },
   artist: {
-    label: "Artist",
+    label: "音樂",
     Icon: Disc3,
-    tone: "border-emerald-400/25 bg-emerald-400/10",
+    tone: "border-[rgb(var(--line))]",
   },
   game: {
-    label: "Game",
+    label: "遊戲",
     Icon: Gamepad2,
-    tone: "border-rose-400/25 bg-rose-400/10",
+    tone: "border-[rgb(var(--line))]",
   },
 };
 
@@ -93,10 +93,10 @@ const recommendationMeta: Record<
   LibraryRecommendation,
   { label: string; Icon: typeof Star }
 > = {
-  brilliant: { label: "Brilliant", Icon: Award },
-  favorite: { label: "Favorite", Icon: Heart },
-  recommended: { label: "Recommended", Icon: Star },
-  casual: { label: "Casual", Icon: Sparkles },
+  brilliant: { label: "極推薦", Icon: Award },
+  favorite: { label: "很喜歡", Icon: Heart },
+  recommended: { label: "推薦", Icon: Star },
+  casual: { label: "普通", Icon: Sparkles },
 };
 
 const statusMeta: Record<
@@ -104,39 +104,39 @@ const statusMeta: Record<
   { label: string; className: string; Icon?: typeof PlayCircle }
 > = {
   watched: {
-    label: "Watched",
+    label: "已看完",
     className:
       "border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.04)] text-[rgb(var(--muted))]",
   },
   listened: {
-    label: "Listened",
+    label: "已聽過",
     className:
       "border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.04)] text-[rgb(var(--muted))]",
   },
   watching: {
-    label: "Watching",
+    label: "● 觀看中",
     Icon: PlayCircle,
     className:
-      "border-[rgb(var(--accent)/0.42)] bg-[rgb(var(--accent)/0.12)] text-[rgb(var(--accent))] shadow-[0_0_0_1px_rgb(var(--accent)/0.16),0_0_24px_rgb(var(--accent)/0.12)]",
+      "text-[var(--status-ok)]",
   },
   playing: {
-    label: "Playing",
+    label: "● 遊玩中",
     Icon: PlayCircle,
     className:
-      "border-emerald-300/55 bg-emerald-300/16 text-emerald-700 shadow-[0_0_0_1px_rgba(52,211,153,0.18),0_0_24px_rgba(52,211,153,0.14)] dark:text-emerald-200",
+      "text-[var(--status-ok)]",
   },
   played: {
-    label: "Played",
+    label: "已玩過",
     className:
       "border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.04)] text-[rgb(var(--muted))]",
   },
   planned: {
-    label: "Planned",
+    label: "○ 待補",
     className:
       "border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.04)] text-[rgb(var(--muted))]",
   },
   recommended: {
-    label: "Recommended",
+    label: "推薦",
     className:
       "border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.04)] text-[rgb(var(--muted))]",
   },
@@ -280,7 +280,7 @@ function LibraryCard({ item }: { item: LibraryItem }) {
         </div>
       )}
       {item.image.credit && (
-        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent p-3 text-[11px] leading-4 text-white/78">
+        <div className="absolute inset-x-0 bottom-0 bg-[rgb(var(--panel))] p-3 text-[11px] leading-4 text-[rgb(var(--muted))]">
           {item.image.credit}
         </div>
       )}
@@ -297,7 +297,7 @@ function LibraryCard({ item }: { item: LibraryItem }) {
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <span
           className={[
-            "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium text-[rgb(var(--text))]",
+            "inline-flex items-center gap-1.5 rounded-full border border-[rgb(var(--line))] px-2.5 py-1 text-xs font-medium text-[rgb(var(--text))]",
             category.tone,
           ].join(" ")}
         >
@@ -311,7 +311,7 @@ function LibraryCard({ item }: { item: LibraryItem }) {
         )}
         <span
           className={[
-            "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium",
+            "inline-flex items-center gap-1.5 rounded-full border border-[rgb(var(--line))] px-2.5 py-1 text-xs font-medium",
             status.className,
           ].join(" ")}
         >

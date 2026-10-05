@@ -1,15 +1,11 @@
-"use client";
-
-import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
+import { ArrowUpRight, Github, Mail, Rss } from "lucide-react";
 import { resumeItems, sortResumeItemsByDate } from "../data/resume";
-import { Post, Talk } from "../types";
+import { projects } from "../data/projects";
+import type { Post, Talk } from "../types";
 import type { LibraryItem } from "../data/library";
 import Header from "./Header";
-import ThemeStyles from "./ThemeStyles";
-import ImdbRating from "../library/ImdbRating";
 
 interface HomeClientProps {
   posts: Post[];
@@ -17,596 +13,435 @@ interface HomeClientProps {
   libraryItems: LibraryItem[];
 }
 
-type HeroSlide = {
-  src: string;
-  alt: string;
-  label: string;
-  href: string;
+const categories = {
+  anime: "動畫",
+  movie: "電影",
+  artist: "音樂",
+  game: "遊戲",
+};
+const statuses = {
+  watched: "已看完",
+  listened: "已聽過",
+  watching: "● 觀看中",
+  playing: "● 遊玩中",
+  played: "已玩過",
+  planned: "○ 待補",
+  recommended: "推薦",
 };
 
-const tickerItems = [
-  "TAIPEI / UTC+8",
-  "STATUS: WRITING",
-  "CODE / BAND / ACGM / LIFE",
-  "NO ALGORITHM HERE",
-  "HAWKS.TW SIGNAL ONLINE",
-];
-
-const quickLinks = [
-  { label: "Blog", href: "/blog", note: "技術學習、活動心得與生活近況" },
-  { label: "Library", href: "/library", note: "動畫、電影、音樂與遊戲的收藏和心得" },
-  { label: "Project", href: "/project", note: "程式作品與個人專案紀錄" },
-  { label: "Search", href: "/search", note: "搜尋文章、短筆記、收藏與標籤" },
-];
-
-function formatDate(date: string) {
-  return date.replaceAll("-", ".");
+function plainText(content = "") {
+  return content
+    .replace(/!\[\[[^\]]+\]\]|!\[[^\]]*\]\([^)]+\)/g, "")
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    .replace(/```[\s\S]*?```/g, "")
+    .replace(/[#>*_`~|]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
-function libraryHref(item: LibraryItem) {
-  return item.hasReview || item.recommendedWorks.length > 0
-    ? `/library/${item.category}/${item.slug}`
-    : `/library/${item.category}`;
+function Source({ children }: { children: React.ReactNode }) {
+  return <div className="panel-source">{children}</div>;
 }
 
-function featuredLibraryItems(items: LibraryItem[]) {
-  const featured = items.filter((item) => item.featured);
-
-  return [...(featured.length > 0 ? featured : items)]
-    .sort(
-      (a, b) =>
-        (a.featuredOrder ?? Number.POSITIVE_INFINITY) -
-          (b.featuredOrder ?? Number.POSITIVE_INFINITY) ||
-        (b.rating ?? -1) - (a.rating ?? -1)
-    )
-    .slice(0, 4);
-}
-
-function markdownImages(content: string | undefined) {
-  if (!content) return [];
-
-  const images: Array<{ src: string; alt: string }> = [];
-  const obsidianPattern = /!\[\[([^|\]]+)(?:\|([^\]]+))?\]\]/g;
-  const markdownPattern = /!\[([^\]]*)\]\(([^)\s]+)(?:\s+["'][^"']*["'])?\)/g;
-
-  for (const match of content.matchAll(obsidianPattern)) {
-    images.push({
-      src: match[1].startsWith("/") ? match[1] : `/images/${match[1]}`,
-      alt: match[2]?.trim() || match[1],
-    });
-  }
-
-  for (const match of content.matchAll(markdownPattern)) {
-    if (!match[2].startsWith("/")) continue;
-    images.push({ src: match[2], alt: match[1].trim() || "站內圖片" });
-  }
-
-  return images;
-}
-
-function resolveContentImage(src: string, banner: string | undefined) {
-  if (!banner || !banner.startsWith("/images/posts/")) return src;
-  if (!/^\/images\/[^/]+$/.test(src)) return src;
-
-  const bannerDirectory = banner.slice(0, banner.lastIndexOf("/"));
-  return `${bannerDirectory}/${src.slice("/images/".length)}`;
-}
-
-function collectHeroSlides(
-  posts: Post[],
-  talks: Talk[]
-) {
-  const slides: HeroSlide[] = [];
-  const seen = new Set<string>();
-
-  const add = (slide: HeroSlide) => {
-    if (!slide.src || !slide.src.startsWith("/") || seen.has(slide.src)) return;
-    seen.add(slide.src);
-    slides.push(slide);
-  };
-
-  add({
-    src: "/images/PXL_20260726_092925853-redacted.jpg",
-    alt: "AIS3 下課後，手上拿著鬆餅和活動名牌",
-    label: "AIS3 / Taipei / 2026.07",
-    href: "/blog/ais3",
-  });
-
-  for (const post of posts) {
-    if (post.banner) {
-      add({
-        src: post.banner,
-        alt: post.title,
-        label: `BLOG / ${post.title}`,
-        href: `/blog/${post.slug}`,
-      });
-    }
-
-    for (const image of markdownImages(post.content)) {
-      add({
-        ...image,
-        src: resolveContentImage(image.src, post.banner),
-        label: `BLOG / ${post.title}`,
-        href: `/blog/${post.slug}`,
-      });
-    }
-  }
-
-  for (const talk of talks) {
-    if (talk.banner) {
-      add({
-        src: talk.banner,
-        alt: talk.title,
-        label: `NOW / ${talk.title}`,
-        href: `/talk/${talk.id}`,
-      });
-    }
-
-    for (const image of markdownImages(talk.desc)) {
-      add({
-        ...image,
-        label: `NOW / ${talk.title}`,
-        href: `/talk/${talk.id}`,
-      });
-    }
-  }
-
-  return slides;
-}
-
-function SectionTitle({
-  code,
+function PanelHeading({
   title,
-  note,
   href,
-  hrefLabel,
+  note,
 }: {
-  code: string;
   title: string;
-  note?: string;
-  href?: string;
-  hrefLabel?: string;
+  href: string;
+  note: string;
 }) {
   return (
-    <div className="home-reveal mb-6 flex flex-col gap-4 border-b border-[rgb(var(--line)/0.15)] pb-5 sm:flex-row sm:items-end sm:justify-between">
-      <div>
-        <div className="mb-2 font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-[rgb(var(--accent))]">
-          {code}
-        </div>
-        <h2 className="font-serif text-3xl font-bold tracking-tight sm:text-4xl">{title}</h2>
-        {note && <p className="mt-2 max-w-2xl leading-7 text-[rgb(var(--muted))]">{note}</p>}
-      </div>
-      {href && (
-        <Link
-          href={href}
-          className="home-action-link self-start font-mono text-xs font-bold uppercase tracking-[0.12em] text-[rgb(var(--accent))] sm:self-auto"
-        >
-          {hrefLabel ?? "OPEN"} ↗
-        </Link>
-      )}
+    <div className="panel-heading">
+      <h2>{title}</h2>
+      <Link href={href}>
+        {note}
+        <ArrowUpRight size={14} aria-hidden="true" />
+      </Link>
     </div>
   );
 }
 
-export default function HomeClient({ posts, talks, libraryItems }: HomeClientProps) {
-  const featuredPosts = posts.slice(0, 3);
-  const libraryPicks = featuredLibraryItems(libraryItems);
-  const timelinePicks = sortResumeItemsByDate(resumeItems).slice(0, 4);
-  const heroSlides = React.useMemo(
-    () => collectHeroSlides(posts, talks),
-    [posts, talks]
-  );
-  const [activeHero, setActiveHero] = React.useState(0);
-  const [isHeroPlaying, setIsHeroPlaying] = React.useState(true);
-  const [activePost, setActivePost] = React.useState(0);
-  const [isPlaying, setIsPlaying] = React.useState(true);
-
-  React.useEffect(() => {
-    if (!isHeroPlaying || heroSlides.length < 2) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-    const timer = window.setInterval(() => {
-      setActiveHero((current) => (current + 1) % heroSlides.length);
-    }, 4600);
-
-    return () => window.clearInterval(timer);
-  }, [heroSlides.length, isHeroPlaying]);
-
-  React.useEffect(() => {
-    if (!isPlaying || featuredPosts.length < 2) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-    const timer = window.setInterval(() => {
-      setActivePost((current) => (current + 1) % featuredPosts.length);
-    }, 5200);
-
-    return () => window.clearInterval(timer);
-  }, [featuredPosts.length, isPlaying]);
-
-  const currentPost = featuredPosts[activePost] ?? featuredPosts[0];
-  const currentHero = heroSlides[activeHero] ?? heroSlides[0];
-
-  const showPreviousHero = React.useCallback(() => {
-    setActiveHero((current) =>
-      heroSlides.length > 0 ? (current - 1 + heroSlides.length) % heroSlides.length : 0
-    );
-  }, [heroSlides.length]);
-
-  const showNextHero = React.useCallback(() => {
-    setActiveHero((current) =>
-      heroSlides.length > 0 ? (current + 1) % heroSlides.length : 0
-    );
-  }, [heroSlides.length]);
-
-  const handlePointerMove = React.useCallback(
-    (event: React.PointerEvent<HTMLElement>) => {
-      const rect = event.currentTarget.getBoundingClientRect();
-      event.currentTarget.style.setProperty("--pointer-x", `${event.clientX - rect.left}px`);
-      event.currentTarget.style.setProperty("--pointer-y", `${event.clientY - rect.top}px`);
+export default function HomeClient({
+  posts,
+  talks,
+  libraryItems,
+}: HomeClientProps) {
+  const entries = [
+    ...posts.map((post) => ({
+      title: post.title,
+      date: post.date,
+      href: `/blog/${post.slug}`,
+      type: "文章",
+      desc: plainText(post.desc || post.content),
+    })),
+    ...talks.map((talk) => ({
+      title: talk.titleGenerated ? "一則近況" : talk.title,
+      date: talk.date,
+      href: `/talk/${talk.id}`,
+      type: "近況",
+      desc: plainText(talk.desc),
+    })),
+  ].sort((a, b) => b.date.localeCompare(a.date));
+  const latest = entries[0];
+  const picks = [...libraryItems]
+    .sort(
+      (a, b) =>
+        Number(b.featured) - Number(a.featured) ||
+        (a.featuredOrder ?? Infinity) - (b.featuredOrder ?? Infinity) ||
+        (b.rating ?? -1) - (a.rating ?? -1),
+    )
+    .slice(0, 4);
+  const history = sortResumeItemsByDate(resumeItems).slice(0, 3);
+  const metrics = [
+    {
+      label: "文章",
+      value: posts.length,
+      unit: "篇",
+      note: "學習筆記與活動心得",
+      href: "/blog/",
+      source: "文章目錄",
     },
-    []
-  );
+    {
+      label: "近況",
+      value: talks.length,
+      unit: "則",
+      note: "生活裡的短更新",
+      href: "/talk/",
+      source: "近況目錄",
+    },
+    {
+      label: "收藏",
+      value: libraryItems.length,
+      unit: "部 / 位",
+      note: "動畫、電影、音樂與遊戲",
+      href: "/library/",
+      source: "收藏目錄",
+    },
+    {
+      label: "專案",
+      value: projects.length,
+      unit: "個",
+      note: "程式實作與作品紀錄",
+      href: "/project/",
+      source: "專案清單",
+    },
+  ];
+  // Anchor the chart to the latest published entry, so static exports stay consistent.
+  const [year, month] = (latest?.date ?? "").split("-").map(Number);
+  const months = latest
+    ? Array.from({ length: 6 }, (_, i) => {
+        const date = new Date(Date.UTC(year, month - 6 + i, 1));
+        const key = date.toISOString().slice(0, 7);
+        return {
+          key,
+          label: `${date.getUTCMonth() + 1} 月`,
+          count: entries.filter((entry) => entry.date.startsWith(key)).length,
+        };
+      })
+    : [];
+  const maxCount = Math.max(1, ...months.map((item) => item.count));
+  const points = months
+    .map((item, i) => `${12 + i * 56},${66 - (item.count / maxCount) * 50}`)
+    .join(" ");
+  const total = posts.length + talks.length + libraryItems.length;
 
   return (
-    <div className="hawks-home min-h-screen text-[rgb(var(--text))]" onPointerMove={handlePointerMove}>
-      <ThemeStyles />
+    <div className="status-home min-h-screen">
       <Header />
+      <main id="main-content" tabIndex={-1} className="status-main">
+        <div className="overview-summary">
+          <span className={latest ? "status-ok" : "secondary"}>
+            {latest ? "● 有新內容" : "○ 尚無更新"}
+          </span>
+          {latest ? (
+            <Link href={latest.href}>
+              最近寫下了〈{latest.title}〉
+              <ArrowUpRight size={14} aria-hidden="true" />
+            </Link>
+          ) : (
+            <span>文章與近況會出現在這裡。</span>
+          )}
+          {latest && <time dateTime={latest.date}>{latest.date}</time>}
+        </div>
 
-      <div className="home-ticker border-b border-[rgb(var(--line)/0.14)] bg-[rgb(var(--panel)/0.72)]">
-        <div className="home-ticker-track py-2.5 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[rgb(var(--muted))]">
-          {[...tickerItems, ...tickerItems].map((item, index) => (
-            <span key={`${item}-${index}`} className="inline-flex items-center gap-5 px-5">
-              <span className="h-1.5 w-1.5 rounded-full bg-[rgb(var(--accent))] shadow-[0_0_12px_rgb(var(--accent)/0.72)]" />
-              {item}
-            </span>
+        <div className="overview-grid">
+          <section
+            className="quiet-panel intro-panel"
+            aria-labelledby="intro-title"
+          >
+            <div className="panel-heading">
+              <span>關於這裡</span>
+              <span className="secondary">台北 · UTC+8</span>
+            </div>
+            <div className="intro-body">
+              <div className="profile-line">
+                <Image
+                  src="/avatar.jpg"
+                  alt="Hawks 的頭像"
+                  width={56}
+                  height={56}
+                  priority
+                />
+                <div>
+                  <span className="profile-name">Hawks</span>
+                  <p className="secondary">大安高工 · 程式 / 資安 / 打擊樂</p>
+                </div>
+              </div>
+              <h1 id="intro-title">
+                把學到的、做過的，
+                <br />
+                慢慢寫下來。
+              </h1>
+              <p className="intro-description">
+                這裡記錄程式開發、機器學習與資安的學習歷程，也放著管樂生活和喜歡的作品。
+              </p>
+              <div className="intro-links">
+                <a href="https://github.com/Sean-Hawks">
+                  <Github size={15} aria-hidden="true" />
+                  GitHub
+                </a>
+                <a href="mailto:me@hawks.tw">
+                  <Mail size={15} aria-hidden="true" />
+                  聯絡我
+                </a>
+                <Link href="/subscribe/">
+                  <Rss size={15} aria-hidden="true" />
+                  訂閱更新
+                </Link>
+              </div>
+            </div>
+            <Source>Hawks · 個人簡介</Source>
+          </section>
+
+          <section
+            className="quiet-panel activity-panel"
+            aria-labelledby="activity-title"
+          >
+            <div className="panel-heading">
+              <h2 id="activity-title">內容總覽</h2>
+              <span className="secondary">已公開的紀錄</span>
+            </div>
+            <div className="activity-body">
+              <div className="activity-total">
+                <span className="big-number">{total}</span>
+                <span className="number-unit">篇 / 則 / 部</span>
+              </div>
+              <p className="secondary">每一篇筆記、每一則近況、每一部收藏。</p>
+              {months.length > 0 && (
+                <div className="writing-chart">
+                  <div className="chart-caption">
+                    <span>寫作紀錄</span>
+                    <span>
+                      {months.reduce((sum, item) => sum + item.count, 0)} 篇 /
+                      則 · 近六個月
+                    </span>
+                  </div>
+                  <svg
+                    viewBox="0 0 304 80"
+                    role="img"
+                    aria-label={`各月文章與近況數量：${months.map((item) => `${item.key}：${item.count}`).join("，")}`}
+                  >
+                    <line
+                      x1="12"
+                      y1="66"
+                      x2="292"
+                      y2="66"
+                      stroke="var(--border)"
+                    />
+                    <polyline
+                      points={points}
+                      fill="none"
+                      stroke="var(--foreground)"
+                      strokeWidth="1.5"
+                      strokeLinejoin="round"
+                    />
+                    {months.map((item, i) => (
+                      <circle
+                        key={item.key}
+                        cx={12 + i * 56}
+                        cy={66 - (item.count / maxCount) * 50}
+                        r="2.5"
+                        fill="var(--foreground)"
+                      />
+                    ))}
+                  </svg>
+                  <div className="chart-months">
+                    {months.map((item) => (
+                      <span key={item.key}>{item.label}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+            <Source>
+              文章 + 近況 + 收藏目錄
+              {latest && <> · 最新文章 / 近況 {latest.date}</>}
+            </Source>
+          </section>
+        </div>
+
+        <div className="metric-grid" aria-label="站內內容數量">
+          {metrics.map((metric) => (
+            <Link
+              href={metric.href}
+              key={metric.label}
+              className="quiet-panel metric-panel"
+            >
+              <div className="panel-heading">
+                <h2>{metric.label}</h2>
+                <ArrowUpRight size={14} aria-hidden="true" />
+              </div>
+              <div className="metric-body">
+                <div>
+                  <span className="big-number">{metric.value}</span>
+                  <span className="number-unit">{metric.unit}</span>
+                </div>
+                <p className="secondary">{metric.note}</p>
+              </div>
+              <Source>{metric.source} · 已公開</Source>
+            </Link>
           ))}
         </div>
-      </div>
 
-      <main id="main-content" tabIndex={-1} className="relative mx-auto max-w-7xl px-4 pb-20 pt-6 sm:px-6 sm:pt-10">
-        <section className="grid gap-7 lg:grid-cols-[280px_minmax(0,1fr)] xl:gap-10">
-          <aside className="home-panel home-profile-panel self-start lg:sticky lg:top-24">
-            <div className="border-b border-[rgb(var(--line)/0.14)] px-5 py-3 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[rgb(var(--accent))]">
-              Profile://1awks
-            </div>
-
-            <div className="p-5">
-              <div className="flex items-center gap-4 lg:block">
-                <div className="home-profile-ring relative h-20 w-20 shrink-0 rounded-full p-[3px] lg:h-28 lg:w-28">
-                  <div className="relative h-full w-full overflow-hidden rounded-full bg-[rgb(var(--panel2))]">
-                    <Image src="/avatar.jpg" alt="Hawks 的頭像" fill sizes="112px" className="object-cover" priority />
+        <div className="reading-grid">
+          <section className="quiet-panel">
+            <PanelHeading
+              title="最近寫下的"
+              href="/blog/"
+              note="全部文章與近況"
+            />
+            <div className="entry-table">
+              {entries.slice(0, 5).map((entry) => (
+                <Link href={entry.href} key={entry.href} className="entry-row">
+                  <time dateTime={entry.date}>{entry.date}</time>
+                  <div>
+                    <span className="entry-type">{entry.type}</span>
+                    <h3>{entry.title}</h3>
+                    <p>{entry.desc || "閱讀完整內容。"}</p>
                   </div>
-                </div>
-                <div className="lg:mt-5">
-                  <div className="flex items-center gap-2">
-                    <h2 className="font-serif text-2xl font-bold">Hawks</h2>
-                    <span className="home-status-dot h-2 w-2 rounded-full bg-emerald-500" title="Online" />
-                  </div>
-                  <p className="mt-1 text-sm text-[rgb(var(--muted))]">大安高工 / Taipei</p>
-                </div>
-              </div>
-
-              <dl className="mt-5 hidden border-t border-[rgb(var(--line)/0.14)] sm:block">
-                <div className="grid grid-cols-[4.5rem_1fr] gap-3 border-b border-[rgb(var(--line)/0.14)] py-3 text-sm">
-                  <dt className="font-mono text-[10px] uppercase tracking-wider text-[rgb(var(--muted))]">Status</dt>
-                  <dd>Writing Blog</dd>
-                </div>
-                <div className="grid grid-cols-[4.5rem_1fr] gap-3 border-b border-[rgb(var(--line)/0.14)] py-3 text-sm">
-                  <dt className="font-mono text-[10px] uppercase tracking-wider text-[rgb(var(--muted))]">Focus</dt>
-                  <dd className="min-w-0 break-words"><strong>Development / Machine Learning / CyberSec / HPC / Percussion</strong></dd>
-                </div>
-                <div className="grid grid-cols-[4.5rem_1fr] gap-3 border-b border-[rgb(var(--line)/0.14)] py-3 text-sm">
-                  <dt className="font-mono text-[10px] uppercase tracking-wider text-[rgb(var(--muted))]">Since</dt>
-                  <dd>2008.03.21</dd>
-                </div>
-              </dl>
-
-              <div className="mt-5 grid grid-cols-3 gap-2">
-                <a href="https://github.com/Sean-Hawks" className="home-mini-button">GitHub</a>
-                <a href="mailto:me@hawks.tw" className="home-mini-button">Email</a>
-                <Link href="/timeline" className="home-mini-button">History</Link>
-              </div>
-            </div>
-          </aside>
-
-          <div className="min-w-0">
-            <section className="home-hero-grid home-panel relative overflow-hidden">
-              <div className="home-hero-copy relative z-10 px-5 pb-8 pt-6 sm:px-8 sm:pb-10 sm:pt-8 xl:px-10">
-                <div className="font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-[rgb(var(--accent))]">
-                  Hawks.tw / Personal signal grid
-                </div>
-                <h1 className="home-hero-title mt-5 font-black uppercase leading-[0.78] tracking-[-0.075em]">
-                  <span className="block">Hawks</span>
-                  <span className="home-hero-outline block">.tw</span>
-                </h1>
-                <p className="mt-7 max-w-xl font-serif text-lg font-bold leading-8 text-[rgb(var(--text)/0.88)] sm:text-xl sm:leading-9">
-                  嗨早安，我是 Hawks！
-                  <br />
-                  我是喜歡寫程式、打擊樂與動畫的學生。這裡記錄我的技術學習、活動心得與生活，也收藏喜歡的電影、音樂和遊戲。
-                </p>
-              </div>
-
-              {currentHero && (
-                <figure className="home-hero-photo group relative min-h-[310px] overflow-hidden border-t border-[rgb(var(--line)/0.14)] sm:min-h-[390px] xl:border-l xl:border-t-0">
-                  <Link
-                    href={currentHero.href}
-                    aria-label={`前往圖片來源：${currentHero.label}`}
-                    className="absolute inset-0"
-                  >
-                    <Image
-                      key={currentHero.src}
-                      src={currentHero.src}
-                      alt={currentHero.alt}
-                      fill
-                      sizes="(min-width: 1280px) 520px, (min-width: 640px) 70vw, 100vw"
-                      className="home-hero-slide object-cover transition-transform duration-700 group-hover:scale-[1.035]"
-                      priority={activeHero === 0}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/10" />
-                  </Link>
-
-                  <div className="absolute inset-x-4 bottom-4 z-10 flex items-end justify-between gap-3 sm:inset-x-5">
-                    <Link
-                      href={currentHero.href}
-                      className="min-w-0 border border-white/25 bg-black/58 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.14em] text-white backdrop-blur transition-colors hover:border-[rgb(var(--accent)/0.7)]"
-                    >
-                      <span className="block truncate">{currentHero.label}</span>
-                      <span className="mt-1 block text-[9px] text-white/65">
-                        {String(activeHero + 1).padStart(2, "0")} / {String(heroSlides.length).padStart(2, "0")}
-                      </span>
-                    </Link>
-
-                    <div className="flex shrink-0 border border-white/25 bg-black/58 text-white backdrop-blur">
-                      <button
-                        type="button"
-                        aria-label="上一張圖片"
-                        onClick={showPreviousHero}
-                        className="home-hero-control"
-                      >
-                        <ChevronLeft className="h-4 w-4" />
-                      </button>
-                      <button
-                        type="button"
-                        aria-label={isHeroPlaying ? "暫停圖片輪播" : "播放圖片輪播"}
-                        aria-pressed={!isHeroPlaying}
-                        onClick={() => setIsHeroPlaying((current) => !current)}
-                        className="home-hero-control border-x border-white/20"
-                      >
-                        {isHeroPlaying ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
-                      </button>
-                      <button
-                        type="button"
-                        aria-label="下一張圖片"
-                        onClick={showNextHero}
-                        className="home-hero-control"
-                      >
-                        <ChevronRight className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </div>
-
-                  <div
-                    key={`${activeHero}-${isHeroPlaying}`}
-                    className={isHeroPlaying ? "home-hero-progress" : "absolute inset-x-0 bottom-0 z-10 h-0.5 bg-[rgb(var(--accent)/0.45)]"}
-                  />
-                  <span className="home-corner home-corner-tl" />
-                  <span className="home-corner home-corner-br" />
-                </figure>
-              )}
-            </section>
-
-            <section aria-label="網站內容統計" className="home-stats-grid mt-4 grid grid-cols-2 sm:grid-cols-4">
-              {[
-                ["Blog", posts.length],
-                ["Notes", talks.length],
-                ["Library", libraryItems.length],
-                ["Timeline", resumeItems.length],
-              ].map(([label, value]) => (
-                <div key={label} className="home-stat-cell home-panel p-4 sm:p-5">
-                  <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-[rgb(var(--muted))]">{label}</div>
-                  <div className="mt-2 font-mono text-3xl font-black tabular-nums sm:text-4xl">
-                    {String(value).padStart(2, "0")}
-                  </div>
-                </div>
-              ))}
-            </section>
-          </div>
-        </section>
-
-        <section className="mt-16 sm:mt-24">
-          <SectionTitle
-            code="Signal / 01"
-            title="Latest Post"
-            href="/blog"
-            hrefLabel="全部文章"
-          />
-
-          <div className="grid gap-4 lg:grid-cols-[minmax(0,1.45fr)_minmax(300px,0.55fr)]">
-            {currentPost && (
-              <article className="home-panel home-featured-post home-reveal overflow-hidden">
-                <Link href={`/blog/${currentPost.slug}`} className="group grid h-full md:grid-cols-[minmax(0,0.95fr)_minmax(280px,1.05fr)]">
-                  <div className="relative min-h-[260px] overflow-hidden bg-[rgb(var(--panel2))] md:min-h-[420px]">
-                    <Image
-                      key={currentPost.slug}
-                      src={currentPost.banner || "/og/default.png"}
-                      alt=""
-                      fill
-                      sizes="(min-width: 1024px) 500px, 100vw"
-                      className="home-signal-image object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/58 via-transparent to-transparent" />
-                    <div className="absolute bottom-4 left-4 font-mono text-[10px] uppercase tracking-[0.18em] text-white/80">
-                      Incoming signal / {String(activePost + 1).padStart(2, "0")}
-                    </div>
-                  </div>
-
-                  <div className="flex min-h-[300px] flex-col p-6 sm:p-8">
-                    <div className="flex items-center justify-between gap-4 font-mono text-[10px] uppercase tracking-[0.16em] text-[rgb(var(--muted))]">
-                      <time>{formatDate(currentPost.date)}</time>
-                      <span>{currentPost.tags.slice(0, 2).join(" / ")}</span>
-                    </div>
-                    <h3 className="mt-6 font-serif text-3xl font-bold leading-tight tracking-tight transition-colors group-hover:text-[rgb(var(--accent))] sm:text-4xl">
-                      {currentPost.title}
-                    </h3>
-                    <p className="mt-4 line-clamp-4 leading-8 text-[rgb(var(--muted))]">{currentPost.desc}</p>
-                    <div className="mt-auto pt-8 font-mono text-xs font-bold uppercase tracking-[0.14em] text-[rgb(var(--accent))]">
-                      Read transmission ↗
-                    </div>
-                  </div>
+                  <ArrowUpRight size={16} aria-hidden="true" />
                 </Link>
+              ))}
+              {!entries.length && (
+                <p className="empty-copy">還沒有公開的文章或近況。</p>
+              )}
+            </div>
+            <Source>文章與近況目錄 · 依發布日期排序</Source>
+          </section>
+          <section className="quiet-panel project-panel">
+            <PanelHeading
+              title="做過的東西"
+              href="/project/"
+              note={`${projects.length} 個專案`}
+            />
+            <div>
+              {projects.slice(0, 3).map((project) => (
+                <a
+                  className="project-row"
+                  href={project.link}
+                  key={project.title}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <div className="project-title">
+                    <h3>{project.title}</h3>
+                    <ArrowUpRight size={14} aria-hidden="true" />
+                  </div>
+                  <p>{project.desc}</p>
+                  <span className="project-tech">
+                    {project.tags.join(" / ")}
+                  </span>
+                </a>
+              ))}
+            </div>
+            <Source>專案清單 · 原始碼連結至 GitHub</Source>
+          </section>
+        </div>
 
-                <div className="flex items-center gap-2 border-t border-[rgb(var(--line)/0.14)] p-3">
-                  {featuredPosts.map((post, index) => (
-                    <button
-                      key={post.slug}
-                      type="button"
-                      aria-label={`顯示文章：${post.title}`}
-                      aria-pressed={activePost === index}
-                      onClick={() => setActivePost(index)}
-                      className={activePost === index ? "home-signal-tab home-signal-tab-active" : "home-signal-tab"}
-                    >
-                      {String(index + 1).padStart(2, "0")}
-                    </button>
-                  ))}
-                  <button
-                    type="button"
-                    aria-label={isPlaying ? "暫停文章輪播" : "播放文章輪播"}
-                    aria-pressed={!isPlaying}
-                    onClick={() => setIsPlaying((current) => !current)}
-                    className="home-signal-tab ml-auto"
-                  >
-                    {isPlaying ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
-                  </button>
-                </div>
-                <div key={`${activePost}-${isPlaying}`} className={isPlaying ? "home-signal-progress" : "h-0.5 bg-[rgb(var(--accent)/0.4)]"} />
-              </article>
-            )}
-
-            <aside className="home-panel home-reveal">
-              <div className="flex items-center justify-between border-b border-[rgb(var(--line)/0.14)] px-5 py-4">
-                <div className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[rgb(var(--accent))]">Latest notes</div>
-                <Link href="/blog" className="font-mono text-[10px] uppercase tracking-wider text-[rgb(var(--muted))] hover:text-[rgb(var(--accent))]">All ↗</Link>
-              </div>
-              <div>
-                {talks.slice(0, 5).map((talk, index) => (
-                  <Link
-                    key={talk.id}
-                    href={`/talk/${talk.id}`}
-                    className="home-list-row group grid grid-cols-[2rem_minmax(0,1fr)] gap-3 border-b border-[rgb(var(--line)/0.12)] p-4 last:border-b-0"
-                  >
-                    <span className="font-mono text-[10px] text-[rgb(var(--accent))]">{String(index + 1).padStart(2, "0")}</span>
-                    <span>
-                      <time className="font-mono text-[10px] text-[rgb(var(--muted))]">{formatDate(talk.date)}</time>
-                      <strong className="mt-1 block font-serif text-lg leading-7 transition-colors group-hover:text-[rgb(var(--accent))]">{talk.title}</strong>
-                    </span>
-                  </Link>
-                ))}
-              </div>
-            </aside>
-          </div>
-        </section>
-
-        <section className="mt-16 sm:mt-24">
-          <SectionTitle
-            code="Archive / 02"
-            title="最近喜歡"
-            href="/library"
-            hrefLabel="打開 Library"
+        <section className="quiet-panel library-panel">
+          <PanelHeading
+            title="喜歡的作品"
+            href="/library/"
+            note="瀏覽全部收藏"
           />
-
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
-            {libraryPicks.map((item, index) => (
+          <div className="library-picks">
+            {picks.map((item) => (
               <Link
+                href={
+                  item.hasReview || item.recommendedWorks.length
+                    ? `/library/${item.category}/${item.slug}`
+                    : `/library/${item.category}`
+                }
                 key={item.id}
-                href={libraryHref(item)}
-                className="home-media-card home-panel home-reveal group overflow-hidden"
+                className="library-pick"
               >
-                <div className="relative aspect-[4/3] overflow-hidden bg-[rgb(var(--panel2))]">
-                  {item.image.src ? (
-                    <Image
-                      src={item.image.src}
-                      alt={item.image.alt}
-                      fill
-                      sizes="(min-width: 1024px) 300px, 50vw"
-                      className={
-                        item.image.zoom
-                          ? "scale-[1.34] object-cover transition-transform duration-500 group-hover:scale-[1.38]"
-                          : item.image.fit === "contain"
-                            ? "object-contain p-5 transition-transform duration-500 group-hover:scale-105"
-                            : "object-cover transition-transform duration-500 group-hover:scale-105"
-                      }
-                    />
-                  ) : null}
-                  <span className="absolute left-3 top-3 border border-white/20 bg-black/55 px-2 py-1 font-mono text-[10px] text-white backdrop-blur">
-                    {String(index + 1).padStart(2, "0")}
+                <div className="pick-image">
+                  <Image
+                    src={item.image.src}
+                    alt={item.image.alt || item.title}
+                    fill
+                    sizes="(max-width: 639px) 40vw, (max-width: 1100px) 22vw, 250px"
+                    className={
+                      item.image.fit === "contain"
+                        ? "object-contain"
+                        : "object-cover"
+                    }
+                  />
+                </div>
+                <div className="pick-meta">
+                  <span>{categories[item.category]}</span>
+                  <span
+                    className={
+                      item.status === "watching" || item.status === "playing"
+                        ? "status-ok"
+                        : "secondary"
+                    }
+                  >
+                    {statuses[item.status]}
                   </span>
                 </div>
-                <div className="p-4">
-                  <div className="flex items-center justify-between gap-2 font-mono text-[9px] uppercase tracking-[0.12em] text-[rgb(var(--muted))]">
-                    <span>{item.category}</span>
-                    <span className="flex items-center gap-1.5">
-                      {item.category === "movie" && (
-                        <ImdbRating rating={item.imdbRating} compact />
-                      )}
-                      {item.rating !== null && <span className="text-[rgb(var(--accent))]">{item.rating.toFixed(1)}</span>}
+                <div className="pick-title">
+                  <h3>{item.title}</h3>
+                  {item.rating !== null && (
+                    <span>
+                      <strong>{item.rating.toFixed(1)}</strong>
+                      <small> / 10</small>
                     </span>
-                  </div>
-                  <h3 className="mt-2 line-clamp-2 font-serif text-lg font-bold leading-7 transition-colors group-hover:text-[rgb(var(--accent))]">{item.title}</h3>
-                  {item.note && <p className="mt-2 line-clamp-2 text-sm leading-6 text-[rgb(var(--muted))]">{item.note}</p>}
+                  )}
                 </div>
+                <p>{item.note}</p>
               </Link>
             ))}
+            {!picks.length && <p className="empty-copy">還沒有公開的收藏。</p>}
           </div>
+          <Source>收藏目錄 · 個人評分與心得</Source>
         </section>
 
-        <section className="mt-16 sm:mt-24">
-          <SectionTitle
-            code="History / 03"
-            title="Timeline pulse"
-            href="/timeline"
-            hrefLabel="完整時間軸"
-          />
-
-          <div className="home-panel home-reveal overflow-hidden">
-            {timelinePicks.map((item, index) => (
-              <Link
-                key={`${item.period}-${item.title}`}
-                href={item.links?.find((link) => !link.external)?.href ?? "/timeline"}
-                className="home-timeline-row group grid gap-3 border-b border-[rgb(var(--line)/0.13)] p-5 last:border-b-0 sm:grid-cols-[3rem_10rem_minmax(0,1fr)_auto] sm:items-center"
+        <section className="quiet-panel history-panel">
+          <PanelHeading title="走過的路" href="/timeline/" note="完整經歷" />
+          <div className="history-grid">
+            {history.map((item) => (
+              <div
+                key={`${item.title}-${item.period}`}
+                className="history-item"
               >
-                <span className="font-mono text-[10px] text-[rgb(var(--accent))]">{String(index + 1).padStart(2, "0")}</span>
-                <time className="font-mono text-xs text-[rgb(var(--muted))]">{item.period}</time>
-                <span>
-                  <strong className="font-serif text-lg transition-colors group-hover:text-[rgb(var(--accent))]">{item.title}</strong>
-                  {item.organization && <small className="mt-1 block text-sm text-[rgb(var(--muted))]">{item.organization}</small>}
-                </span>
-                <span className="hidden font-mono text-xs text-[rgb(var(--muted))] sm:block">↗</span>
-              </Link>
+                <span className="secondary">{item.period}</span>
+                <h3>{item.title}</h3>
+                <p>{item.summary}</p>
+              </div>
             ))}
           </div>
-        </section>
-
-        <section className="mt-16 sm:mt-24">
-          <SectionTitle code="Index / 04" title="Choose a route" />
-          <nav className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4" aria-label="首頁主要入口">
-            {quickLinks.map((item, index) => (
-              <Link key={item.href} href={item.href} className="home-route-card home-panel home-reveal group p-5">
-                <div className="flex items-center justify-between font-mono text-[10px] text-[rgb(var(--accent))]">
-                  <span>ROUTE_{String(index + 1).padStart(2, "0")}</span>
-                  <span>↗</span>
-                </div>
-                <div className="mt-8 font-serif text-2xl font-bold transition-colors group-hover:text-[rgb(var(--accent))]">{item.label}</div>
-                <p className="mt-2 text-sm leading-6 text-[rgb(var(--muted))]">{item.note}</p>
-              </Link>
-            ))}
-          </nav>
+          <Source>經歷時間軸 · 最近三筆紀錄</Source>
         </section>
       </main>
-
-      <footer className="border-t border-[rgb(var(--line)/0.14)] bg-[rgb(var(--panel)/0.5)]">
-        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-7 font-mono text-[10px] uppercase tracking-[0.16em] text-[rgb(var(--muted))] sm:flex-row sm:items-center sm:justify-between sm:px-6">
-          <span>© {new Date().getFullYear()} Hawks / hawks.tw</span>
-          <span>End of transmission — for now.</span>
+      <footer className="status-footer">
+        <span>© Hawks · hawks.tw</span>
+        <div>
+          <Link href="/blogroll/">部落卷</Link>
+          <Link href="/search/">搜尋</Link>
+          <Link href="/subscribe/">RSS 訂閱 ↗</Link>
         </div>
       </footer>
     </div>

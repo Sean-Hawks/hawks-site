@@ -44,20 +44,20 @@ const categoryIcons: Record<LibraryCategory, typeof Tv> = {
 };
 
 const categoryLabels: Record<LibraryCategory, string> = {
-  anime: "Anime",
-  movie: "Movie",
-  artist: "Artist",
-  game: "Game",
+  anime: "動畫",
+  movie: "電影",
+  artist: "音樂",
+  game: "遊戲",
 };
 
 const statusLabels: Record<LibraryItem["status"], string> = {
-  watched: "Watched",
-  listened: "Listened",
-  watching: "Watching",
-  playing: "Playing",
-  played: "Played",
-  planned: "Planned",
-  recommended: "Recommended",
+  watched: "已看完",
+  listened: "已聽過",
+  watching: "● 觀看中",
+  playing: "● 遊玩中",
+  played: "已玩過",
+  planned: "○ 待補",
+  recommended: "推薦",
 };
 
 function ratingValue(item: LibraryItem) {
@@ -126,10 +126,10 @@ function getLibraryStats(items: LibraryItem[]) {
     ratedItems.length > 0 ? Math.max(...ratedItems.map((item) => item.rating ?? 0)) : null;
 
   return [
-    { label: "Collections", value: items.length.toString() },
-    { label: "Reviews", value: reviews.toString() },
-    { label: "Watching / Playing", value: active.toString() },
-    { label: "TOP SCORE", value: formatRating(topScore) },
+    { label: "收藏", value: items.length.toString() },
+    { label: "評論", value: reviews.toString() },
+    { label: "觀看 / 遊玩中", value: active.toString() },
+    { label: "最高評分", value: formatRating(topScore) },
   ];
 }
 
@@ -140,11 +140,11 @@ function StatusBadge({ item }: { item: LibraryItem }) {
   return (
     <span
       className={[
-        "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium",
+        "inline-flex items-center gap-1.5 rounded-full border border-[rgb(var(--line))] px-2.5 py-1 text-xs",
         isWatching
-          ? "border-[rgb(var(--accent)/0.42)] bg-[rgb(var(--accent)/0.12)] text-[rgb(var(--accent))] shadow-[0_0_18px_rgb(var(--accent)/0.10)]"
+          ? "text-[var(--status-ok)]"
           : isPlaying
-            ? "border-emerald-300/55 bg-emerald-300/16 text-emerald-700 shadow-[0_0_18px_rgba(52,211,153,0.14)] dark:text-emerald-200"
+            ? "text-[var(--status-ok)]"
           : "border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.04)] text-[rgb(var(--muted))]",
       ].join(" ")}
     >
@@ -428,7 +428,7 @@ export default function LibraryPage() {
       <main id="main-content" tabIndex={-1} className="mx-auto max-w-6xl px-4 py-10 sm:px-3">
         <section className="space-y-5">
           <SignalPageHeader
-            code="02 / MEDIA INDEX"
+
             title="看過，聽過，玩過"
             description="關於我對 ACGM 以及藝術的品味。"
             statLabel="Entries"
@@ -463,7 +463,7 @@ export default function LibraryPage() {
                 className="inline-flex items-center gap-2 rounded-full border border-[rgb(var(--line)/0.10)] bg-[rgb(var(--line)/0.04)] px-4 py-2 text-sm font-medium text-[rgb(var(--muted))] transition-colors hover:text-[rgb(var(--text))]"
               >
                 <PlayCircle className="h-4 w-4" />
-                Watching / Playing
+                觀看 / 遊玩中
               </Link>
             </div>
           </SignalPageHeader>
@@ -477,10 +477,10 @@ export default function LibraryPage() {
               <div>
                 <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[rgb(var(--accent))]">
                   <PlayCircle className="h-3.5 w-3.5" />
-                  Now
+                  目前狀態
                 </div>
                 <h2 className="mt-1 font-serif text-2xl font-bold leading-tight tracking-tight">
-                  Watching / Playing
+                  觀看 / 遊玩中
                 </h2>
               </div>
             </div>

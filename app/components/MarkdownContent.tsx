@@ -263,8 +263,8 @@ export default function MarkdownContent({
       }
 
       const paragraphClass = isLibraryReview
-        ? "my-4 rounded-xl border border-[rgb(var(--line)/0.08)] bg-[rgb(var(--panel2)/0.34)] px-4 py-3 text-base leading-8 text-[rgb(var(--text)/0.92)] shadow-[0_10px_30px_rgba(90,76,55,0.06)] sm:px-5 sm:py-4 sm:text-[1.06rem]"
-        : "my-5 leading-8 text-[rgb(var(--text)/0.84)] text-base sm:text-[1.05rem]";
+        ? "my-4 rounded-xl border border-[rgb(var(--line)/0.08)] bg-[rgb(var(--panel2)/0.34)] px-4 py-3 text-base leading-8 text-[rgb(var(--text)/0.92)] shadow-[0_10px_30px_rgba(90,76,55,0.06)] sm:px-5 sm:py-4 sm:text-base"
+        : "my-5 leading-8 text-[rgb(var(--text)/0.84)] text-base sm:text-base";
 
       return (
         <div className={paragraphClass} {...props}>
@@ -303,7 +303,7 @@ export default function MarkdownContent({
       return (
         <code
           className={[
-            "text-[rgb(var(--accent))] bg-[rgb(var(--accent)/0.10)] px-1.5 py-0.5 rounded text-[0.9em] font-mono border border-[rgb(var(--accent)/0.18)]",
+            "text-[rgb(var(--accent))] bg-[rgb(var(--accent)/0.10)] px-1.5 py-0.5 rounded text-sm font-mono border border-[rgb(var(--accent)/0.18)]",
             className,
           ]
             .filter(Boolean)
