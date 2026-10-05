@@ -2238,7 +2238,7 @@ html[data-gui="console"] {
   display: block;
   min-height: 44px;
 }
-:root[data-gui="console"] .collection-channel > div:first-child {
+:root[data-gui="console"] .collection-channel > :first-child {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
@@ -2252,8 +2252,146 @@ html[data-gui="console"] {
   font-family: var(--font-mono);
   font-size: 16px;
 }
-:root[data-gui="console"] .collection-channel:hover > div:first-child {
+:root[data-gui="console"] .collection-channel:hover > :first-child {
   color: var(--foreground);
+}
+
+/* Clickable channels and quiet content changes make the instruments functional. */
+:root[data-gui="console"] button.collection-channel {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  text-align: left;
+  cursor: pointer;
+}
+:root[data-gui="console"] button.collection-channel:is(:hover, [aria-pressed="true"]) {
+  border-color: var(--info-border);
+}
+:root[data-gui="console"] button.collection-channel[aria-pressed="true"] > :first-child {
+  color: var(--info);
+}
+:root[data-gui="console"] button.collection-channel[aria-pressed="true"] .meter-used {
+  color: var(--info);
+}
+:root[data-gui="console"] .collection-selection-row,
+:root[data-gui="console"] .collection-pager {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  font-size: 11px;
+  color: rgb(var(--muted));
+}
+:root[data-gui="console"] .collection-selection-row {
+  padding-top: 12px;
+}
+:root[data-gui="console"] .collection-selection-row button {
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: rgb(var(--muted));
+  cursor: pointer;
+}
+:root[data-gui="console"] .collection-selection-row button[aria-pressed="true"] {
+  border-color: var(--info-border);
+  color: var(--foreground);
+}
+:root[data-gui="console"] .collection-pager {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  font-family: var(--font-mono);
+}
+:root[data-gui="console"] .collection-pager > div {
+  display: flex;
+  gap: 8px;
+}
+:root[data-gui="console"] .collection-pager button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--info-border);
+  border-radius: 4px;
+  color: var(--info);
+  cursor: pointer;
+}
+:root[data-gui="console"] .collection-pager button:disabled {
+  border-color: var(--border);
+  color: rgb(var(--muted));
+  cursor: default;
+}
+:root[data-gui="console"] .console-draw-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 44px;
+  margin-top: 16px;
+  padding: 10px 12px;
+  border: 1px solid var(--info-border);
+  border-radius: 4px;
+  color: var(--foreground);
+  font-size: 13px;
+  cursor: pointer;
+}
+:root[data-gui="console"] .console-draw-button svg {
+  color: var(--info);
+}
+:root[data-gui="console"] .console-draw-button:disabled {
+  border-color: var(--border);
+  color: rgb(var(--muted));
+  cursor: default;
+}
+:root[data-gui="console"] .inventory-draw-card {
+  margin-top: 16px;
+  padding: 16px 0 0;
+  border-top: 1px solid var(--border);
+}
+:root[data-gui="console"] .inventory-draw-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  font-size: 11px;
+  color: rgb(var(--muted));
+}
+:root[data-gui="console"] .inventory-draw-meta time {
+  font-family: var(--font-mono);
+}
+:root[data-gui="console"] .inventory-draw-card a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+  margin-top: 8px;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+:root[data-gui="console"] .inventory-draw-card a svg {
+  flex-shrink: 0;
+  color: var(--info);
+}
+:root[data-gui="console"] .inventory-draw-card p {
+  margin-top: 8px;
+  font-size: 11px;
+  color: rgb(var(--muted));
+}
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-gui="console"] .inventory-draw-card,
+  :root[data-gui="console"] #console-library-picks {
+    animation: console-arrive 180ms ease-out both;
+  }
+  :root[data-gui="console"] :is(.collection-channel, .console-draw-button, .collection-pager button) {
+    transition: border-color 160ms ease, transform 160ms ease;
+  }
+  :root[data-gui="console"] :is(.console-draw-button, .collection-pager button):enabled:active {
+    transform: translateY(1px);
+  }
 }
 @media (max-width: 1099px) {
   :root[data-gui="console"] .reading-inventory {

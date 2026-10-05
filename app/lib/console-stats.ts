@@ -23,6 +23,7 @@ export function consoleStatistics(posts: Post[], talks: Talk[], library: Library
     count: publicLibrary.filter((item) => item.category === category).length,
   }));
   return {
+    readings,
     reading,
     collection,
     averageRating: ratings.length ? ratings.reduce((sum, rating) => sum + rating, 0) / ratings.length : null,

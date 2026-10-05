@@ -6,28 +6,13 @@ import type { Post, Talk } from "../types";
 import type { LibraryItem } from "../data/library";
 import PublicationActivity from "./PublicationActivity";
 import { consoleStatistics } from "../lib/console-stats";
+import ConsoleReadingInventory from "./ConsoleReadingInventory";
+import ConsoleLibraryPanel, { type ConsoleLibraryItem } from "./ConsoleLibraryPanel";
 interface HomeClientProps {
   posts: Post[];
   talks: Talk[];
   libraryItems: LibraryItem[];
 }
-
-const categories = {
-  anime: "動畫",
-  movie: "電影",
-  artist: "音樂",
-  game: "遊戲",
-};
-const readingKinds = { post: "文章", talk: "近況", library: "作品評論" };
-const statuses = {
-  watched: "已看完",
-  listened: "已聽過",
-  watching: "● 觀看中",
-  playing: "● 遊玩中",
-  played: "已玩過",
-  planned: "○ 待補",
-  recommended: "推薦",
-};
 
 function plainText(content = "") {
   return content
@@ -71,14 +56,6 @@ export default function HomeClient({
   const recent = entries
     .filter((entry) => entry.href !== latest?.href)
     .slice(0, 3);
-  const picks = [...libraryItems]
-    .sort(
-      (a, b) =>
-        Number(b.featured) - Number(a.featured) ||
-        (a.featuredOrder ?? Infinity) - (b.featuredOrder ?? Infinity) ||
-        (b.rating ?? -1) - (a.rating ?? -1),
-    )
-    .slice(0, 3);
   const ratedCount = libraryItems.filter((item) => item.rating !== null).length;
   const activeCount = libraryItems.filter(
     (item) => item.status === "watching" || item.status === "playing",
@@ -86,10 +63,20 @@ export default function HomeClient({
   const plannedCount = libraryItems.filter(
     (item) => item.status === "planned",
   ).length;
-  const { reading, collection, averageRating } = consoleStatistics(posts, talks, libraryItems);
-  const ratingSegments = libraryItems.length
-    ? Math.round((ratedCount / libraryItems.length) * 24)
-    : 0;
+  const { reading, readings, collection, averageRating } = consoleStatistics(posts, talks, libraryItems);
+  const libraryPreview: ConsoleLibraryItem[] = libraryItems.map((item) => ({
+    id: item.id,
+    title: item.title,
+    category: item.category,
+    status: item.status,
+    rating: item.rating,
+    featured: item.featured,
+    featuredOrder: item.featuredOrder,
+    image: { src: item.image.src, alt: item.image.alt, fit: item.image.fit },
+    href: item.hasReview || item.recommendedWorks.length
+      ? `/library/${item.category}/${item.slug}/`
+      : `/library/${item.category}/?q=${encodeURIComponent(item.title)}#item-${item.slug}`,
+  }));
   const metrics = [
     { label: "文章", value: posts.length, unit: "篇", href: "/blog/" },
     { label: "近況", value: talks.length, unit: "則", href: "/talk/" },
@@ -156,27 +143,7 @@ export default function HomeClient({
               <Source>個人資料 · GitHub / 經歷</Source>
             </section>
             <PublicationActivity dates={entries.map((entry) => entry.date)} />
-            {reading.count > 0 && (
-              <section className="reading-inventory" aria-labelledby="inventory-title">
-                <div className="console-title-row">
-                  <h2 id="inventory-title">閱讀存量</h2><span>{reading.count} 篇正文</span>
-                </div>
-                <div className="inventory-body">
-                  <p className="inventory-label">全部讀完，預估需要</p>
-                  <div className="inventory-total"><strong>{reading.minutes}</strong><small>分鐘</small></div>
-                  <dl className="inventory-breakdown">
-                    {reading.breakdown.map((item) => (
-                      <div key={item.kind}><dt>{readingKinds[item.kind]}</dt><dd><strong>{item.minutes}</strong> 分鐘</dd></div>
-                    ))}
-                  </dl>
-                  <Link href="/explore/" className="inventory-short-link">
-                    <span>五分鐘內可讀完 <strong>{reading.shortCount}</strong> 篇</span>
-                    <ArrowUpRight size={16} aria-hidden="true" />
-                  </Link>
-                </div>
-                <Source>公開正文 · 依文字估算，圖片與程式碼不計</Source>
-              </section>
-            )}
+            <ConsoleReadingInventory summary={reading} items={readings} />
           </aside>
           <div className="home-stream">
             <nav className="content-index" aria-label="站內內容索引">
@@ -261,138 +228,14 @@ export default function HomeClient({
               <Source>文章 / 近況目錄 · 依發布日期排序</Source>
             </section>
 
-            <section id="console-library" className="home-library" aria-labelledby="library-title">
-              <div className="panel-heading">
-                <h2 id="library-title">喜歡的作品</h2>
-                <Link href="/library/">
-                  全部收藏
-                  <ArrowUpRight size={13} aria-hidden="true" />
-                </Link>
-              </div>
-              {libraryItems.length > 0 && (
-                <div className="library-monitor">
-                  <div>
-                    <div className="monitor-heading">
-                      <span>評分紀錄</span>
-                      <span>
-                        <strong>{ratedCount}</strong>
-                        <small> / {libraryItems.length} 件已評分</small>
-                      </span>
-                    </div>
-                    <div
-                      className="monitor-meter"
-                      role="meter"
-                      aria-label="收藏評分紀錄"
-                      aria-valuemin={0}
-                      aria-valuemax={libraryItems.length}
-                      aria-valuenow={ratedCount}
-                      aria-valuetext={`${ratedCount} / ${libraryItems.length} 件已評分`}
-                    >
-                      {Array.from({ length: 24 }, (_, index) => (
-                        <span
-                          key={index}
-                          className={
-                            index < ratingSegments ? "meter-used" : undefined
-                          }
-                          aria-hidden="true"
-                        >
-                          ━
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="monitor-status">
-                    {averageRating !== null && (
-                      <span>平均個人評分<strong>{averageRating.toFixed(1)}</strong> / 10</span>
-                    )}
-                    <span>
-                      <span className={activeCount ? "status-ok" : "secondary"}>
-                        {activeCount ? "●" : "○"} 進行中
-                      </span>
-                      <strong>{activeCount}</strong> 件
-                    </span>
-                    <span>
-                      ○ 待補<strong>{plannedCount}</strong> 件
-                    </span>
-                  </div>
-                </div>
-              )}
-              {libraryItems.length > 0 && (
-                <div className="collection-distribution" aria-label="收藏分類占比">
-                  {collection.map(({ category, count }) => (
-                    <Link href={`/library/${category}/`} key={category} className="collection-channel">
-                      <div><span>{categories[category]}</span><span><strong>{count}</strong> {category === "artist" ? "位 / 組" : category === "game" ? "款" : "部"}</span></div>
-                      <div className="monitor-meter" role="meter" aria-label={`${categories[category]}占全部收藏`} aria-valuemin={0} aria-valuemax={libraryItems.length} aria-valuenow={count} aria-valuetext={`${count} / ${libraryItems.length} 件`}>
-                        {Array.from({ length: 24 }, (_, index) => (
-                          <span key={index} className={index < Math.round(count / libraryItems.length * 24) ? "meter-used" : undefined} aria-hidden="true">━</span>
-                        ))}
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              )}
-              <div className="library-picks">
-                {picks.map((item) => (
-                  <Link
-                    href={
-                      item.hasReview || item.recommendedWorks.length
-                        ? `/library/${item.category}/${item.slug}`
-                        : `/library/${item.category}`
-                    }
-                    key={item.id}
-                    className="library-pick"
-                  >
-                    <div className="pick-image">
-                      <Image
-                        src={item.image.src}
-                        alt={item.image.alt || item.title}
-                        fill
-                        sizes="72px"
-                        className={
-                          item.image.fit === "contain"
-                            ? "object-contain"
-                            : "object-cover"
-                        }
-                      />
-                    </div>
-                    <div className="pick-content">
-                      <div className="pick-meta">
-                        <span>{categories[item.category]}</span>
-                        <span
-                          className={
-                            item.status === "watching" ||
-                            item.status === "playing"
-                              ? "status-ok"
-                              : "secondary"
-                          }
-                        >
-                          {statuses[item.status]}
-                        </span>
-                      </div>
-                      <h3>{item.title}</h3>
-                      {item.rating !== null && (
-                        <div className="pick-rating">
-                          <span className="rating-value">
-                            <strong>{item.rating.toFixed(1)}</strong>
-                            <small> / 10</small>
-                          </span>
-                          <span className="rating-meter" aria-hidden="true">
-                            <span>{"━".repeat(Math.round(item.rating))}</span>
-                            <span>
-                              {"━".repeat(10 - Math.round(item.rating))}
-                            </span>
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </Link>
-                ))}
-                {!picks.length && (
-                  <p className="empty-copy">還沒有公開的收藏。</p>
-                )}
-              </div>
-              <Source>收藏目錄 · 依目前紀錄計算 · 個人評分滿分 10</Source>
-            </section>
+            <ConsoleLibraryPanel
+              items={libraryPreview}
+              collection={collection}
+              averageRating={averageRating}
+              ratedCount={ratedCount}
+              activeCount={activeCount}
+              plannedCount={plannedCount}
+            />
           </div>
         </div>
       </main>
