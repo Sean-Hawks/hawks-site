@@ -77,6 +77,16 @@ export default function HomeClient({
         (b.rating ?? -1) - (a.rating ?? -1),
     )
     .slice(0, 3);
+  const ratedCount = libraryItems.filter((item) => item.rating !== null).length;
+  const activeCount = libraryItems.filter(
+    (item) => item.status === "watching" || item.status === "playing",
+  ).length;
+  const plannedCount = libraryItems.filter(
+    (item) => item.status === "planned",
+  ).length;
+  const ratingSegments = libraryItems.length
+    ? Math.round((ratedCount / libraryItems.length) * 24)
+    : 0;
   const metrics = [
     { label: "文章", value: posts.length, unit: "篇", href: "/blog/" },
     { label: "近況", value: talks.length, unit: "則", href: "/talk/" },
@@ -226,6 +236,51 @@ export default function HomeClient({
               <ArrowUpRight size={13} aria-hidden="true" />
             </Link>
           </div>
+          {libraryItems.length > 0 && (
+            <div className="library-monitor">
+              <div>
+                <div className="monitor-heading">
+                  <span>評分紀錄</span>
+                  <span>
+                    <strong>{ratedCount}</strong>
+                    <small> / {libraryItems.length} 件已評分</small>
+                  </span>
+                </div>
+                <div
+                  className="monitor-meter"
+                  role="meter"
+                  aria-label="收藏評分紀錄"
+                  aria-valuemin={0}
+                  aria-valuemax={libraryItems.length}
+                  aria-valuenow={ratedCount}
+                  aria-valuetext={`${ratedCount} / ${libraryItems.length} 件已評分`}
+                >
+                  {Array.from({ length: 24 }, (_, index) => (
+                    <span
+                      key={index}
+                      className={
+                        index < ratingSegments ? "meter-used" : undefined
+                      }
+                      aria-hidden="true"
+                    >
+                      ━
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <div className="monitor-status">
+                <span>
+                  <span className={activeCount ? "status-ok" : "secondary"}>
+                    {activeCount ? "●" : "○"} 進行中
+                  </span>
+                  <strong>{activeCount}</strong> 件
+                </span>
+                <span>
+                  ○ 待補<strong>{plannedCount}</strong> 件
+                </span>
+              </div>
+            </div>
+          )}
           <div className="library-picks">
             {picks.map((item) => (
               <Link
@@ -281,7 +336,7 @@ export default function HomeClient({
             ))}
             {!picks.length && <p className="empty-copy">還沒有公開的收藏。</p>}
           </div>
-          <Source>收藏目錄 · 個人評分</Source>
+          <Source>收藏目錄 · 依目前紀錄計算 · 個人評分滿分 10</Source>
         </section>
       </main>
       <footer className="status-footer">
