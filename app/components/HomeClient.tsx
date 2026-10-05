@@ -5,6 +5,7 @@ import { projects } from "../data/projects";
 import type { Post, Talk } from "../types";
 import type { LibraryItem } from "../data/library";
 import PublicationActivity from "./PublicationActivity";
+import ConsoleCommandButton from "./ConsoleCommandButton";
 interface HomeClientProps {
   posts: Post[];
   talks: Talk[];
@@ -114,16 +115,26 @@ export default function HomeClient({
           {updated && <time dateTime={updated.date}>{updated.date}</time>}
         </div>
 
+        <header className="console-masthead">
+          <h1 id="intro-title">HAWKS<span>.TW</span></h1>
+          <div className="console-masthead-controls">
+            <span>個人網站 · 台北 · UTC+8</span>
+            <ConsoleCommandButton />
+          </div>
+        </header>
+        <nav className="console-section-nav" aria-label="首頁區塊">
+          <a href="#main-content">總覽</a>
+          <a href="#console-writing">文章與近況</a>
+          <a href="#console-library">喜歡的作品</a>
+          {entries.length > 0 && <a href="#console-activity">發布活動</a>}
+        </nav>
         <div className="home-console">
           <aside className="home-dossier">
-            <section className="home-profile" aria-labelledby="intro-title">
+            <section className="home-profile" aria-labelledby="profile-title">
               <div className="profile-eyebrow">
-                個人檔案<span>台北 · UTC+8</span>
+                <h2 id="profile-title">關於我</h2><span>Hawks</span>
               </div>
               <div className="profile-copy">
-                <h1 id="intro-title">
-                  HAWKS<span>.TW</span>
-                </h1>
                 <p className="identity-focus">嗨早安，我是 Hawks！</p>
                 <p className="identity-description">
                   我喜歡寫程式、打擊樂跟動畫。
@@ -175,7 +186,7 @@ export default function HomeClient({
               <Source>文章 / 近況 / 收藏 / 專案目錄</Source>
             </nav>
 
-            <section className="home-writing" aria-labelledby="writing-title">
+            <section id="console-writing" className="home-writing" aria-labelledby="writing-title">
               <div className="panel-heading">
                 <h2 id="writing-title">最近寫下的</h2>
                 <Link href="/blog/">
@@ -239,7 +250,7 @@ export default function HomeClient({
               <Source>文章 / 近況目錄 · 依發布日期排序</Source>
             </section>
 
-            <section className="home-library" aria-labelledby="library-title">
+            <section id="console-library" className="home-library" aria-labelledby="library-title">
               <div className="panel-heading">
                 <h2 id="library-title">喜歡的作品</h2>
                 <Link href="/library/">

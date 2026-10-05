@@ -30,7 +30,7 @@ export default function PublicationActivity({
   const selected = points[selectedMonth];
 
   return (
-    <section className="publication-panel" aria-labelledby="activity-title">
+    <section id="console-activity" className="publication-panel" aria-labelledby="activity-title">
       <div className="console-title-row">
         <h2 id="activity-title">發布活動</h2>
         <span>

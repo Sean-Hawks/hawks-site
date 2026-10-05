@@ -21,6 +21,7 @@ import {
   X,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { CONSOLE_COMMAND_EVENT } from "../lib/console-commands";
 import {
   createAppearanceClickHandler,
   guiSnapshot,
@@ -241,10 +242,18 @@ export default function Header() {
             </nav>
             <Link
               href="/search/"
-              aria-label="搜尋全站"
-              title="搜尋全站"
+              aria-label={gui === "console" ? "搜尋與快速前往" : "搜尋全站"}
+              title={gui === "console" ? "搜尋與快速前往（⌘ / Ctrl K）" : "搜尋全站"}
+              aria-haspopup={gui === "console" ? "dialog" : undefined}
+              aria-keyshortcuts={gui === "console" ? "Meta+K Control+K" : undefined}
               aria-current={current("/search/")}
-              onClick={closeMenu}
+              onClick={(event) => {
+                closeMenu();
+                if (gui === "console" && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) {
+                  event.preventDefault();
+                  window.dispatchEvent(new Event(CONSOLE_COMMAND_EVENT));
+                }
+              }}
               className="header-icon-button"
             >
               <Search aria-hidden="true" className="h-[18px] w-[18px]" />
