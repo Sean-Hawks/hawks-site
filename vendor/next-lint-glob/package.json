@@ -1,0 +1,11 @@
+{
+  "name": "fast-glob",
+  "version": "3.3.1-hawks.1",
+  "private": true,
+  "description": "Local Next.js lint globSync adapter backed by tinyglobby",
+  "type": "commonjs",
+  "main": "index.cjs",
+  "dependencies": {
+    "tinyglobby": "0.2.17"
+  }
+}
