@@ -423,12 +423,12 @@ html[data-gui="console"] {
   color: rgb(var(--muted));
   white-space: nowrap;
 }
-:root[data-gui="console"] .content-index svg {
+:root[data-gui="console"] .content-index > a > svg {
   grid-column: 2;
   grid-row: 1;
   color: rgb(var(--muted));
 }
-:root[data-gui="console"] .content-index > a:hover svg {
+:root[data-gui="console"] .content-index > a:hover > svg {
   color: var(--info);
 }
 :root[data-gui="console"] .home-writing,
@@ -2602,8 +2602,9 @@ html[data-gui="console"] {
 }
 :root[data-gui="console"] .index-readout {
   position: relative;
-  display: inline-grid;
-  place-items: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 :root[data-gui="console"] .index-readout-dial {
   width: 72px;
@@ -2616,8 +2617,6 @@ html[data-gui="console"] {
 }
 :root[data-gui="console"] .index-collection-dial {
   position: absolute;
-  grid-column: auto;
-  grid-row: auto;
   inset: 0;
   width: 72px;
   height: 72px;
