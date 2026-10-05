@@ -2469,3 +2469,181 @@ html[data-gui="console"] {
   from { opacity: 0; }
   to { opacity: 1; }
 }
+
+/* A physical nameplate and an instrument selector give the console a focal point. */
+:root[data-gui="console"] .identity-plaque {
+  margin-top: 24px;
+}
+:root[data-gui="console"] .plaque-stage {
+  perspective: 700px;
+}
+:root[data-gui="console"] .plaque-face {
+  position: relative;
+  padding: 16px 14px 0;
+  border: 1px solid var(--info-border);
+  border-radius: 6px;
+  background: rgb(var(--panel2));
+  transform-style: preserve-3d;
+}
+:root[data-gui="console"] .plaque-caption {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 12px;
+  color: rgb(var(--muted));
+  font-size: 11px;
+}
+:root[data-gui="console"] .plaque-caption > span:last-child {
+  font-family: var(--font-mono);
+}
+:root[data-gui="console"] .profile-copy .plaque-face h1 {
+  margin: 20px 0 24px;
+  font-size: clamp(64px, 16vw, 80px);
+  transform: translateZ(20px);
+}
+:root[data-gui="console"] .plaque-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: calc(100% + 28px);
+  min-height: 44px;
+  margin-inline: -14px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--info-border);
+  border-radius: 0 0 5px 5px;
+  color: rgb(var(--muted));
+  background: rgb(var(--panel));
+  font-size: 11px;
+  text-align: left;
+  cursor: pointer;
+}
+:root[data-gui="console"] .plaque-toggle svg {
+  color: var(--brand);
+}
+:root[data-gui="console"] .identity-plaque[data-expanded="true"] .plaque-toggle svg {
+  transform: rotate(180deg);
+}
+:root[data-gui="console"] .plaque-toggle:hover {
+  color: var(--foreground);
+}
+:root[data-gui="console"] .plaque-details {
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+}
+:root[data-gui="console"] .identity-plaque[data-expanded="true"] .plaque-details {
+  grid-template-rows: 1fr;
+  visibility: visible;
+}
+:root[data-gui="console"] .plaque-details > div {
+  overflow: hidden;
+  min-height: 0;
+}
+:root[data-gui="console"] .plaque-details dl {
+  display: grid;
+  gap: 12px;
+  padding: 20px 14px 12px;
+  border-inline: 1px solid var(--info-border);
+  font-size: 11px;
+}
+:root[data-gui="console"] .plaque-details dl > div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 12px;
+}
+:root[data-gui="console"] .plaque-details dt {
+  color: rgb(var(--muted));
+}
+:root[data-gui="console"] .plaque-details dd {
+  font-family: var(--font-mono);
+}
+:root[data-gui="console"] .plaque-details a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 1px solid var(--info-border);
+  border-top: 0;
+  border-radius: 0 0 6px 6px;
+  font-size: 11px;
+  color: var(--info);
+}
+:root[data-gui="console"] .content-index-mechanical {
+  position: relative;
+}
+:root[data-gui="console"] .content-index-mechanical > a {
+  background: transparent;
+}
+:root[data-gui="console"] .content-index-mechanical > a::after {
+  content: none;
+}
+:root[data-gui="console"] .index-tracking-frame {
+  position: absolute;
+  z-index: 2;
+  border: 1px solid var(--info);
+  border-radius: 4px;
+  opacity: 0;
+  pointer-events: none;
+}
+:root[data-gui="console"] .index-tracking-frame[data-visible="true"] {
+  opacity: 1;
+}
+:root[data-gui="console"] .index-tracking-frame::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 12px;
+  width: 24px;
+  height: 1px;
+  background: var(--brand);
+}
+:root[data-gui="console"] .index-readout {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+}
+:root[data-gui="console"] .index-readout-dial {
+  width: 72px;
+  height: 72px;
+  flex-shrink: 0;
+}
+:root[data-gui="console"] .index-readout > span {
+  position: relative;
+  z-index: 1;
+}
+:root[data-gui="console"] .index-collection-dial {
+  position: absolute;
+  grid-column: auto;
+  grid-row: auto;
+  inset: 0;
+  width: 72px;
+  height: 72px;
+}
+:root[data-gui="console"] .index-collection-dial circle {
+  fill: rgb(var(--muted));
+}
+:root[data-gui="console"] .index-collection-dial g:hover circle {
+  fill: var(--info);
+}
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-gui="console"] .plaque-face {
+    transition: transform 320ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  :root[data-gui="console"] .plaque-toggle svg {
+    transition: transform 240ms ease;
+  }
+  :root[data-gui="console"] .plaque-details {
+    transition: grid-template-rows 320ms cubic-bezier(0.2, 0.8, 0.2, 1), visibility 320ms;
+  }
+  :root[data-gui="console"] .index-tracking-frame {
+    transition: left 260ms cubic-bezier(0.2, 0.8, 0.2, 1), top 260ms cubic-bezier(0.2, 0.8, 0.2, 1), width 260ms ease, height 260ms ease, opacity 140ms ease;
+  }
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  :root[data-gui="console"] .home-profile[data-console-surface="true"] .plaque-face {
+    transform: rotateX(var(--surface-tilt-x)) rotateY(var(--surface-tilt-y));
+  }
+}

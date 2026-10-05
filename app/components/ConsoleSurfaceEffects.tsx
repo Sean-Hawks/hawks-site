@@ -4,7 +4,7 @@ import { useEffect, useSyncExternalStore } from "react";
 import { guiSnapshot, subscribeAppearance } from "../lib/appearance";
 
 const surfaces = ".home-profile, .content-index, .home-writing, .home-library, .publication-panel, .reading-inventory, .home-panel, .quiet-panel, .reading-header";
-const properties = ["--surface-x", "--surface-y", "--surface-position", "--surface-offset-x", "--surface-offset-y"];
+const properties = ["--surface-x", "--surface-y", "--surface-position", "--surface-offset-x", "--surface-offset-y", "--surface-tilt-x", "--surface-tilt-y"];
 
 export default function ConsoleSurfaceEffects() {
   const gui = useSyncExternalStore(subscribeAppearance, guiSnapshot, () => "classic");
@@ -49,6 +49,8 @@ export default function ConsoleSurfaceEffects() {
       active.style.setProperty("--surface-position", `${(localX / bounds.width * 100).toFixed(1)}%`);
       active.style.setProperty("--surface-offset-x", `${(localX / bounds.width * 2 - 1).toFixed(2)}px`);
       active.style.setProperty("--surface-offset-y", `${(localY / bounds.height * 2 - 1).toFixed(2)}px`);
+      active.style.setProperty("--surface-tilt-x", `${((localY / bounds.height * 2 - 1) * -4).toFixed(2)}deg`);
+      active.style.setProperty("--surface-tilt-y", `${((localX / bounds.width * 2 - 1) * 4).toFixed(2)}deg`);
     };
     const move = (event: PointerEvent) => {
       if (event.pointerType !== "mouse" || !enabled.matches) {

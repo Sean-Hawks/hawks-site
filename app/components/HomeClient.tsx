@@ -8,6 +8,8 @@ import PublicationActivity from "./PublicationActivity";
 import { consoleStatistics } from "../lib/console-stats";
 import ConsoleReadingInventory from "./ConsoleReadingInventory";
 import ConsoleLibraryPanel, { type ConsoleLibraryItem } from "./ConsoleLibraryPanel";
+import ConsoleIdentityPlaque from "./ConsoleIdentityPlaque";
+import ConsoleContentIndex from "./ConsoleContentIndex";
 interface HomeClientProps {
   posts: Post[];
   talks: Talk[];
@@ -108,10 +110,10 @@ export default function HomeClient({
           <aside className="home-dossier">
             <section className="home-profile" aria-labelledby="profile-title">
               <div className="profile-eyebrow">
-                <h2 id="profile-title">個人檔案</h2><span>台北 · UTC+8</span>
+                <h2 id="profile-title">個人檔案</h2><span>Hawks</span>
               </div>
               <div className="profile-copy">
-                <h1 id="intro-title"><span className="wordmark-solid">HAWKS</span><span className="wordmark-outline">.TW</span></h1>
+                <ConsoleIdentityPlaque firstDate={entries.at(-1)?.date} lastDate={updated?.date} entries={entries.length} />
                 <p className="identity-focus">嗨早安，我是 Hawks！</p>
                 <p className="identity-description">
                   我喜歡寫程式、打擊樂跟動畫。
@@ -146,23 +148,7 @@ export default function HomeClient({
             <ConsoleReadingInventory summary={reading} items={readings} />
           </aside>
           <div className="home-stream">
-            <nav className="content-index" aria-label="站內內容索引">
-              <div className="console-title-row">
-                <h2>內容總覽</h2>
-                <span>站內索引</span>
-              </div>
-              {metrics.map((metric) => (
-                <Link href={metric.href} key={metric.label}>
-                  <span className="index-label">{metric.label}</span>
-                  <span className="index-value">
-                    {metric.value}
-                    <small>{metric.unit}</small>
-                  </span>
-                  <ArrowUpRight size={13} aria-hidden="true" />
-                </Link>
-              ))}
-              <Source>文章 / 近況 / 收藏 / 專案目錄</Source>
-            </nav>
+            <ConsoleContentIndex metrics={metrics} collection={collection} />
 
             <section id="console-writing" className="home-writing" aria-labelledby="writing-title">
               <div className="panel-heading">
