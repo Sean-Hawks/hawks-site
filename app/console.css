@@ -306,14 +306,14 @@ html[data-gui="console"] {
   letter-spacing: -0.055em;
   line-height: 0.85;
 }
-:root[data-gui="console"] .profile-copy h1 span {
+:root[data-gui="console"] .profile-copy h1 .wordmark-outline {
   display: block;
   color: var(--info);
   margin-top: 6px;
   letter-spacing: -0.04em;
 }
 @supports (-webkit-text-stroke: 1px currentColor) {
-  :root[data-gui="console"] .profile-copy h1 span {
+  :root[data-gui="console"] .profile-copy h1 .wordmark-outline {
     color: transparent;
     -webkit-text-stroke: 1.5px #859aaa;
   }
@@ -1742,7 +1742,7 @@ html[data-gui="console"] {
   letter-spacing: -0.035em;
   text-wrap: balance;
 }
-:root[data-gui="console"] .profile-copy h1 span {
+:root[data-gui="console"] .profile-copy h1 .wordmark-outline {
   -webkit-text-stroke-color: var(--info);
 }
 :root[data-gui="console"] .identity-description {
@@ -2403,4 +2403,69 @@ html[data-gui="console"] {
     grid-template-columns: 1fr;
     gap: 12px;
   }
+}
+
+/* The cursor catches the frame and wordmark; the reading surface stays still. */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  :root[data-gui="console"] [data-console-surface="true"] {
+    position: relative;
+    isolation: isolate;
+  }
+  @supports (mask-composite: exclude) or (-webkit-mask-composite: xor) {
+    :root[data-gui="console"] [data-console-surface="true"]::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      z-index: 3;
+      padding: 1px;
+      border-radius: inherit;
+      background: radial-gradient(180px circle at var(--surface-x) var(--surface-y), var(--info), var(--border) 85%);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+      animation: console-edge-reveal 140ms ease-out both;
+    }
+  }
+  :root[data-gui="console"] [data-console-surface="true"] > :is(.panel-heading, .console-title-row, .profile-eyebrow) {
+    position: relative;
+  }
+  :root[data-gui="console"] [data-console-surface="true"] > :is(.panel-heading, .console-title-row, .profile-eyebrow)::after {
+    content: "";
+    position: absolute;
+    left: clamp(20px, calc(var(--surface-x) - 24px), calc(100% - 68px));
+    bottom: -1px;
+    width: 48px;
+    height: 1px;
+    background: var(--brand);
+    pointer-events: none;
+    animation: console-edge-reveal 140ms ease-out both;
+  }
+  :root[data-gui="console"] .home-profile[data-console-surface="true"] .wordmark-solid {
+    background: linear-gradient(110deg, var(--foreground) 25%, var(--brand) 50%, var(--foreground) 75%);
+    background-size: 200% 100%;
+    background-position: var(--surface-position) 0;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  :root[data-gui="console"] .home-profile[data-console-surface="true"] .profile-portrait img {
+    transform: translate(var(--surface-offset-x), var(--surface-offset-y)) scale(1.035);
+  }
+  :root[data-gui="console"] .profile-portrait img {
+    transition: transform 220ms ease-out;
+  }
+  :root[data-gui="console"] .header-icon-button,
+  :root[data-gui="console"] .rail-link,
+  :root[data-gui="console"] .content-index > a {
+    transition: border-color 180ms ease, color 180ms ease, transform 180ms ease;
+  }
+  :root[data-gui="console"] :is(.header-icon-button, .rail-link, .content-index > a):active {
+    transform: translateY(1px);
+  }
+}
+@keyframes console-edge-reveal {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }

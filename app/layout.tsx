@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { feedChannels } from "./lib/feed-channels";
 import CloudflareAnalytics from "./components/CloudflareAnalytics";
 import ConsoleCommandMenu from "./components/ConsoleCommandMenu";
+import ConsoleSurfaceEffects from "./components/ConsoleSurfaceEffects";
 import { displayFont } from "./lib/display-font";
 import { appearanceBootstrap } from "./lib/appearance";
 import "./globals.css";
@@ -127,6 +128,7 @@ export default function RootLayout({
         <a href="#main-content" className="skip-link">跳到主要內容</a>
         {children}
         <ConsoleCommandMenu />
+        <ConsoleSurfaceEffects />
         <CloudflareAnalytics />
       </body>
     </html>
