@@ -148,7 +148,7 @@ export default function HomeClient({
             <ConsoleReadingInventory summary={reading} items={readings} />
           </aside>
           <div className="home-stream">
-            <ConsoleContentIndex metrics={metrics} collection={collection} />
+            <ConsoleContentIndex metrics={metrics} />
 
             <section id="console-writing" className="home-writing" aria-labelledby="writing-title">
               <div className="panel-heading">
