@@ -4,8 +4,8 @@
   --background: #0b0e12;
   --foreground: #f5f5f5;
   --bg: 11 14 18;
-  --panel: 13 17 22;
-  --panel2: 21 27 34;
+  --panel: 14 19 26;
+  --panel2: 20 28 38;
   --text: 245 245 245;
   --muted: 170 179 189;
   --accent: 245 245 245;
@@ -17,7 +17,7 @@
   --brand: #ddd083;
   --info: #91bddf;
   --info-border: #43505e;
-  --info-panel: #1a2129;
+  --info-panel: #121a23;
   --status-ok: #4ade80;
   --status-warning: #fbbf24;
   --status-error: #f87171;
@@ -410,7 +410,7 @@ html[data-gui="console"] {
   grid-column: 1 / -1;
   grid-row: 2;
   font-family: var(--font-mono);
-  font-size: 32px;
+  font-size: 44px;
   font-weight: 700;
   line-height: 1.2;
   color: var(--foreground);
@@ -509,9 +509,9 @@ html[data-gui="console"] {
 }
 :root[data-gui="console"] .feature-image {
   position: relative;
-  aspect-ratio: 16 / 8;
+  aspect-ratio: 16 / 9;
   overflow: hidden;
-  margin-top: 24px;
+  margin: 0 0 20px;
   border: 1px solid var(--border);
   border-radius: 6px;
 }
@@ -1706,4 +1706,291 @@ html[data-gui="console"] {
 }
 :root[data-gui="console"] .site-header {
   backdrop-filter: none;
+}
+
+/* Console refinement: raised title strips, restrained accents and real controls. */
+:root[data-gui="console"] .home-profile,
+:root[data-gui="console"] .content-index,
+:root[data-gui="console"] .home-writing,
+:root[data-gui="console"] .home-library,
+:root[data-gui="console"] .publication-panel {
+  overflow: hidden;
+  border-radius: 8px;
+}
+:root[data-gui="console"] .profile-eyebrow,
+:root[data-gui="console"] .console-title-row,
+:root[data-gui="console"] .panel-heading,
+:root[data-gui="console"] .signal-page-kicker {
+  background: rgb(var(--panel2));
+  min-height: 44px;
+}
+:root[data-gui="console"] .panel-heading h2,
+:root[data-gui="console"] .console-title-row h2 {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  letter-spacing: 0;
+}
+:root[data-gui="console"] .panel-heading h2::before,
+:root[data-gui="console"] .console-title-row h2::before {
+  content: "";
+  width: 2px;
+  height: 11px;
+  background: var(--brand);
+}
+:root[data-gui="console"] .profile-copy h1 {
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+:root[data-gui="console"] .profile-copy h1 span {
+  -webkit-text-stroke-color: var(--info);
+}
+:root[data-gui="console"] .identity-description {
+  text-wrap: pretty;
+}
+:root[data-gui="console"] .identity-links a {
+  text-decoration: underline;
+  text-decoration-color: var(--border);
+  text-underline-offset: 6px;
+  text-decoration-thickness: 1px;
+}
+:root[data-gui="console"] .identity-links a:hover {
+  text-decoration-color: var(--info);
+}
+:root[data-gui="console"] .content-index > a {
+  position: relative;
+  padding-top: 16px;
+  padding-bottom: 24px;
+}
+:root[data-gui="console"] .content-index > a::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 20px;
+  right: 20px;
+  height: 1px;
+  background: var(--info);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+:root[data-gui="console"] .content-index > a:is(:hover, :focus-visible)::after {
+  transform: scaleX(1);
+}
+:root[data-gui="console"] .content-index > a:hover .index-label {
+  color: var(--foreground);
+  font-size: 11px;
+}
+:root[data-gui="console"] .home-writing {
+  container-type: inline-size;
+}
+:root[data-gui="console"] .featured-entry {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+:root[data-gui="console"] .feature-image {
+  width: 100%;
+}
+:root[data-gui="console"] .featured-entry h3,
+:root[data-gui="console"] .entry-row h3,
+:root[data-gui="console"] .pick-content h3 {
+  text-wrap: pretty;
+}
+:root[data-gui="console"] .feature-read {
+  margin-top: auto;
+  padding-top: 20px;
+}
+:root[data-gui="console"] .featured-entry:hover h3,
+:root[data-gui="console"] .entry-row:hover h3,
+:root[data-gui="console"] .library-pick:hover h3 {
+  text-decoration: none;
+  color: var(--info);
+}
+:root[data-gui="console"] .entry-row {
+  margin-inline: -12px;
+  padding-inline: 12px;
+  border-radius: 4px;
+}
+:root[data-gui="console"] .library-pick {
+  margin-inline: -10px;
+  padding-inline: 10px;
+  border-radius: 4px;
+}
+:root[data-gui="console"] .entry-row:is(:hover, :focus-visible),
+:root[data-gui="console"] .library-pick:is(:hover, :focus-visible) {
+  background: rgb(var(--panel2));
+}
+:root[data-gui="console"] .publication-readout {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  font-family: var(--font-mono);
+}
+:root[data-gui="console"] .publication-readout > div {
+  display: grid;
+  gap: 6px;
+  font-size: 11px;
+}
+:root[data-gui="console"] .publication-readout time {
+  color: var(--info);
+}
+:root[data-gui="console"] .publication-readout span,
+:root[data-gui="console"] .publication-readout small {
+  color: rgb(var(--muted));
+  font-size: 11px;
+}
+:root[data-gui="console"] .publication-readout strong {
+  color: var(--foreground);
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1;
+}
+:root[data-gui="console"] .publication-readout small {
+  margin-left: 8px;
+}
+:root[data-gui="console"] .publication-body svg {
+  cursor: crosshair;
+}
+:root[data-gui="console"] .publication-cursor {
+  fill: none;
+  stroke: var(--info-border);
+  stroke-width: 1;
+  stroke-dasharray: 2 3;
+  vector-effect: non-scaling-stroke;
+}
+:root[data-gui="console"] .publication-point.is-selected {
+  fill: var(--foreground);
+  stroke: rgb(var(--panel));
+  stroke-width: 2;
+}
+:root[data-gui="console"] .publication-control-label {
+  display: block;
+  margin-top: 8px;
+  font-size: 11px;
+  color: rgb(var(--muted));
+}
+:root[data-gui="console"] .publication-slider {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  margin: 0;
+  padding: 0;
+  appearance: none;
+  background: transparent;
+  cursor: ew-resize;
+  touch-action: pan-y;
+}
+:root[data-gui="console"] .publication-slider::-webkit-slider-runnable-track {
+  height: 2px;
+  background: var(--border);
+}
+:root[data-gui="console"] .publication-slider::-moz-range-track {
+  height: 2px;
+  background: var(--border);
+}
+:root[data-gui="console"] .publication-slider::-webkit-slider-thumb {
+  width: 12px;
+  height: 12px;
+  margin-top: -5px;
+  appearance: none;
+  border: 2px solid var(--info);
+  border-radius: 2px;
+  background: rgb(var(--panel));
+}
+:root[data-gui="console"] .publication-slider::-moz-range-thumb {
+  width: 8px;
+  height: 8px;
+  border: 2px solid var(--info);
+  border-radius: 2px;
+  background: rgb(var(--panel));
+}
+:root[data-gui="console"] :is(a, button, input, select, textarea):focus-visible {
+  outline: 2px solid var(--info);
+  outline-offset: 4px;
+}
+@container (max-width: 540px) {
+  :root[data-gui="console"] .writing-layout {
+    grid-template-columns: 1fr;
+  }
+  :root[data-gui="console"] .recent-entries {
+    padding: 20px 0 0;
+    border-left: 0;
+    border-top: 1px solid var(--border);
+  }
+}
+@media screen and (min-width: 1280px) {
+  :root[data-gui="console"] .rail-link {
+    position: relative;
+  }
+  :root[data-gui="console"] .rail-link[aria-current]::before {
+    content: "";
+    position: absolute;
+    left: -8px;
+    top: 50%;
+    width: 2px;
+    height: 20px;
+    background: var(--info);
+    transform: translateY(-50%);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-gui="console"] .home-profile,
+  :root[data-gui="console"] .content-index,
+  :root[data-gui="console"] .home-writing,
+  :root[data-gui="console"] .home-library,
+  :root[data-gui="console"] .publication-panel,
+  :root[data-gui="console"] .signal-page-header {
+    animation: console-arrive 300ms ease-out both;
+  }
+  :root[data-gui="console"] .home-writing { animation-delay: 40ms; }
+  :root[data-gui="console"] .home-library { animation-delay: 80ms; }
+  :root[data-gui="console"] .content-index > a,
+  :root[data-gui="console"] .entry-row,
+  :root[data-gui="console"] .library-pick,
+  :root[data-gui="console"] .identity-links a {
+    transition: background-color 180ms ease, color 180ms ease, text-decoration-color 180ms ease;
+  }
+  :root[data-gui="console"] .content-index > a::after,
+  :root[data-gui="console"] .feature-read svg,
+  :root[data-gui="console"] .panel-heading > a svg {
+    transition: transform 180ms ease;
+  }
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  :root[data-gui="console"] .feature-image img {
+    transition: transform 280ms ease;
+  }
+  :root[data-gui="console"] .featured-entry:hover .feature-image img {
+    transform: scale(1.025);
+  }
+  :root[data-gui="console"] .featured-entry:hover .feature-read svg,
+  :root[data-gui="console"] .panel-heading > a:hover svg {
+    transform: translate(2px, -2px);
+  }
+}
+@keyframes console-arrive {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+:root[data-gui="console"] .content-index > a:focus-visible {
+  outline-offset: -5px;
+}
+:root[data-gui="console"] .signal-page-kicker > span:first-child::before {
+  content: "";
+  display: inline-block;
+  width: 2px;
+  height: 11px;
+  margin-right: 10px;
+  vertical-align: -1px;
+  background: var(--brand);
+}
+:root[data-gui="console"] .now-desk-kicker {
+  padding-left: 10px;
+  border-left: 2px solid var(--brand);
+  color: var(--foreground);
+}
+:root[data-gui="console"] .reading-header {
+  border-top-color: var(--info-border);
 }

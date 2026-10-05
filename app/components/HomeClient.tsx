@@ -186,23 +186,23 @@ export default function HomeClient({
               <div className="writing-layout">
                 {latest ? (
                   <Link href={latest.href} className="featured-entry">
-                    <div className="feature-meta">
-                      <span>最新{latest.type}</span>
-                      <time dateTime={latest.date}>{latest.date}</time>
-                    </div>
-                    <h3>{latest.title}</h3>
-                    <p>{latest.desc || "閱讀完整內容。"}</p>
                     {latest.image && (
                       <div className="feature-image">
                         <Image
                           src={latest.image}
                           alt={latest.title}
                           fill
-                          sizes="(max-width: 899px) 90vw, 600px"
+                          sizes="(max-width: 699px) 90vw, (max-width: 1099px) 55vw, 480px"
                           className="object-cover"
                         />
                       </div>
                     )}
+                    <div className="feature-meta">
+                      <span>最新{latest.type}</span>
+                      <time dateTime={latest.date}>{latest.date}</time>
+                    </div>
+                    <h3>{latest.title}</h3>
+                    <p>{latest.desc || "閱讀完整內容。"}</p>
                     <span className="feature-read">
                       閱讀全文
                       <ArrowUpRight size={16} aria-hidden="true" />

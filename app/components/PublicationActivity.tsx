@@ -1,3 +1,7 @@
+"use client";
+
+import { useState } from "react";
+
 type PublicationActivityProps = {
   dates: string[];
 };
@@ -5,6 +9,7 @@ type PublicationActivityProps = {
 export default function PublicationActivity({
   dates,
 }: PublicationActivityProps) {
+  const [selectedMonth, setSelectedMonth] = useState(11);
   const newest = [...dates].sort().at(-1);
   if (!newest) return null;
 
@@ -22,6 +27,7 @@ export default function PublicationActivity({
     x: 8 + index * (264 / 11),
     y: 84 - (item.count / peak) * 64,
   }));
+  const selected = points[selectedMonth];
 
   return (
     <section className="publication-panel" aria-labelledby="activity-title">
@@ -32,6 +38,15 @@ export default function PublicationActivity({
         </span>
       </div>
       <div className="publication-body">
+        <div className="publication-readout">
+          <div>
+            <time dateTime={selected.key}>{selected.key.replace("-", " / ")}</time>
+            <span>文章與近況</span>
+          </div>
+          <output htmlFor="publication-month" aria-live="off">
+            <strong>{selected.count}</strong><small>則</small>
+          </output>
+        </div>
         <div className="publication-scale">
           <span>文章與近況 / 每月</span>
           <span>最高 {peak} 則</span>
@@ -40,6 +55,12 @@ export default function PublicationActivity({
           viewBox="0 0 280 96"
           role="img"
           aria-labelledby="activity-chart-title activity-chart-desc"
+          onPointerMove={(event) => {
+            if (event.pointerType !== "mouse") return;
+            const bounds = event.currentTarget.getBoundingClientRect();
+            const x = ((event.clientX - bounds.left) / bounds.width) * 280;
+            setSelectedMonth(Math.max(0, Math.min(11, Math.round((x - 8) / 24))));
+          }}
         >
           <title id="activity-chart-title">最近 12 個月發布數量</title>
           <desc id="activity-chart-desc">
@@ -53,20 +74,31 @@ export default function PublicationActivity({
             points={points.map((point) => `${point.x},${point.y}`).join(" ")}
             className="publication-line"
           />
+          <path d={`M${selected.x} 12V88`} className="publication-cursor" />
           {points.map((point) => (
             <circle
               key={point.key}
               cx={point.x}
               cy={point.y}
-              r="2"
-              className="publication-point"
+              r={point.key === selected.key ? 4 : 2}
+              className={`publication-point${point.key === selected.key ? " is-selected" : ""}`}
             >
-              <title>
-                {point.key} · {point.count} 則
-              </title>
+              <title>{`${point.key} · ${point.count} 則`}</title>
             </circle>
           ))}
         </svg>
+        <label className="publication-control-label" htmlFor="publication-month">選擇月份</label>
+        <input
+          id="publication-month"
+          className="publication-slider"
+          type="range"
+          min={0}
+          max={11}
+          step={1}
+          value={selectedMonth}
+          aria-valuetext={`${selected.key}：${selected.count} 則文章與近況`}
+          onChange={(event) => setSelectedMonth(Number(event.target.value))}
+        />
         <div className="publication-scale">
           <span>{months[0].key}</span>
           <span>{newest.slice(0, 7)}</span>
