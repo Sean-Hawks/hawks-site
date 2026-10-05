@@ -4,7 +4,6 @@ import { ArrowUpRight } from "lucide-react";
 import { projects } from "../data/projects";
 import type { Post, Talk } from "../types";
 import type { LibraryItem } from "../data/library";
-import Header from "./Header";
 import PublicationActivity from "./PublicationActivity";
 interface HomeClientProps {
   posts: Post[];
@@ -102,7 +101,6 @@ export default function HomeClient({
 
   return (
     <div className="status-home min-h-screen">
-      <Header />
       <main id="main-content" tabIndex={-1} className="status-main">
         <div className="overview-summary">
           <span className={updated ? "status-ok" : "secondary"}>

@@ -12,19 +12,34 @@ import {
   Home,
   Library,
   Menu,
+  Moon,
   Rss,
   Search,
+  Sun,
   UserRound,
   Users,
   X,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
+import {
+  createAppearanceClickHandler,
+  guiSnapshot,
+  subscribeAppearance,
+  themeSnapshot,
+  toggleGui,
+  toggleTheme,
+} from "../lib/appearance";
 
 const mainLinks = [
   { label: "總覽", detail: "最新動態", href: "/" },
   { label: "文章", detail: "文章與近況", href: "/blog/" },
   { label: "收藏", detail: "收藏與評論", href: "/library/" },
   { label: "專案", detail: "程式與作品", href: "/project/" },
+];
+const classicLinks = [
+  { label: "Blog", detail: "文章與近況", href: "/blog/" },
+  { label: "Library", detail: "收藏與評論", href: "/library/" },
+  { label: "Project", detail: "程式與作品", href: "/project/" },
 ];
 const readingLinks = [
   { label: "隨機探索", href: "/explore/", icon: Compass },
@@ -46,6 +61,16 @@ const aboutLinks = [
 
 export default function Header() {
   const pathname = usePathname();
+  const gui = React.useSyncExternalStore(subscribeAppearance, guiSnapshot, () => "classic");
+  const theme = React.useSyncExternalStore(subscribeAppearance, themeSnapshot, () => "light");
+  const [announcement, setAnnouncement] = React.useState("");
+  const appearanceClicks = React.useMemo(() => createAppearanceClickHandler(toggleTheme, () => {
+    toggleGui();
+    setAnnouncement(guiSnapshot() === "console" ? "已切換到 Cyberpunk 介面" : "已切換到原本的介面");
+  }), []);
+  const themeLabel = theme === "dark" ? "切換到淺色模式" : "切換到深色模式";
+  const ThemeIcon = theme === "dark" ? Sun : Moon;
+  const contentLinks = gui === "console" ? mainLinks : classicLinks;
   const headerRef = React.useRef<HTMLElement>(null);
   const desktopNavRef = React.useRef<HTMLElement>(null);
   const panelRef = React.useRef<HTMLElement>(null);
@@ -120,7 +145,7 @@ export default function Header() {
     const railBreakpoint = window.matchMedia("(min-width: 1280px)");
     const onRailBreakpoint = (event: MediaQueryListEvent) => {
       if (
-        (event.matches &&
+        (event.matches && guiSnapshot() === "console" &&
           desktopNavRef.current?.contains(document.activeElement)) ||
         (!event.matches && document.activeElement?.closest(".site-rail"))
       ) {
@@ -184,7 +209,7 @@ export default function Header() {
       </nav>
       <header
         ref={headerRef}
-        className="site-header sticky top-0 z-20 w-full border-b"
+        className="site-header sticky top-0 z-20 w-full border-b border-[rgb(var(--line)/0.12)] bg-[rgb(var(--bg)/0.94)] backdrop-blur-xl"
       >
         <div className="relative mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
           <Link
@@ -193,16 +218,16 @@ export default function Header() {
             onClick={closeMenu}
             className="header-wordmark shrink-0 text-[rgb(var(--text))]"
           >
-            <span>hawks.tw</span>
+            {gui === "console" ? <span>hawks.tw</span> : <><span>HAWKS</span><span className="header-wordmark-outline">.TW</span></>}
           </Link>
 
           <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
             <nav
               ref={desktopNavRef}
               aria-label="主要導覽"
-              className="mr-3 hidden items-center gap-1 md:flex xl:hidden"
+              className="header-desktop-nav mr-3 hidden items-center gap-1 md:flex"
             >
-              {mainLinks.map((item) => (
+              {contentLinks.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
@@ -224,6 +249,23 @@ export default function Header() {
             >
               <Search aria-hidden="true" className="h-[18px] w-[18px]" />
             </Link>
+            <button
+              type="button"
+              aria-label={themeLabel}
+              aria-pressed={theme === "dark"}
+              aria-describedby="appearance-shortcut"
+              title={`${themeLabel}；快速連點三下切換介面`}
+              onClick={appearanceClicks.click}
+              onBlur={appearanceClicks.reset}
+              onKeyDown={(event) => {
+                if (event.repeat && (event.key === "Enter" || event.key === " ")) event.preventDefault();
+              }}
+              className="header-icon-button theme-toggle"
+            >
+              <ThemeIcon aria-hidden="true" className="h-[18px] w-[18px]" />
+            </button>
+            <span id="appearance-shortcut" className="sr-only">快速連點三下，在原本介面與 Cyberpunk 介面之間切換。</span>
+            <span className="sr-only" role="status">{announcement}</span>
             <button
               type="button"
               ref={menuButtonRef}
@@ -256,8 +298,8 @@ export default function Header() {
           >
             <div className="header-nav-group header-mobile-content md:hidden">
               <h2 className="header-nav-heading">瀏覽內容</h2>
-              <div className="grid grid-cols-2 gap-2">
-                {mainLinks.map((item) => (
+              <div className={`grid gap-2 ${gui === "console" ? "grid-cols-2" : "grid-cols-3"}`}>
+                {contentLinks.map((item) => (
                   <Link
                     key={item.href}
                     href={item.href}

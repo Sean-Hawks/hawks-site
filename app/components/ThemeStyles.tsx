@@ -1,3 +1,3 @@
 export default function ThemeStyles() {
-  return null; // The shared status-first palette is defined in globals.css.
+  return null; // Both appearance palettes are supplied by the root layout.
 }

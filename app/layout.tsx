@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import { feedChannels } from "./lib/feed-channels";
 import CloudflareAnalytics from "./components/CloudflareAnalytics";
 import { displayFont } from "./lib/display-font";
+import { appearanceBootstrap } from "./lib/appearance";
 import "./globals.css";
+import "./console.css";
 import "./article-print.css";
 
 const siteUrl = "https://hawks.tw";
@@ -109,8 +111,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="zh-TW" data-theme="dark">
+    <html lang="zh-TW" suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: appearanceBootstrap }} />
         {feedChannels.map(feed => <link key={feed.id} rel="alternate" type="application/rss+xml" title={`hawks.tw · ${feed.title}`} href={feed.path} />)}
         <script
           type="application/ld+json"

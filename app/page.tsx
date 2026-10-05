@@ -41,11 +41,14 @@ import { getSortedPostsData } from "./lib/posts";
 import { getSortedTalksData } from "./lib/talks";
 import { getAllLibraryItems } from "./lib/library";
 import HomeClient from "./components/HomeClient";
+import ClassicHome from "./components/ClassicHome";
+import HomeAppearance from "./components/HomeAppearance";
 
 export default function Page() {
 	const posts = getSortedPostsData();
 	const talks = getSortedTalksData();
 	const libraryItems = getAllLibraryItems();
 
-	return <HomeClient posts={posts} talks={talks} libraryItems={libraryItems} />;
+	const props = { posts, talks, libraryItems };
+	return <HomeAppearance classic={<ClassicHome {...props} />} console={<HomeClient {...props} />} />;
 }
