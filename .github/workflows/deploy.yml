@@ -38,7 +38,7 @@ jobs:
         run: npm ci
 
       - name: Verify source and regression tests
-        run: npm run lint && npm test && npm run test:export
+        run: npm run lint && npm test && npm --prefix comments-server test && npm run test:export
 
       # OG 圖在 build 前生成 (prebuild)，需中文字型才能正確渲染標題
       - name: Install CJK fonts
@@ -48,6 +48,8 @@ jobs:
         env:
           PRESERVE_LIVE_STATIC_ORIGIN: https://hawks.tw
           NEXT_PUBLIC_HEARTS_API_URL: ${{ vars.NEXT_PUBLIC_HEARTS_API_URL }}
+          NEXT_PUBLIC_COMMENTS_API_URL: ${{ vars.NEXT_PUBLIC_COMMENTS_API_URL }}
+          NEXT_PUBLIC_COMMENTS_TURNSTILE_SITE_KEY: ${{ vars.NEXT_PUBLIC_COMMENTS_TURNSTILE_SITE_KEY }}
         run: npm run build
 
       - name: Verify exported pages and assets

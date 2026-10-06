@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Comments from "./Comments";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { projects } from "../data/projects";
@@ -224,6 +225,7 @@ export default function HomeClient({
             />
           </div>
         </div>
+        <div className="col-span-full"><Comments /></div>
       </main>
       <footer className="status-footer">
         <span>© Hawks · hawks.tw</span>

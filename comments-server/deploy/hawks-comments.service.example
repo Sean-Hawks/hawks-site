@@ -1,0 +1,19 @@
+[Unit]
+Description=Hawks website comments API
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/YOUR_USER/apps/hawks-comments
+# Replace this with the absolute result of command -v node (Node 22.13+).
+ExecStart=/usr/bin/node --env-file=.env src/main.mjs
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=20
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=default.target

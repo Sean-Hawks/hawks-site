@@ -1,3 +1,4 @@
+import Comments from "../../components/Comments";
 import { optimizedSrc, optimizedSrcSet } from "../../lib/image-loader";
 import Link from "next/link";
 import { ArrowLeft, ArrowUpRight, FileText, Presentation, Rss, Video } from "lucide-react";
@@ -238,6 +239,7 @@ export default async function TalkDetailPage({ params }: PageProps) {
                 </div>
               </Link>
             </section>
+            <Comments />
           </div>
         </main>
 

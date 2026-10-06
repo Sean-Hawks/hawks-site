@@ -147,6 +147,10 @@ Blog、Talk 與 Library 詳頁可加入免登入愛心，支援取消與共用�
 
 尚未設定 `NEXT_PUBLIC_HEARTS_API_URL` 時不顯示按鈕。完整本機預覽、測試、上線順序與匿名互動限制見 [愛心系統指南](docs/HEARTS.md)；後端程式與資料庫遷移在 [`hearts-worker/`](hearts-worker/)。
 
+## 留言區
+
+首頁、Blog、近況與收藏詳頁支援匿名／暱稱留言與巢狀回覆。網站維持靜態部署，互動 API 與 SQLite 獨立架在 WSL，目前透過 Tailscale Funnel 提供 HTTPS，也支援 Cloudflare Tunnel；包含 Turnstile 驗證、限流與管理員刪除。前端未設定 API 時顯示「留言區準備中」。本機預覽與部署步驟見 [留言服務指南](comments-server/README.md)。
+
 ## 寫作方式
 
 - **直接編輯 Markdown**：修改 `content/` 下的檔案，在本機預覽後提交。

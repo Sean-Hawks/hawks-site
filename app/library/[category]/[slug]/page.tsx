@@ -1,3 +1,4 @@
+import Comments from "../../../components/Comments";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
@@ -405,6 +406,7 @@ export default async function LibraryReviewPage({ params }: PageProps) {
               )}
               {recommendedWorksSection}
               <ArticleActions id={`library:${item.category}:${item.slug}`} title={item.title} date={item.date} path={`/library/${item.category}/${item.slug}/`} />
+              <Comments />
             </article>
 
           </div>

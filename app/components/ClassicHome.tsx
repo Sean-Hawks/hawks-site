@@ -8,6 +8,7 @@ import { resumeItems, sortResumeItemsByDate } from "../data/resume";
 import { Post, Talk } from "../types";
 import type { LibraryItem } from "../data/library";
 import ThemeStyles from "./ThemeStyles";
+import Comments from "./Comments";
 import ImdbRating from "../library/ImdbRating";
 
 interface HomeClientProps {
@@ -599,6 +600,7 @@ export default function ClassicHome({ posts, talks, libraryItems }: HomeClientPr
             ))}
           </nav>
         </section>
+        <Comments />
       </main>
 
       <footer className="border-t border-[rgb(var(--line)/0.14)] bg-[rgb(var(--panel)/0.5)]">

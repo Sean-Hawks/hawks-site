@@ -1,0 +1,22 @@
+services:
+  comments:
+    build: .
+    restart: unless-stopped
+    init: true
+    env_file: .env
+    environment:
+      COMMENTS_HOST: 0.0.0.0
+      COMMENTS_DATA_DIR: /data
+      COMMENTS_PORT: 8790
+    ports:
+      - "127.0.0.1:8790:8790"
+    volumes:
+      - comments-data:/data
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8790/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    stop_grace_period: 20s
+volumes:
+  comments-data:
