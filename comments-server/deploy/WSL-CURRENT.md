@@ -9,15 +9,23 @@
 - 服務：systemd user `hawks-comments.service`，enabled，user linger 已啟用
 - SQLite：`/home/sean8/apps/hawks-comments/.data/comments.sqlite`
 - 私密設定：`/home/sean8/apps/hawks-comments/.env`（0600，不印出、不提交）
-- 公開 API：`https://hawks-wsl.tail5bdb5f.ts.net:10000`
-- HTTPS：Tailscale Funnel port 10000 → `http://127.0.0.1:8790`
+- 公開 API：`https://hawks-comments.sean-hawks.workers.dev`
+- HTTPS：Cloudflare Worker → VPC Service → WSL named Tunnel → `http://127.0.0.1:8790`
+- Tunnel：`hawks-comments-wsl`（`e9c83f06-1ca4-4c61-9a95-11afa34df6f2`）
+- VPC Service：`01a11228-dc31-70f3-9d8f-f3d316b296c5`，HTTP loopback port 8790
+- cloudflared：`/usr/local/bin/cloudflared`（2026.10.0），`hawks-comments-tunnel.service` enabled
+- Tunnel token：`/etc/hawks-comments/tunnel-token`（root 0600）
+- Proxy trust：`COMMENTS_PROXY=cloudflare`；只經 gateway 提供公開入口
 - Turnstile：Cloudflare widget `hawks.tw comments`，managed，hostname `hawks.tw`，action `comment`
 
 ```sh
 ssh hawks-wsl 'systemctl --user status hawks-comments --no-pager'
 ssh hawks-wsl 'systemctl --user restart hawks-comments'
-curl -fsS https://hawks-wsl.tail5bdb5f.ts.net:10000/healthz
+ssh hawks-wsl 'sudo systemctl status hawks-comments-tunnel --no-pager'
+curl -fsS -A 'Mozilla/5.0' https://hawks-comments.sean-hawks.workers.dev/healthz
 ```
+
+Tailscale Funnel 曾啟用，但公開 DNS 持續 NXDOMAIN；留言新增的 port 10000 已移除，既有其他代理未改動。
 
 ## Windows／WSL 常駐
 
@@ -29,6 +37,6 @@ curl -fsS https://hawks-wsl.tail5bdb5f.ts.net:10000/healthz
 Windows 管理員修正腳本已放在：
 `C:\Users\sean8\AppData\Local\Hawks\repair-wsl-startup.ps1`
 
-腳本會備份排程、將執行時限改為無限制、失敗重試 3 次，啟用 Windows Tailscale unattended 模式，並啟動開機排程。目前透過 WSL 執行的 Windows 程序沒有管理員權限，尚需在管理員 PowerShell 執行後驗證。未測試 Windows 重開機；不要以部署完成推定重開機驗證通過。
+已由使用者在管理員 PowerShell 執行修正腳本並核對：兩個排程的執行時限皆為 `PT0S`（無限制），失敗重試 3 次；開機排程改用 S4U 本機登入（不儲存密碼），狀態為 Running，WSL 的 `/bin/sleep infinity` 正在執行。Windows Tailscale `ForceDaemon=true`（unattended）。既有排程與啟動腳本皆有備份。未測試 Windows 重開機；不要以目前程序正在執行推定重開機驗證通過。
 
-Tailscale 裝置金鑰到期仍需在管理頁停用。管理網頁的登入期限不能藉此延長。Windows 睡眠／關機仍會讓 WSL 與留言 API 離線。
+已核對 `hawks-wsl` 與 `Hawks-PC` 的 `KeyExpiry=null`，兩台裝置的金鑰到期已停用。管理網頁的登入期限不能藉此延長。Windows 睡眠／關機仍會讓 WSL 與留言 API 離線。

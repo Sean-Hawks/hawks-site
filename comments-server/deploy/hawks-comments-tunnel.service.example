@@ -1,0 +1,18 @@
+[Unit]
+Description=Hawks comments Cloudflare VPC tunnel
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/cloudflared tunnel --no-autoupdate --protocol quic --metrics 127.0.0.1:20242 run --token-file /etc/hawks-comments/tunnel-token
+Restart=on-failure
+RestartSec=5
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+
+[Install]
+WantedBy=multi-user.target

@@ -15,7 +15,13 @@ foreach ($taskName in @("Start WSL Ubuntu Tailscale", "Start WSL Ubuntu Tailscal
     $settings.ExecutionTimeLimit = "PT0S"
     $settings.RestartCount = 3
     $settings.RestartInterval = "PT1M"
-    Set-ScheduledTask -TaskName $taskName -Settings $settings | Out-Null
+    $task.Settings = $settings
+    if ($taskName -eq "Start WSL Ubuntu Tailscale") {
+        # S4U runs this local task while signed out without storing a password.
+        # The action only uses local WSL and its Linux network connection.
+        $task.Principal = New-ScheduledTaskPrincipal -UserId $identity.Name -LogonType S4U -RunLevel Limited
+    }
+    Register-ScheduledTask -TaskName $taskName -InputObject $task -Force | Out-Null
 }
 
 & "$env:ProgramFiles\Tailscale\tailscale.exe" set --unattended=true

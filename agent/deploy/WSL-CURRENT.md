@@ -23,4 +23,4 @@ The verified cutover backup is private at:
 
 Back up the complete remote `.data` with the service stopped, and keep `.env` privately. Before rolling back, stop WSL's service and copy its newest data back to the Mac; the Mac copy becomes stale after migration. Only one instance may use this Discord token.
 
-WSL must remain running. Windows shutdown, sleep or `wsl --shutdown` stops the bot. The systemd service does not configure Windows to start WSL automatically after reboot.
+WSL must remain running. Windows shutdown or sleep stops the bot. On 2026-10-07 the existing Windows boot/logon tasks were repaired to keep Ubuntu-24.04 running with a foreground `wsl.exe ... /bin/sleep infinity` process, without a 72-hour execution limit. Windows Tailscale unattended mode is enabled, and device key expiry is disabled for Hawks-PC and hawks-wsl. Current task/process state was verified; a Windows reboot was not tested. See [the shared WSL startup details](../../comments-server/deploy/WSL-CURRENT.md). Before intentionally stopping WSL for maintenance, stop both Windows startup tasks so the keep-alive loop does not restart it.

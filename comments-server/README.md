@@ -29,7 +29,7 @@ NEXT_PUBLIC_COMMENTS_API_URL=http://127.0.0.1:8790 npm run dev
 
 ## WSL：systemd 部署
 
-已獨立部署在 `/home/sean8/apps/hawks-comments`，使用 `hawks-comments.service`；與 `/home/sean8/apps/hawks-agent` 的資料及服務分開。2026-10-07 確認 Ubuntu-24.04 原先為 Stopped，從 Windows 啟動後已恢復 SSH、Tailscale 與 bot。Node 為 `/home/sean8/.local/opt/hawks-agent-node/bin/node`（22.23.2），遠端留言測試 9 項通過。以下步驟供重新部署使用。
+已獨立部署在 `/home/sean8/apps/hawks-comments`，使用 `hawks-comments.service`；與 `/home/sean8/apps/hawks-agent` 的資料及服務分開。2026-10-07 確認 Ubuntu-24.04 原先為 Stopped，從 Windows 啟動後已恢復 SSH、Tailscale 與 bot。Node 為 `/home/sean8/.local/opt/hawks-agent-node/bin/node`（22.23.2），遠端留言與 gateway 測試 16 項通過。以下步驟供重新部署使用。
 
 把本資料夾的程式碼帶到 WSL，**不複製本機 `.env`、`.data` 或 node_modules**；以下指令在 WSL 上執行：
 
@@ -49,7 +49,7 @@ COMMENTS_HOST=127.0.0.1
 COMMENTS_PORT=8790
 COMMENTS_DATA_DIR=.data
 COMMENTS_ORIGINS=https://hawks.tw
-COMMENTS_PROXY=tailscale
+COMMENTS_PROXY=cloudflare
 COMMENTS_TURNSTILE_SECRET=填入私密的 Turnstile secret key
 COMMENTS_TURNSTILE_HOSTNAMES=hawks.tw
 COMMENTS_ALLOW_UNVERIFIED=false
@@ -74,41 +74,42 @@ systemctl --user status hawks-comments --no-pager
 journalctl --user -u hawks-comments -n 50 --no-pager
 ```
 
-## HTTPS：Tailscale Funnel（目前使用）
+## HTTPS：Cloudflare Worker → VPC Tunnel → WSL（目前使用）
 
-`hawks.tw` 的 DNS 使用 Gandi，目前未加入 Cloudflare 網域；因此採用既有 Tailscale Funnel 提供公開 HTTPS：
+公開 API 是 **`https://hawks-comments.sean-hawks.workers.dev`**。Worker 只代理留言與健康檢查；Node.js、SQLite 與管理刪除仍在 WSL。`hawks.tw` 的 DNS 維持 Gandi，無需搬移網域或開放 8790 公網埠。
+
+WSL 的 `hawks-comments-tunnel.service` 使用 Cloudflare 官方 `cloudflared`，透過 QUIC 連到 named Tunnel `hawks-comments-wsl`。Worker 的 VPC Service binding 只指向 `127.0.0.1:8790`，不提供其他 WSL 網路服務。相關程式與設定在 [gateway](gateway/)，systemd 範例在 [hawks-comments-tunnel.service.example](deploy/hawks-comments-tunnel.service.example)。
+
+Tunnel token 存在 `/etc/hawks-comments/tunnel-token`，root 0600；不要提交或印出。安裝 cloudflared 後，把範例 service 複製到 `/etc/systemd/system/hawks-comments-tunnel.service`，執行 `sudo systemctl daemon-reload` 與 `sudo systemctl enable --now hawks-comments-tunnel`。Node API 設定 `COMMENTS_PROXY=cloudflare`，使用 gateway 轉送的 Cloudflare `CF-Connecting-IP` 限流。必須維持 loopback 綁定，且不能另開相信訪客 header 的公網代理。
+
+部署 Worker（先完成 Cloudflare 登入及 VPC Service 建立；目前 service ID 已記錄在設定中）：
 
 ```sh
-sudo tailscale funnel --bg --https=10000 --yes http://127.0.0.1:8790
+npm --prefix hearts-worker ci
+hearts-worker/node_modules/.bin/wrangler deploy --config comments-server/gateway/wrangler.jsonc
+curl -fsS -A 'Mozilla/5.0' https://hawks-comments.sean-hawks.workers.dev/healthz
 ```
 
-API origin 是 **`https://hawks-wsl.tail5bdb5f.ts.net:10000`**，`/healthz` 已驗證回傳 `{"ok":true}`。此入口對一般網路訪客開放，不需要安裝 Tailscale。既有 443、9443、10443 的代理保持原設定。
+新建通道／搬家時依 [Cloudflare Workers VPC 指南](https://developers.cloudflare.com/workers-vpc/get-started/)建立 named Tunnel，再用 `wrangler vpc service create hawks-comments-wsl --type http --tunnel-id TUNNEL_ID --ipv4 127.0.0.1 --http-port 8790` 建立服務，更新 `gateway/wrangler.jsonc` 的 binding ID。Workers VPC 目前為免費 beta，功能與價格仍可能改變，見 [官方說明](https://developers.cloudflare.com/workers-vpc/platform/pricing/)；Worker 本身依帳號方案配額運作。
 
-服務綁定 `127.0.0.1:8790`，設定 `COMMENTS_PROXY=tailscale`。此模式只接受從 loopback 連入的代理，並使用 Tailscale Serve 覆寫的單一 `X-Forwarded-For` IP 進行限流；不接受訪客自行提供的 IP 清單。原生部署使用這個模式；Docker bridge 下請採用下方 Cloudflare Tunnel 方案，避免把非 loopback 的 Docker 網路當作可信 Tailscale 代理。
+曾試用 Tailscale Funnel，但節點的公開 DNS 持續回傳 NXDOMAIN，tailnet 內測試成功不能代表訪客可連線。因此已移除本次留言新增的 Funnel port 10000；既有 443、9443、10443 的代理維持原設定。
 
-Cloudflare Turnstile widget 為 `hawks.tw comments`，採 managed 模式，只允許 `hawks.tw`。secret 只存遠端私人的 `.env`。GitHub Actions 需設定以下兩個公開 repository variables，並重新建置網站：
+Cloudflare Turnstile widget 為 `hawks.tw comments`，managed，只允許 `hawks.tw`，action `comment`。secret 與管理 token 只存在 WSL 私密 `.env`。GitHub Actions 使用以下公開 repository variables；修改後必須重新建置網站：
 
 | Repository variable | 值 |
 | --- | --- |
-| `NEXT_PUBLIC_COMMENTS_API_URL` | `https://hawks-wsl.tail5bdb5f.ts.net:10000` |
+| `NEXT_PUBLIC_COMMENTS_API_URL` | `https://hawks-comments.sean-hawks.workers.dev` |
 | `NEXT_PUBLIC_COMMENTS_TURNSTILE_SITE_KEY` | widget 的公開 site key |
 
-## HTTPS：Cloudflare Tunnel（替代方案）
+設定缺失時服務拒絕啟動／送出，不會略過正式環境驗證。驗證流程依 [Turnstile server-side validation](https://developers.cloudflare.com/turnstile/get-started/server-side-validation/)。Worker 不公開 DELETE 路由，也不轉送 Authorization、Cookie 或 X-Forwarded-For。WSL 離線時回傳可供前端顯示的 503，保留 `hawks.tw` CORS header，不快取留言或錯誤。
 
-此方案需要 Cloudflare 上的網域。在 WSL 安裝並啟動 `cloudflared`，依 [Cloudflare 官方的遠端 Tunnel 指南](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/get-started/create-remote-tunnel/)建立常駐 Tunnel，公開 hostname 可使用 **`comments.hawks.tw`**，service 指向 **`http://127.0.0.1:8790`**。此 hostname 尚未建立 DNS 或 Tunnel。
+WSL／Windows 睡眠、關機會使留言服務離線，網站本身仍可閱讀。systemd 的自動重啟只在 WSL 正在執行時生效；systemd 本身不會保持 WSL VM 執行。Windows 的啟動排程使用 [wsl-keep-alive.ps1](deploy/wsl-keep-alive.ps1) 持續執行 `wsl.exe ... /bin/sleep infinity`，WSL 被手動停止時會在 15 秒後重新啟動。[repair-wsl-startup.ps1](deploy/repair-wsl-startup.ps1) 已由管理員執行並核對：排程無執行時限、失敗重試 3 次，Windows Tailscale unattended 已啟用。若要停機維護，先停止兩個 Windows 啟動排程。兩台裝置的 Tailscale 金鑰到期皆已停用；這與 VM 常駐、管理網頁登入期限各自獨立。
 
-不需把 8790 開放到公網或設定路由器轉送。服務綁在 loopback，只透過 Tunnel 提供公網入口；只有這種架構才設定 `COMMENTS_PROXY=cloudflare`，依 Cloudflare 提供的 `CF-Connecting-IP` 分別限制訪客。其他代理設定 `none` 時會依 socket IP 限流，所有訪客可能共享代理 IP 的配額。避免直接暴露相信代理 header 的服務。
+若日後需要再次執行修正腳本，在管理員 PowerShell 使用以下單次執行參數（不改永久執行原則）：
 
-確認 HTTPS 的 `/healthz` 可讀，再在 GitHub repository 的 **Settings → Secrets and variables → Actions → Variables** 設定：
-
-| Repository variable | 值 |
-| --- | --- |
-| `NEXT_PUBLIC_COMMENTS_API_URL` | `https://comments.hawks.tw`，或實際 API origin |
-| `NEXT_PUBLIC_COMMENTS_TURNSTILE_SITE_KEY` | 允許 `hawks.tw` 的公開 Turnstile site key |
-
-網站 workflow 已讀取這兩個變數；必須重新建置部署網站才會生效。Turnstile secret、管理 token 只放在 WSL。設定缺失時服務拒絕啟動／送出；不會自動略過正式環境驗證。正式驗證流程依 [Turnstile server-side validation](https://developers.cloudflare.com/turnstile/get-started/server-side-validation/)。
-
-WSL／Windows 睡眠、關機會使留言服務離線，網站本身仍可閱讀。systemd 的自動重啟只在 WSL 正在執行時生效；systemd 本身不會保持 WSL VM 執行。Windows 的啟動排程使用 [wsl-keep-alive.ps1](deploy/wsl-keep-alive.ps1) 持續執行 `wsl.exe ... /bin/sleep infinity`，WSL 被手動停止時會在 15 秒後重新啟動。排程的 72 小時上限與 Windows Tailscale unattended 模式需由管理員執行 [repair-wsl-startup.ps1](deploy/repair-wsl-startup.ps1) 修正。若要停機維護，先停止兩個 Windows 啟動排程。裝置不需定期重新登入的設定是 Tailscale 管理頁的 Disable key expiry，與 VM 常駐、管理網頁登入期限各自獨立。
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$env:LOCALAPPDATA\Hawks\repair-wsl-startup.ps1"
+```
 
 ## Docker Compose（替代 systemd）
 

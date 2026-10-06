@@ -1,0 +1,16 @@
+{
+  "$schema": "../../hearts-worker/node_modules/wrangler/config-schema.json",
+  "name": "hawks-comments",
+  "main": "worker.mjs",
+  "account_id": "dc05aa37a18752c3444b9e2adcc72417",
+  "compatibility_date": "2026-10-06",
+  "workers_dev": true,
+  "preview_urls": false,
+  "observability": { "enabled": false },
+  "vpc_services": [
+    {
+      "binding": "COMMENTS_BACKEND",
+      "service_id": "01a11228-dc31-70f3-9d8f-f3d316b296c5"
+    }
+  ]
+}
