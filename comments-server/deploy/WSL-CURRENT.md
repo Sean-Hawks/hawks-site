@@ -43,6 +43,8 @@ Tailscale Funnel 曾啟用，但公開 DNS 持續 NXDOMAIN；留言新增的 por
 - 本次修改前用 SQLite backup API 備份資料庫，並私密備份三個後端模組至 `.backups/notification-email-*`；Mac 與 WSL 的 35 項後端測試通過，正式 API 已恢復正常。已修正 session 逾期／重複登出仍可切回匿名。Cloudflare gateway 已允許登入 session 的信箱移除路由，管理 token 仍不能通過 gateway。
 - 使用者實際確認訂閱時發現表單回覆「不允許此網站連線」。原因是 HTML 頁面的 `Referrer-Policy: no-referrer` 會讓原生表單 POST 使用 `Origin: null`，被既有來源檢查拒絕（[Fetch 標準](https://fetch.spec.whatwg.org/#append-a-request-origin-header)）。已改為 `same-origin`：同源表單仍帶正確 Origin，外連不帶 referrer。沒有放寬 origin 白名單；測試確認確認／取消頁面的標頭與同源 POST，`Origin: null` 仍被拒絕。WSL 修正已部署，原確認信可沿用。
 - 2026-10-08 使用者重新從確認信開啟頁面並完成訂閱，已核對正式 `subscriptions.verified=1`，`notification_emails` 中的 `@Sean-Hawks`／`me@hawks.tw` 驗證紀錄存在。後續訂閱其他討論串可沿用該帳號信箱，完整回覆通知收信仍在驗證。
+- 2026-10-08 留言體驗修正：登入狀態恢復前暫停送出，網路故障保留帳號而不切匿名；登出清除通知選項但保留草稿。草稿、回覆對象、暱稱與主動填寫的通知選項保留於分頁 sessionStorage；逾時重試與重新整理沿用同一 request ID。留言列表、操作回饋、草稿與身分處理已分離，統一 Unicode 字數檢查。前端 7 項 DOM 流程測試通過，後端 35 項在 Mac／WSL 通過；確認連結可在原有效期內安全重開，失效連結改為 HTML 提示。
+- WSL 隔離收信流程已由留言 API 建立訂閱、確認並新增匿名回覆，使用正式 SMTP 設定及真實 Postfix；通知實際到達 `me@hawks.tw` 並以 IMAP UID 9 讀回，主旨及驗證內容符合，含 DKIM 簽章。隔離資料庫已移除，正式資料庫未新增測試留言。正式網站匿名回覆及新版手機畫面仍待人工確認，不能把 DOM 測試或隔離收信當成正式瀏覽器端完整驗證。
 - 對目前 IP 的 Spamhaus ZEN 查詢（透過 HiNet DNS）回傳 `127.0.0.11`，TXT 指向 PBL 查詢頁：Spamhaus 維護的 PBL。先前透過公共 resolver 得到的 `127.255.255.254` 是查詢錯誤，不能當成名單結果。
 - PBL 是一般用戶網段直接寄信的政策名單，不代表主機正在寄垃圾信。它可能影響收件端評分，但沒有證據能斷定 Gmail 本次分類的唯一原因。是否為配給此用戶的固定 IP 尚待確認；只有符合固定 IP、自有郵件伺服器、正反向 DNS 等條件才適合申請排除，且移除後仍不保證進入收件匣。見 [Spamhaus PBL 條件](https://www.spamhaus.org/faqs/policy-blocklist-pbl/)。
 

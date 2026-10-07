@@ -18,6 +18,27 @@ export type CommentUser = {
 export type CommentFeatures = { githubEnabled: boolean; emailEnabled: boolean };
 export type CommentHistory = { messages: CommentMessage[]; hasMore: boolean };
 
+export class CommentsRequestError extends Error {
+  constructor(
+    public readonly status: number,
+    message: string,
+  ) {
+    super(message);
+    this.name = "CommentsRequestError";
+  }
+}
+
+export function commentLength(value: string): number {
+  return [...value.trim()].length;
+}
+
+export function commentValidation(name: string, body: string): string {
+  if (commentLength(name) > 24) return "顯示名稱最多 24 字。";
+  if (commentLength(body) > 1000) return "留言最多 1,000 字。";
+  if (!body.trim()) return "請先寫下留言。";
+  return "";
+}
+
 export function commentsApiOrigin(value: string | undefined): string | null {
   if (!value) return null;
   try {
@@ -67,7 +88,8 @@ export async function commentsRequest<T>(
   if (!data || typeof data !== "object")
     throw new Error("留言服務回應異常，請稍後再試。");
   if (!response.ok)
-    throw new Error(
+    throw new CommentsRequestError(
+      response.status,
       typeof data.error === "string" ? data.error : "留言服務暫時無法使用。",
     );
   return data as T;

@@ -158,3 +158,9 @@ npm test
 ```
 
 後端測試使用暫存／記憶體 SQLite，Turnstile 使用模擬 API，不會對正式站發送留言。
+
+## 留言操作與前端驗證
+
+前端將留言列表、回饋提示、草稿與登入狀態分開維護。恢復登入期間不能送出；暫時的服務故障不會默默切換成匿名。回覆會帶到表單並顯示對象，登出保留內容並清除通知選項。草稿只保留在目前分頁，送出成功後移除；回應逾時後重試仍使用同一 request ID，避免重複留言。
+
+`npm test` 包含 `tests/comments-flow.test.mjs` 的 7 項真實 React DOM 操作測試。這些測試使用隔離 API 回應，並未向 GitHub 或真人寄信。正式 GitHub 授權、信箱確認及 WSL 隔離 SMTP／IMAP 收信驗證範圍記錄於 [整合設定](deploy/INTEGRATIONS-SETUP.md)；新版手機畫面與授權視窗操作仍待人工確認。

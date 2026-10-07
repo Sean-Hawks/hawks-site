@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   commentsRequest,
+  CommentsRequestError,
   type CommentFeatures,
   type CommentUser,
 } from "../lib/comments-client";
@@ -10,7 +11,12 @@ import {
 const sessionKey = "hawks:comments-session";
 const pendingKey = "hawks:comments-login";
 type PendingLogin = { state: string; verifier: string; started: number };
-type LoginResult = { pending?: boolean; token?: string; user?: CommentUser; notificationEmail?: string };
+type LoginResult = {
+  pending?: boolean;
+  token?: string;
+  user?: CommentUser;
+  notificationEmail?: string;
+};
 
 function storageGet(key: string) {
   try {
@@ -36,6 +42,8 @@ function base64url(bytes: Uint8Array) {
 
 export default function useCommentIdentity(api: string | null) {
   const [features, setFeatures] = useState<CommentFeatures | null>(null);
+  const [restoring, setRestoring] = useState(Boolean(api));
+  const [sessionUncertain, setSessionUncertain] = useState(false);
   const [user, setUser] = useState<CommentUser | null>(null);
   const [token, setToken] = useState("");
   const [notificationEmail, setNotificationEmail] = useState("");
@@ -57,12 +65,14 @@ export default function useCommentIdentity(api: string | null) {
     setToken("");
     setUser(null);
     setNotificationEmail("");
+    setSessionUncertain(false);
     setNotice("");
   }, []);
   useEffect(() => {
     if (!api) return;
     let active = true;
     void (async () => {
+      setRestoring(true);
       try {
         const config = await commentsRequest<CommentFeatures>(
           `${api}/v1/comments/config`,
@@ -72,18 +82,37 @@ export default function useCommentIdentity(api: string | null) {
         const saved = storageGet(sessionKey);
         if (saved) {
           try {
-            const session = await commentsRequest<{ user: CommentUser; notificationEmail?: string }>(
-              `${api}/v1/comments/auth/me`,
-              { headers: { Authorization: `Bearer ${saved}` } },
-            );
+            const session = await commentsRequest<{
+              user: CommentUser;
+              notificationEmail?: string;
+            }>(`${api}/v1/comments/auth/me`, {
+              headers: { Authorization: `Bearer ${saved}` },
+            });
             if (!session.user) throw new Error("Session expired");
             if (active) {
               setToken(saved);
               setUser(session.user);
               setNotificationEmail(session.notificationEmail || "");
+              setSessionUncertain(false);
             }
-          } catch {
-            if (active) invalidate();
+          } catch (failure) {
+            if (!active) return;
+            if (
+              failure instanceof CommentsRequestError &&
+              failure.status === 401
+            ) {
+              invalidate();
+              setError(
+                "登入已到期，請重新登入；也可繼續匿名留言。草稿已保留。",
+              );
+            } else {
+              // A network failure must not silently turn a signed-in draft anonymous.
+              setError(
+                "無法確認登入狀態，請重試，或選擇改用匿名。草稿已保留。",
+              );
+              setSessionUncertain(true);
+              return;
+            }
           }
         }
         const storedPending = storageGet(pendingKey);
@@ -102,7 +131,12 @@ export default function useCommentIdentity(api: string | null) {
           }
         }
       } catch {
-        if (active) setError("登入與通知設定暫時無法讀取，請稍後重新整理。");
+        if (active) {
+          setError("登入與通知設定暫時無法讀取，請重試。草稿已保留。");
+          setSessionUncertain(Boolean(storageGet(sessionKey)));
+        }
+      } finally {
+        if (active) setRestoring(false);
       }
     })();
     return () => {
@@ -163,9 +197,12 @@ export default function useCommentIdentity(api: string | null) {
         setToken(result.token);
         setUser(result.user);
         setNotificationEmail(result.notificationEmail || "");
+        setSessionUncertain(false);
         setPending(null);
         setNoticeTitle("GitHub 登入成功");
-        setNotice(`已登入 @${result.user.githubLogin}，接下來的留言會顯示 GitHub 身分。`);
+        setNotice(
+          `已登入 @${result.user.githubLogin}，接下來的留言會顯示 GitHub 身分。`,
+        );
         try {
           popup.current?.close();
         } catch {
@@ -191,7 +228,13 @@ export default function useCommentIdentity(api: string | null) {
     };
   }, [api, pending]);
   async function login() {
-    if (!api || !features?.githubEnabled || pending || startInFlight.current)
+    if (
+      !api ||
+      restoring ||
+      !features?.githubEnabled ||
+      pending ||
+      startInFlight.current
+    )
       return;
     startInFlight.current = true;
     const attempt = ++attemptId.current;
@@ -282,8 +325,10 @@ export default function useCommentIdentity(api: string | null) {
       invalidate();
       setNoticeTitle("已切換匿名留言");
       setNotice("已登出，接下來會以匿名或你填寫的暱稱留言。");
+      return true;
     } catch {
       setError("暫時無法登出，請稍後再試。");
+      return false;
     } finally {
       logoutInFlight.current = false;
       setSigningOut(false);
@@ -302,7 +347,10 @@ export default function useCommentIdentity(api: string | null) {
     try {
       await commentsRequest(`${api}/v1/comments/auth/email/unlink`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: "{}",
       });
       setNotificationEmail("");
@@ -319,6 +367,9 @@ export default function useCommentIdentity(api: string | null) {
   }
   return {
     features,
+    restoring,
+    // Keep posting blocked until a saved session has been checked or explicitly discarded.
+    sessionUncertain,
     user,
     token,
     notificationEmail,
@@ -334,5 +385,12 @@ export default function useCommentIdentity(api: string | null) {
     invalidate,
     retryConfig,
     unlinkEmail,
+    dismissNotice: () => setNotice(""),
+    useAnonymous: () => {
+      invalidate();
+      setError("");
+      storageSet(pendingKey, null);
+      setPending(null);
+    },
   };
 }

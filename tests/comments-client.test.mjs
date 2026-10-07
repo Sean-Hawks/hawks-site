@@ -18,7 +18,15 @@ const code = ts.transpileModule(
   },
 ).outputText;
 vm.runInNewContext(code, { exports, URL, AbortSignal });
-const { commentsApiOrigin, commentPageKey, mergeComments } = exports;
+const {
+  commentsApiOrigin,
+  commentPageKey,
+  mergeComments,
+  commentValidation,
+  commentLength,
+  commentsRequest,
+  CommentsRequestError,
+} = exports;
 
 test("comments API origin permits HTTPS and local development, rejecting credentials and paths", () => {
   for (const value of [
@@ -74,4 +82,35 @@ test("overlapping history and retries produce one item per ID while applying del
     "remove me",
     "merging must not mutate existing state",
   );
+});
+
+test("comment limits count trimmed Unicode characters consistently", () => {
+  assert.equal(commentLength("  😀留言 \n"), 3);
+  assert.equal(commentValidation("😀".repeat(24), "字".repeat(1000)), "");
+  assert.ok(commentValidation("😀".repeat(25), "內容"));
+  assert.ok(commentValidation("", "字".repeat(1001)));
+  assert.ok(commentValidation("", " \n "));
+});
+
+test("request errors retain HTTP status so only authentication failures invalidate a session", async () => {
+  const context = {
+    exports: {},
+    URL,
+    AbortSignal,
+    fetch: async () => Response.json({ error: "登入已到期" }, { status: 401 }),
+  };
+  vm.runInNewContext(code, context);
+  await assert.rejects(
+    context.exports.commentsRequest("https://comments.hawks.tw"),
+    (error) => error.status === 401 && error.name === "CommentsRequestError",
+  );
+  context.fetch = async () => {
+    throw new TypeError("network down");
+  };
+  await assert.rejects(
+    context.exports.commentsRequest("https://comments.hawks.tw"),
+    (error) =>
+      error instanceof TypeError && !(error instanceof CommentsRequestError),
+  );
+  assert.equal(typeof commentsRequest, "function");
 });

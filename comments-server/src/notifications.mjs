@@ -108,9 +108,14 @@ export function createNotifications({
     const existing = db
       .prepare("SELECT * FROM subscriptions WHERE root_id=? AND email=?")
       .get(root, email);
-    const verifiedForAccount = Boolean(message.githubId && db.prepare(
-      "SELECT 1 FROM notification_emails WHERE user_id=? AND email=?",
-    ).get(message.githubId, email));
+    const verifiedForAccount = Boolean(
+      message.githubId &&
+        db
+          .prepare(
+            "SELECT 1 FROM notification_emails WHERE user_id=? AND email=?",
+          )
+          .get(message.githubId, email),
+    );
     if (existing) {
       if (!existing.verified && verifiedForAccount) {
         db.prepare(
@@ -119,7 +124,7 @@ export function createNotifications({
         db.prepare(
           "UPDATE mail_outbox SET status='cancelled',payload='{}' WHERE subscription_id=? AND kind='confirm' AND status='pending'",
         ).run(existing.id);
-        return "留言已送出，已使用帳號的驗證信箱訂閱此討論串。";
+        return "已開啟此討論串的回覆通知。";
       }
       return existing.verified
         ? "已訂閱此討論串的回覆通知。"
@@ -131,7 +136,7 @@ export function createNotifications({
       )
       .get(now() - 60 * 60_000, hash(email)).count;
     if (!verifiedForAccount && confirmations >= 3)
-      return "留言已送出；此信箱的確認信寄送次數已達上限，請稍後再訂閱。";
+      return "通知尚未開啟：此信箱的確認信寄送次數已達上限，請稍後再訂閱。";
     const token = verifiedForAccount ? null : random();
     const unsub = random();
     const result = db
@@ -149,8 +154,7 @@ export function createNotifications({
         unsub,
         now(),
       );
-    if (verifiedForAccount)
-      return "留言已送出，已使用帳號的驗證信箱訂閱此討論串，不需再次收信確認。";
+    if (verifiedForAccount) return "已開啟回覆通知，不需再次收信確認。";
     const sub = db
       .prepare("SELECT * FROM subscriptions WHERE id=?")
       .get(result.lastInsertRowid);
@@ -160,7 +164,7 @@ export function createNotifications({
       null,
       `你在 Hawks 留言區填寫了這個信箱，並要求接收此討論串的新回覆。${message.githubId ? `\n\n確認後，這個信箱也會成為 GitHub @${message.githubLogin} 的通知信箱；同一帳號訂閱其他討論串時，不必再驗證。如果這不是你的 GitHub 帳號，請勿確認。` : ""}\n\n請在 48 小時內確認訂閱：${config.publicApi}/v1/comments/notifications/confirm?token=${token}\n\n討論串：${config.siteOrigin}${message.page}#comment-${root}\n\n如果不是你提出的要求，不必確認。你也可以取消：${config.publicApi}/v1/comments/notifications/unsubscribe?token=${unsub}`,
     );
-    return "留言已送出，請至信箱確認回覆通知訂閱。";
+    return "請至信箱確認回覆通知，確認信可能在垃圾郵件匣。";
   }
   async function handle(req, res, url) {
     const confirm = url.pathname === "/v1/comments/notifications/confirm";
@@ -170,8 +174,15 @@ export function createNotifications({
     if (!["GET", "POST"].includes(req.method))
       throw new HttpError(405, "不支援此操作。");
     const token = url.searchParams.get("token");
-    if (!token || !opaque.test(token))
-      throw new HttpError(400, "通知連結無效。");
+    if (!token || !opaque.test(token)) {
+      html(
+        res,
+        "通知連結無效",
+        `<p>請重新開啟信中的完整連結。</p><a href="${config.siteOrigin}">返回 Hawks</a>`,
+        400,
+      );
+      return true;
+    }
     const sub = confirm
       ? db
           .prepare(
@@ -181,11 +192,34 @@ export function createNotifications({
       : db
           .prepare("SELECT * FROM subscriptions WHERE unsubscribe_token=?")
           .get(token);
-    if (!sub) throw new HttpError(400, "通知連結已失效或已使用。");
+    if (!sub) {
+      html(
+        res,
+        "通知連結已失效",
+        `<p>連結可能已逾期，或這個訂閱已確認或取消。若先前已確認，通知設定不受影響。</p><a href="${config.siteOrigin}">返回 Hawks</a>`,
+        400,
+      );
+      return true;
+    }
+    const confirmed = () =>
+      html(
+        res,
+        "已確認訂閱",
+        `<p>這個討論串有新回覆時會寄信通知你。</p>${sub.github_id ? "<p>已驗證帳號的通知信箱，之後訂閱其他討論串不必再次收確認信。</p>" : ""}<a href="${config.siteOrigin}${sub.page}#comment-${sub.root_id}">返回討論串</a>`,
+      );
+    // Reopening a confirmed link is harmless; only the first POST changes state.
+    // Retain its hash until the original expiry so reloads have a clear result.
+    if (confirm && sub.verified) {
+      confirmed();
+      return true;
+    }
     if (req.method === "GET") {
-      const account = confirm && sub.github_id
-        ? db.prepare("SELECT login FROM github_users WHERE id=?").get(sub.github_id)
-        : null;
+      const account =
+        confirm && sub.github_id
+          ? db
+              .prepare("SELECT login FROM github_users WHERE id=?")
+              .get(sub.github_id)
+          : null;
       // Email link scanners can visit GET links without changing a preference.
       html(
         res,
@@ -195,12 +229,13 @@ export function createNotifications({
     } else if (confirm) {
       db.exec("BEGIN IMMEDIATE");
       try {
-        db.prepare(
-          "UPDATE subscriptions SET verified=1,verify_hash=NULL,verify_expires=NULL WHERE id=?",
-        ).run(sub.id);
-        if (sub.github_id) db.prepare(
-          "INSERT INTO notification_emails (user_id,email,verified_at) VALUES (?,?,?) ON CONFLICT(user_id,email) DO UPDATE SET verified_at=excluded.verified_at",
-        ).run(sub.github_id, sub.email, now());
+        db.prepare("UPDATE subscriptions SET verified=1 WHERE id=?").run(
+          sub.id,
+        );
+        if (sub.github_id)
+          db.prepare(
+            "INSERT INTO notification_emails (user_id,email,verified_at) VALUES (?,?,?) ON CONFLICT(user_id,email) DO UPDATE SET verified_at=excluded.verified_at",
+          ).run(sub.github_id, sub.email, now());
         db.prepare(
           "UPDATE mail_outbox SET status='cancelled',payload='{}' WHERE subscription_id=? AND kind='confirm' AND status='pending'",
         ).run(sub.id);
@@ -209,14 +244,14 @@ export function createNotifications({
         db.exec("ROLLBACK");
         throw error;
       }
-      html(
-        res,
-        "已確認訂閱",
-        `<p>這個討論串有新回覆時會寄信通知你。</p>${sub.github_id ? "<p>已驗證帳號的通知信箱，之後訂閱其他討論串不必再次收確認信。</p>" : ""}<a href="${config.siteOrigin}${sub.page}#comment-${sub.root_id}">返回討論串</a>`,
-      );
+      confirmed();
     } else {
       db.prepare("DELETE FROM subscriptions WHERE id=?").run(sub.id);
-      html(res, "已取消通知", "<p>已移除此討論串的訂閱信箱與待寄通知。</p>");
+      html(
+        res,
+        "已取消通知",
+        `<p>這個討論串不會再寄信通知你，其他訂閱不受影響。</p><a href="${config.siteOrigin}${sub.page}#comment-${sub.root_id}">返回討論串</a>`,
+      );
     }
     return true;
   }

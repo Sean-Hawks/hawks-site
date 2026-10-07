@@ -37,8 +37,7 @@ async function fixture(t, options = {}, ports = {}) {
       assert.ok(init.body.get("code_verifier"));
       return Response.json({ access_token: "private-github-access" });
     }
-    if (url === "https://api.github.com/user")
-      return Response.json(profile);
+    if (url === "https://api.github.com/user") return Response.json(profile);
     if (url === "https://api.resend.com/emails") {
       deliveries.push({ ...init, payload: JSON.parse(init.body) });
       return Response.json({ id: randomUUID() });
@@ -84,10 +83,13 @@ async function fixture(t, options = {}, ports = {}) {
   const action = (url, method = "GET") =>
     fetch(base + url.pathname + url.search, {
       method,
-      headers: method === "POST" ? {
-        Origin: publicApi,
-        "Content-Type": "application/x-www-form-urlencoded",
-      } : {},
+      headers:
+        method === "POST"
+          ? {
+              Origin: publicApi,
+              "Content-Type": "application/x-www-form-urlencoded",
+            }
+          : {},
     });
   return {
     app,
@@ -102,23 +104,32 @@ async function fixture(t, options = {}, ports = {}) {
     advance(ms = 61_000) {
       clock += ms;
     },
-    setProfile(value) { profile = value; },
+    setProfile(value) {
+      profile = value;
+    },
   };
 }
 
 async function signedIn(f) {
   const login = await f.login();
-  const callback = await fetch(`${f.base}/v1/comments/auth/github/callback?code=test&state=${login.state}`);
+  const callback = await fetch(
+    `${f.base}/v1/comments/auth/github/callback?code=test&state=${login.state}`,
+  );
   assert.equal(callback.status, 200);
-  return (await f.post("/v1/comments/auth/github/session", {
-    state: login.state, verifier: login.verifier,
-  })).json();
+  return (
+    await f.post("/v1/comments/auth/github/session", {
+      state: login.state,
+      verifier: login.verifier,
+    })
+  ).json();
 }
 
 async function identity(f, token) {
-  return (await fetch(`${f.base}/v1/comments/auth/me`, {
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-  })).json();
+  return (
+    await fetch(`${f.base}/v1/comments/auth/me`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    })
+  ).json();
 }
 
 test("optional integration configuration is complete, HTTPS, and fail closed", () => {
@@ -292,13 +303,22 @@ test("double opt-in scopes notifications to one nested thread and never publishe
   const confirmation = f.confirmUrl(f.deliveries[0]);
   const confirmationPage = await f.action(confirmation);
   assert.equal(confirmationPage.status, 200); // Scanner only visits GET.
-  assert.equal(confirmationPage.headers.get("Referrer-Policy"), "same-origin", "native form POSTs must retain a verifiable Origin");
+  assert.equal(
+    confirmationPage.headers.get("Referrer-Policy"),
+    "same-origin",
+    "native form POSTs must retain a verifiable Origin",
+  );
   const firstReply = await (
     await f.message({ replyTo: root.message.id })
   ).json();
   await f.app.flushMail();
   assert.equal(f.deliveries.length, 1); // No notification before explicit confirmation.
   assert.equal((await f.action(confirmation, "POST")).status, 200);
+  assert.match(await (await f.action(confirmation)).text(), /已確認訂閱/);
+  assert.match(
+    await (await f.action(confirmation, "POST")).text(),
+    /已確認訂閱/,
+  );
   await f.message({ body: "巢狀回覆", replyTo: firstReply.message.id });
   await f.message({ body: "另一串" });
   await f.message({
@@ -329,26 +349,65 @@ test("a GitHub account verifies its email once and reuses it only for explicitly
   const url = f.confirmUrl(f.deliveries[0]);
   assert.match(f.deliveries[0].payload.text, /GitHub @Hawks-test/);
   assert.match(await (await f.action(url)).text(), /@Hawks-test/);
-  assert.equal((await identity(f, session.token)).notificationEmail, "", "GET scanners must not bind an email");
+  assert.equal(
+    (await identity(f, session.token)).notificationEmail,
+    "",
+    "GET scanners must not bind an email",
+  );
   await f.action(url, "POST");
-  assert.equal((await identity(f, session.token)).notificationEmail, "reader@example.com");
-  assert.equal((await identity(f)).notificationEmail, "", "anonymous readers cannot read a private email");
-  const next = await (await f.message({ email: "reader@example.com" }, session.token, "/blog/next/")).json();
+  assert.equal(
+    (await identity(f, session.token)).notificationEmail,
+    "reader@example.com",
+  );
+  assert.equal(
+    (await identity(f)).notificationEmail,
+    "",
+    "anonymous readers cannot read a private email",
+  );
+  const next = await (
+    await f.message(
+      { email: "reader@example.com" },
+      session.token,
+      "/blog/next/",
+    )
+  ).json();
   assert.match(next.notice, /不需再次收信確認/);
   await f.message({}, undefined, "/blog/unselected/");
   await f.app.flushMail();
-  assert.equal(f.deliveries.length, 1, "no repeated verification or automatic subscription on unrelated pages");
-  await f.message({ replyTo: next.message.id, body: "另一位讀者回覆" }, undefined, "/blog/next/");
+  assert.equal(
+    f.deliveries.length,
+    1,
+    "no repeated verification or automatic subscription on unrelated pages",
+  );
+  await f.message(
+    { replyTo: next.message.id, body: "另一位讀者回覆" },
+    undefined,
+    "/blog/next/",
+  );
   await f.app.flushMail();
   assert.equal(f.deliveries.length, 2);
   assert.match(f.deliveries[1].payload.text, /另一位讀者回覆/);
-  const history = await (await fetch(`${f.base}/v1/comments/messages?page=/blog/next/`)).text();
+  const history = await (
+    await fetch(`${f.base}/v1/comments/messages?page=/blog/next/`)
+  ).text();
   assert.ok(!history.includes("reader@example.com"));
   const again = await signedIn(f);
-  assert.equal(again.notificationEmail, "reader@example.com", "verification survives logging in again");
+  assert.equal(
+    again.notificationEmail,
+    "reader@example.com",
+    "verification survives logging in again",
+  );
   await f.action(f.unsubUrl(f.deliveries[1]), "POST");
-  assert.equal((await identity(f, again.token)).notificationEmail, "reader@example.com", "unsubscribing one thread retains the account email verification");
-  await f.message({ email: "reader@example.com" }, again.token, "/blog/after-unsubscribe/");
+  assert.equal(
+    (await identity(f, again.token)).notificationEmail,
+    "reader@example.com",
+    "unsubscribing one thread retains the account email verification",
+  );
+  await f.message(
+    { email: "reader@example.com" },
+    again.token,
+    "/blog/after-unsubscribe/",
+  );
   await f.app.flushMail();
   assert.equal(f.deliveries.length, 2);
 });
@@ -363,39 +422,69 @@ test("email verification cannot be borrowed by an anonymous visitor, another Git
   f.setProfile({ id: 5678, login: "Other-reader", name: "Other" });
   const second = await signedIn(f);
   assert.equal(second.notificationEmail, "");
-  const other = await (await f.message({ email: "reader@example.com", githubId: 1234 }, second.token)).json();
+  const other = await (
+    await f.message(
+      { email: "reader@example.com", githubId: 1234 },
+      second.token,
+    )
+  ).json();
   assert.match(other.notice, /確認/);
   await f.message({ email: "new@example.com" }, first.token);
   await f.app.flushMail();
-  assert.equal(f.deliveries.length, 4, "all three unverified combinations require their own confirmation");
+  assert.equal(
+    f.deliveries.length,
+    4,
+    "all three unverified combinations require their own confirmation",
+  );
   assert.equal((await identity(f, second.token)).notificationEmail, "");
 });
 
 test("unlink requires authentication, cancels owned subscriptions and pending mail, and preserves other accounts", async (t) => {
   const f = await fixture(t);
   const first = await signedIn(f);
-  const root = (await (await f.message({ email: "reader@example.com" }, first.token)).json()).message;
+  const root = (
+    await (await f.message({ email: "reader@example.com" }, first.token)).json()
+  ).message;
   await f.app.flushMail();
   await f.action(f.confirmUrl(f.deliveries[0]), "POST");
   f.setProfile({ id: 5678, login: "Other-reader", name: "Other" });
   const second = await signedIn(f);
-  const otherRoot = (await (await f.message({ email: "other@example.com" }, second.token)).json()).message;
+  const otherRoot = (
+    await (await f.message({ email: "other@example.com" }, second.token)).json()
+  ).message;
   await f.app.flushMail();
   await f.action(f.confirmUrl(f.deliveries[1]), "POST");
   await f.message({ replyTo: root.id });
-  assert.equal((await f.post("/v1/comments/auth/email/unlink", {})).status, 401);
-  assert.equal((await f.post("/v1/comments/auth/email/unlink", {}, first.token)).status, 200);
+  assert.equal(
+    (await f.post("/v1/comments/auth/email/unlink", {})).status,
+    401,
+  );
+  assert.equal(
+    (await f.post("/v1/comments/auth/email/unlink", {}, first.token)).status,
+    200,
+  );
   assert.equal((await identity(f, first.token)).notificationEmail, "");
-  assert.equal((await identity(f, second.token)).notificationEmail, "other@example.com");
+  assert.equal(
+    (await identity(f, second.token)).notificationEmail,
+    "other@example.com",
+  );
   await f.app.flushMail();
-  assert.equal(f.deliveries.length, 2, "the pending reply for the unlinked account was cancelled");
+  assert.equal(
+    f.deliveries.length,
+    2,
+    "the pending reply for the unlinked account was cancelled",
+  );
   await f.message({ replyTo: otherRoot.id });
   await f.app.flushMail();
   assert.equal(f.deliveries.length, 3);
   assert.equal(f.deliveries[2].payload.to[0], "other@example.com");
   await f.message({ email: "reader@example.com" }, first.token);
   await f.app.flushMail();
-  assert.equal(f.deliveries.length, 4, "using an unlinked email requires fresh verification");
+  assert.equal(
+    f.deliveries.length,
+    4,
+    "using an unlinked email requires fresh verification",
+  );
 });
 
 test("notification retries reuse the exact idempotency key and durable payload", async (t) => {
@@ -480,6 +569,9 @@ test("unsubscribe is explicit, removes queued mail, and confirmation tokens expi
   const expired = f.confirmUrl(f.deliveries[2]);
   f.advance(49 * 60 * 60_000);
   assert.equal((await f.action(expired, "POST")).status, 400);
+  const expiredPage = await f.action(expired);
+  assert.match(expiredPage.headers.get("content-type"), /text\/html/);
+  assert.match(await expiredPage.text(), /通知連結已失效/);
 });
 
 test("outbox survives restart and mail attempts respect the rolling daily limit", async (t) => {
