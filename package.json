@@ -44,7 +44,7 @@
     "fast-glob": "file:vendor/next-lint-glob",
     "jsdom": "^26.1.0",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^7"
   },
   "overrides": {
     "fast-glob": "$fast-glob",
