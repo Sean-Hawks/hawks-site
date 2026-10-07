@@ -49,9 +49,9 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$env:LOCALAPPDATA\Hawks
 
 ## Gandi MX 切換與回復
 
-**目前尚未切換。** 公開 MX 仍為 `10 spool.mail.gandi.net.` 與 `50 fb.mail.gandi.net.`，公開 SMTP 25 埠仍未通過測試。因此外部信件仍走原本 Gandi 轉址，WSL 尚不能接收一般外部來信。
+**目前尚未切換。** 權威 DNS 的 MX 仍為 `10 spool.mail.gandi.net.` 與 `50 fb.mail.gandi.net.`（TTL 300 秒）。Windows 安裝與路由器轉送已由使用者完成，公開 TCP 25 已通過美國、瑞士節點連線測試，Postfix 也記錄到這兩個實際外部來源 IP。因此已可切換 MX；目前一般外部來信仍由 DNS 指向原 Gandi 轉址。
 
-外部 SMTP 測試通過後，先在 Gandi 匯出／備份 DNS 記錄，再於 `hawks.tw` 的 DNS records 編輯 **MX 記錄組**，改為：
+先在 Gandi 匯出／備份 DNS 記錄，再於 `hawks.tw` 的 DNS records 編輯 **MX 記錄組**，改為：
 
 ```dns
 @ 300 IN MX 10 mail.hawks.tw.
@@ -84,5 +84,9 @@ Remove-NetFirewallRule -Name 'Hawks-Mail-SMTP-Ingress'
 - Windows 代理實際編譯與 TCP／STARTTLS 轉送通過；Postfix 紀錄保留 Mac 的原始 Tailscale 來源 IP。
 - 收件者 `me@hawks.tw` 接受；不存在信箱回 `550`；未授權外部 relay 回 `554`，未提交測試信 DATA。
 - 最終兩個 PowerShell 腳本語法檢查通過。臨時 Windows 測試程序已停止。
-- Windows 管理員常駐安裝、手動路由器轉送、公開 TCP 25、MX 切換、真實外部收信與 Windows 重開機仍待驗證。不要把本機投遞成功視為外部收信已完成。
+- 使用者在管理員 PowerShell 安裝後，輸出 `Hawks Mail SMTP Ingress Running`；目前 Windows `0.0.0.0:25` 正在監聽。非管理員 WSL interop 查詢該 SYSTEM 排程明確回覆 Access denied，因此沒有假設能讀到排程的詳細狀態。
+- 使用者完成路由器轉送與 DHCP 固定配給；有線 MAC 為 `74:56:3C:BD:CB:35`，目前 Windows Ethernet 是 `192.168.50.52`。
+- 真實外部 TCP 檢查：美國 Los Angeles（`38.145.202.12`）與瑞士 Zurich（`141.255.165.104`）均連上 `114.32.161.42:25`，WSL Postfix 日誌記錄兩個來源。見 [檢查報告](https://check-host.net/check-report/4f83b2b5k35b)。
+- 經公開 IP 的 SMTP STARTTLS 使用 TLS 1.3，投遞一份自有已簽章的測試信後，成功由 IMAP 讀回（queue `B80D4666D7`、UID 5）。這次郵件投遞來自同一 LAN，路由器使用 NAT loopback，Postfix 看到來源 `192.168.50.1`；不能將它當成跨 Internet 的完整收信測試。外部節點檢查僅建立 TCP 連線，未寄送郵件。
+- MX 切換、Gmail 等外部 MTA 的完整收信與 Windows 重開機仍待驗證。不要把 TCP 連線與 NAT loopback 投遞成功視為 MX 收信已完成。
 - 現有 IP 的 Spamhaus PBL 排除尚未申請。信箱接通後才能收到驗證信；使用者認為 IP 是固定配給，但仍須確認符合 [Spamhaus 的申請條件](https://www.spamhaus.org/faqs/policy-blocklist-pbl/)。
