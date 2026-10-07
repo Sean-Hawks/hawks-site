@@ -45,7 +45,7 @@ ssh hawks-wsl 'sudo systemctl status caddy php8.3-fpm --no-pager'
 ssh hawks-wsl 'sudo systemctl restart caddy'
 ```
 
-驗證：HTTPS 首頁與 CSS 回覆 200，installer／config 回覆 404；以 PHP FPM 相同的 `webmail` 使用者透過 **Roundcube 自身的 PHP 類別**確認 SQLite、TLS IMAP 登入與讀取 Gmail 測試信，SMTP STARTTLS 驗證及本機投遞通過，新測試信的 DKIM 簽章與 IMAP 讀回通過（UID 7）。Chrome 控制操作逾時，尚未自動完成瀏覽器登入；已請使用者確認網頁能登入並看見「hi」。沒有用替代瀏覽器自動化繞過控制連線。
+驗證：HTTPS 首頁與 CSS 回覆 200，installer／config 回覆 404；以 PHP FPM 相同的 `webmail` 使用者透過 **Roundcube 自身的 PHP 類別**確認 SQLite、TLS IMAP 登入與讀取 Gmail 測試信，SMTP STARTTLS 驗證及本機投遞通過，新測試信的 DKIM 簽章與 IMAP 讀回通過（UID 7）。Chrome 控制操作逾時，沒有用替代瀏覽器自動化繞過控制連線。使用者已親自確認網頁登入成功並看到「hi」；Roundcube SQLite 的 `me@hawks.tw` last_login 為 2026-10-07 15:19:12 UTC（23:19:12 Taipei），與使用者確認一致。
 
 ## 手機 Gmail App
 

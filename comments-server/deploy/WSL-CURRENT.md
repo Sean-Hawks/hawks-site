@@ -69,4 +69,4 @@ Windows SMTP 代理已完成並測試接受自有收件者、拒絕未知地址�
 
 使用者選擇 Roundcube。已恢復既有 1.7.4 的網頁服務，入口為 **https://hawks-wsl.tail5bdb5f.ts.net:9443/**（Tailscale tailnet only），帳號 `me@hawks.tw`，密碼與 IMAP 相同。
 
-發現 Caddy 於開機時綁定尚未就緒的 Tailscale IP 而失敗；已新增依賴 tailscaled／PHP FPM 與每 15 秒失敗重試的 drop-in，設定修改前已私密備份。Caddy、PHP FPM active，既有 HTTPS 9443 → loopback 9080 路由已正常運作。Roundcube 自身 PHP 類別的 SQLite、IMAP 登入／讀信與 SMTP STARTTLS 登入／本機寄信測試通過；網頁與 CSS 回覆 200，installer／config 404。瀏覽器控制逾時，網頁實際登入待使用者確認；Windows 重開機仍未測試。細節見 [MAILBOX-SETUP.md](MAILBOX-SETUP.md)。
+發現 Caddy 於開機時綁定尚未就緒的 Tailscale IP 而失敗；已新增依賴 tailscaled／PHP FPM 與每 15 秒失敗重試的 drop-in，設定修改前已私密備份。Caddy、PHP FPM active，既有 HTTPS 9443 → loopback 9080 路由已正常運作。Roundcube 自身 PHP 類別的 SQLite、IMAP 登入／讀信與 SMTP STARTTLS 登入／本機寄信測試通過；網頁與 CSS 回覆 200，installer／config 404。瀏覽器控制逾時，使用者已親自確認網頁登入成功並可看到 Gmail 的「hi」測試信，服務端 last_login 與確認時間一致；Windows 重開機仍未測試。細節見 [MAILBOX-SETUP.md](MAILBOX-SETUP.md)。
