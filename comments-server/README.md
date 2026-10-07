@@ -2,9 +2,9 @@
 
 參考 [emtech.cc 的留言架構](https://emtech.cc/p/emtech-2026/)：靜態網站搭配獨立互動 API。這裡使用 WSL 上的 Node.js HTTP 服務與 SQLite，網站繼續由 GitHub Pages 提供。實際主機與啟動設定見 [目前部署](deploy/WSL-CURRENT.md)。
 
-已支援匿名／暱稱、首頁與每篇文章各自的討論串、巢狀回覆、較早留言分頁、送出重試去重、Turnstile 後端驗證、IP 速率限制與管理員刪除。首頁兩種 GUI、Blog、Talk、Library 詳頁都使用同一個留言元件。
+已支援匿名／暱稱、GitHub 身份與頭像、Email 回覆通知、首頁與每篇文章各自的討論串、巢狀回覆、較早留言分頁、送出重試去重、Turnstile 後端驗證、IP 速率限制與管理員刪除。首頁兩種 GUI、Blog、Talk、Library 詳頁都使用同一個留言元件。
 
-這一版未提供 GitHub OAuth、Email／Gravatar、通知、審核佇列或圖片上傳。暱稱不是已驗證身分；文字會直接公開。訊息以純文字顯示，不解譯 HTML 或 Markdown。留言列表在進入頁面、按「重新整理」時讀取，送出後立即顯示自己的留言。
+GitHub 與 Email 功能可各自啟用，缺少設定時不影響匿名留言。正式環境尚待設定 OAuth App 與 Resend，見 [啟用指南](deploy/INTEGRATIONS-SETUP.md)。Email 需收信確認，提供取消訂閱，不會出現在公開資料中。未登入者的暱稱不是已驗證身分；文字會直接公開。訊息以純文字顯示，不解譯 HTML 或 Markdown。未提供 Gravatar、審核佇列或圖片上傳。留言列表在進入頁面、按「重新整理」時讀取，送出後立即顯示自己的留言。
 
 ## 本機預覽
 
@@ -29,7 +29,7 @@ NEXT_PUBLIC_COMMENTS_API_URL=http://127.0.0.1:8790 npm run dev
 
 ## WSL：systemd 部署
 
-已獨立部署在 `/home/sean8/apps/hawks-comments`，使用 `hawks-comments.service`；與 `/home/sean8/apps/hawks-agent` 的資料及服務分開。2026-10-07 確認 Ubuntu-24.04 原先為 Stopped，從 Windows 啟動後已恢復 SSH、Tailscale 與 bot。Node 為 `/home/sean8/.local/opt/hawks-agent-node/bin/node`（22.23.2），遠端留言與 gateway 測試 16 項通過。以下步驟供重新部署使用。
+已獨立部署在 `/home/sean8/apps/hawks-comments`，使用 `hawks-comments.service`；與 `/home/sean8/apps/hawks-agent` 的資料及服務分開。2026-10-07 確認 Ubuntu-24.04 原先為 Stopped，從 Windows 啟動後已恢復 SSH、Tailscale 與 bot。Node 為 `/home/sean8/.local/opt/hawks-agent-node/bin/node`（22.23.2），留言、登入、通知與 gateway 測試 28 項通過。以下步驟供重新部署使用。
 
 把本資料夾的程式碼帶到 WSL，**不複製本機 `.env`、`.data` 或 node_modules**；以下指令在 WSL 上執行：
 
@@ -101,7 +101,7 @@ Cloudflare Turnstile widget 為 `hawks.tw comments`，managed，只允許 `hawks
 | `NEXT_PUBLIC_COMMENTS_API_URL` | `https://hawks-comments.sean-hawks.workers.dev` |
 | `NEXT_PUBLIC_COMMENTS_TURNSTILE_SITE_KEY` | widget 的公開 site key |
 
-設定缺失時服務拒絕啟動／送出，不會略過正式環境驗證。驗證流程依 [Turnstile server-side validation](https://developers.cloudflare.com/turnstile/get-started/server-side-validation/)。Worker 不公開 DELETE 路由，也不轉送 Authorization、Cookie 或 X-Forwarded-For。WSL 離線時回傳可供前端顯示的 503，保留 `hawks.tw` CORS header，不快取留言或錯誤。
+設定缺失時服務拒絕啟動／送出，不會略過正式環境驗證。驗證流程依 [Turnstile server-side validation](https://developers.cloudflare.com/turnstile/get-started/server-side-validation/)。Worker 不公開 DELETE 路由，只轉送 hcs_ 網站 session 的 Authorization；不轉送管理 token、Cookie 或 X-Forwarded-For。WSL 離線時回傳可供前端顯示的 503，保留 `hawks.tw` CORS header，不快取留言或錯誤。
 
 WSL／Windows 睡眠、關機會使留言服務離線，網站本身仍可閱讀。systemd 的自動重啟只在 WSL 正在執行時生效；systemd 本身不會保持 WSL VM 執行。Windows 的啟動排程使用 [wsl-keep-alive.ps1](deploy/wsl-keep-alive.ps1) 持續執行 `wsl.exe ... /bin/sleep infinity`，WSL 被手動停止時會在 15 秒後重新啟動。[repair-wsl-startup.ps1](deploy/repair-wsl-startup.ps1) 已由管理員執行並核對：排程無執行時限、失敗重試 3 次，Windows Tailscale unattended 已啟用。若要停機維護，先停止兩個 Windows 啟動排程。兩台裝置的 Tailscale 金鑰到期皆已停用；這與 VM 常駐、管理網頁登入期限各自獨立。
 

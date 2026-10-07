@@ -4,13 +4,9 @@ import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
 import { isIP } from "node:net";
 import { createHash, randomUUID, timingSafeEqual } from "node:crypto";
-
-class HttpError extends Error {
-  constructor(status, message) {
-    super(message);
-    this.status = status;
-  }
-}
+import { HttpError } from "./http.mjs";
+import { createIdentity } from "./identity.mjs";
+import { createNotifications, normalizeEmail } from "./notifications.mjs";
 
 export function readConfig(env = process.env) {
   const origins = (env.COMMENTS_ORIGINS || "https://hawks.tw")
@@ -50,6 +46,40 @@ export function readConfig(env = process.env) {
     .filter(Boolean);
   if (secret && !hostnames.length)
     throw new Error("請設定 COMMENTS_TURNSTILE_HOSTNAMES");
+  const githubClientId = env.COMMENTS_GITHUB_CLIENT_ID || "";
+  const githubClientSecret = env.COMMENTS_GITHUB_CLIENT_SECRET || "";
+  const resendApiKey = env.COMMENTS_RESEND_API_KEY || "";
+  const mailFrom = env.COMMENTS_MAIL_FROM || "";
+  if (Boolean(githubClientId) !== Boolean(githubClientSecret))
+    throw new Error("GitHub Client ID 與 Secret 必須一起設定");
+  if (Boolean(resendApiKey) !== Boolean(mailFrom))
+    throw new Error("Resend API Key 與寄件者必須一起設定");
+  if (mailFrom && (/[\r\n]/.test(mailFrom) || !mailFrom.includes("@")))
+    throw new Error("COMMENTS_MAIL_FROM 無效");
+  const publicApi = env.COMMENTS_PUBLIC_API_URL || "";
+  const siteOrigin = env.COMMENTS_SITE_ORIGIN || origins[0];
+  if (!origins.includes(siteOrigin))
+    throw new Error("COMMENTS_SITE_ORIGIN 必須在允許的來源中");
+  if (publicApi) {
+    const parsed = new URL(publicApi);
+    const local = ["localhost", "127.0.0.1", "[::1]"].includes(parsed.hostname);
+    if (
+      parsed.origin !== publicApi ||
+      parsed.username ||
+      parsed.password ||
+      (parsed.protocol !== "https:" && !(local && parsed.protocol === "http:"))
+    )
+      throw new Error("COMMENTS_PUBLIC_API_URL 必須是 HTTPS origin");
+  }
+  if ((githubClientId || resendApiKey) && !publicApi)
+    throw new Error("請設定 COMMENTS_PUBLIC_API_URL");
+  const mailDailyLimit = Number(env.COMMENTS_MAIL_DAILY_LIMIT || 100);
+  if (
+    !Number.isInteger(mailDailyLimit) ||
+    mailDailyLimit < 1 ||
+    mailDailyLimit > 10000
+  )
+    throw new Error("COMMENTS_MAIL_DAILY_LIMIT 無效");
   return {
     host: env.COMMENTS_HOST || "127.0.0.1",
     port,
@@ -60,12 +90,19 @@ export function readConfig(env = process.env) {
     hostnames,
     database: `${env.COMMENTS_DATA_DIR || ".data"}/comments.sqlite`,
     adminToken: env.COMMENTS_ADMIN_TOKEN || "",
+    githubClientId,
+    githubClientSecret,
+    resendApiKey,
+    mailFrom,
+    publicApi,
+    siteOrigin,
+    mailDailyLimit,
   };
 }
 
 export function createCommentsServer(
   config,
-  { fetchImpl = fetch, now = Date.now } = {},
+  { fetchImpl = fetch, now = Date.now, scheduleMail = true } = {},
 ) {
   if (config.database !== ":memory:")
     mkdirSync(dirname(config.database), { recursive: true, mode: 0o700 });
@@ -82,18 +119,33 @@ export function createCommentsServer(
       deleted INTEGER NOT NULL DEFAULT 0
     );`);
   db.exec("CREATE INDEX IF NOT EXISTS messages_page_id ON messages(page, id)");
+  const columns = new Set(
+    db
+      .prepare("PRAGMA table_info(messages)")
+      .all()
+      .map((column) => column.name),
+  );
+  for (const [name, type] of [
+    ["github_id", "INTEGER"],
+    ["github_login", "TEXT"],
+    ["notification_email", "TEXT"],
+  ])
+    if (!columns.has(name))
+      db.exec(`ALTER TABLE messages ADD COLUMN ${name} ${type}`);
   const fields =
-    "id, page, name, body, reply_to AS replyTo, created_at AS createdAt, deleted";
+    "id, page, name, body, reply_to AS replyTo, created_at AS createdAt, deleted, github_id AS githubId, github_login AS githubLogin";
   const history = db.prepare(
     `SELECT ${fields} FROM messages WHERE page = ? AND id < ? ORDER BY id DESC LIMIT 101`,
   );
   const find = db.prepare(`SELECT ${fields} FROM messages WHERE id = ?`);
   const duplicate = db.prepare(
-    `SELECT ${fields} FROM messages WHERE request_id = ?`,
+    `SELECT ${fields}, notification_email AS notificationEmailHash FROM messages WHERE request_id = ?`,
   );
   const insert = db.prepare(
-    "INSERT INTO messages (request_id, page, name, body, reply_to, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+    "INSERT INTO messages (request_id, page, name, body, reply_to, created_at, github_id, github_login, notification_email) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
   );
+  const identity = createIdentity({ db, config, fetchImpl, now });
+  const notifications = createNotifications({ db, config, fetchImpl, now });
   const rates = new Map();
   const salt = randomUUID();
 
@@ -134,7 +186,10 @@ export function createCommentsServer(
       chunks.push(chunk);
     }
     try {
-      return JSON.parse(Buffer.concat(chunks).toString("utf8"));
+      const data = JSON.parse(Buffer.concat(chunks).toString("utf8"));
+      if (!data || typeof data !== "object" || Array.isArray(data))
+        throw new Error("invalid payload");
+      return data;
     } catch {
       throw new HttpError(400, "無效的 JSON。");
     }
@@ -150,7 +205,15 @@ export function createCommentsServer(
         return json(res, 200, { ok: true });
       }
       const origin = req.headers.origin;
-      if (origin && !config.origins.includes(origin))
+      const notificationForm = [
+        "/v1/comments/notifications/confirm",
+        "/v1/comments/notifications/unsubscribe",
+      ].includes(url.pathname);
+      if (
+        origin &&
+        !config.origins.includes(origin) &&
+        !(notificationForm && origin === config.publicApi)
+      )
         throw new HttpError(403, "不允許此網站連線。");
       if (origin) res.setHeader("Access-Control-Allow-Origin", origin);
       if (req.method === "OPTIONS") {
@@ -184,7 +247,7 @@ export function createCommentsServer(
         if (!existing || existing.deleted)
           throw new HttpError(404, "留言不存在。");
         db.prepare(
-          "UPDATE messages SET deleted = 1, body = '', name = '已刪除' WHERE id = ?",
+          "UPDATE messages SET deleted = 1, body = '', name = '已刪除', github_id=NULL, github_login=NULL, notification_email=NULL WHERE id = ?",
         ).run(id);
         return json(res, 200, { ok: true });
       }
@@ -207,6 +270,28 @@ export function createCommentsServer(
         throw new HttpError(403, "缺少代理資訊。");
       const ipKey = createHash("sha256").update(`${salt}:${ip}`).digest("hex");
       rate(`request:${ipKey}`, 120, 60_000);
+      const requireOrigin = () => {
+        if (!origin || !config.origins.includes(origin))
+          throw new HttpError(403, "缺少網站來源。");
+        if (!req.headers["content-type"]?.startsWith("application/json"))
+          throw new HttpError(415, "請使用 JSON。");
+      };
+      if (url.pathname === "/v1/comments/config" && req.method === "GET")
+        return json(res, 200, {
+          githubEnabled: identity.enabled,
+          emailEnabled: notifications.enabled,
+        });
+      if (
+        await identity.handle(req, res, url, {
+          json,
+          readBody,
+          requireOrigin,
+          rate,
+          ipKey,
+        })
+      )
+        return;
+      if (await notifications.handle(req, res, url)) return;
       if (url.pathname === "/v1/comments/messages" && req.method === "GET") {
         const before = url.searchParams.get("before");
         if (
@@ -240,6 +325,18 @@ export function createCommentsServer(
           token,
           website,
         } = payload;
+        const email = normalizeEmail(payload.email);
+        // Only keep a digest for request deduplication. The actual address
+        // belongs to the private subscription, which can be removed entirely.
+        const emailHash = email
+          ? createHash("sha256").update(email).digest("hex")
+          : "";
+        if (email && !notifications.enabled)
+          throw new HttpError(
+            503,
+            "Email 回覆通知暫時無法使用，可清空信箱後送出。",
+          );
+        const author = identity.user(req.headers.authorization);
         if (website) throw new HttpError(400, "驗證失敗。");
         if (
           typeof requestId !== "string" ||
@@ -310,23 +407,38 @@ export function createCommentsServer(
             previous.page !== page ||
             previous.name !== name.trim() ||
             previous.body !== body.trim() ||
-            previous.replyTo !== replyTo
+            previous.replyTo !== replyTo ||
+            (previous.githubId ?? null) !== (author?.githubId ?? null) ||
+            (previous.notificationEmailHash || "") !== emailHash
           )
             throw new HttpError(409, "訊息識別碼已使用。");
-          return json(res, 200, { message: previous });
+          return json(res, 200, { message: find.get(previous.id) });
         }
         if (replyTo !== null && find.get(replyTo)?.deleted)
           throw new HttpError(400, "回覆的留言已被刪除。");
-        const result = insert.run(
-          requestId,
-          page,
-          name.trim(),
-          body.trim(),
-          replyTo,
-          new Date(now()).toISOString(),
-        );
-        const message = find.get(Number(result.lastInsertRowid));
-        return json(res, 201, { message });
+        db.exec("BEGIN IMMEDIATE");
+        let message;
+        let notice;
+        try {
+          const result = insert.run(
+            requestId,
+            page,
+            name.trim(),
+            body.trim(),
+            replyTo,
+            new Date(now()).toISOString(),
+            author?.githubId ?? null,
+            author?.githubLogin ?? null,
+            emailHash || null,
+          );
+          message = find.get(Number(result.lastInsertRowid));
+          notice = notifications.posted(message, email);
+          db.exec("COMMIT");
+        } catch (error) {
+          db.exec("ROLLBACK");
+          throw error;
+        }
+        return json(res, 201, { message, ...(notice ? { notice } : {}) });
       }
       throw new HttpError(404, "找不到此 API。");
     } catch (error) {
@@ -345,16 +457,34 @@ export function createCommentsServer(
   const cleanup = setInterval(() => {
     for (const [key, value] of rates)
       if (value.until <= now()) rates.delete(key);
+    identity.cleanup();
+    notifications.cleanup();
   }, 20_000);
   cleanup.unref();
+  const mailTimer =
+    scheduleMail && notifications.enabled
+      ? setInterval(() => {
+          void notifications
+            .flush()
+            .catch(() => console.error("Comments mail dispatcher unavailable"));
+        }, 15_000)
+      : null;
+  mailTimer?.unref();
+  let closing;
   return {
     server,
-    async close() {
-      clearInterval(cleanup);
-      await new Promise((resolve, reject) =>
-        server.close((error) => (error ? reject(error) : resolve())),
-      );
-      db.close();
+    flushMail: notifications.flush,
+    close() {
+      return (closing ??= (async () => {
+        clearInterval(cleanup);
+        if (mailTimer) clearInterval(mailTimer);
+        await notifications.stop();
+        if (server.listening)
+          await new Promise((resolve, reject) =>
+            server.close((error) => (error ? reject(error) : resolve())),
+          );
+        db.close();
+      })());
     },
   };
 }

@@ -27,6 +27,10 @@ curl -fsS -A 'Mozilla/5.0' https://hawks-comments.sean-hawks.workers.dev/healthz
 
 Tailscale Funnel 曾啟用，但公開 DNS 持續 NXDOMAIN；留言新增的 port 10000 已移除，既有其他代理未改動。
 
+## GitHub 與 Email 設定
+
+程式與資料庫 migration 已支援 GitHub OAuth、獨立分頁 session、Email 雙重確認、回覆通知與取消訂閱。正式環境未設定 OAuth App 或 Resend 憑證，`/v1/comments/config` 目前回傳兩項皆 false，介面明確顯示暫不可用。依使用者要求先完成程式與設定步驟；啟用操作見 [INTEGRATIONS-SETUP.md](INTEGRATIONS-SETUP.md)。測試使用假的 provider 回應，未進行真實 GitHub 授權或寄信。
+
 ## Windows／WSL 常駐
 
 已備份並更新既有啟動腳本：

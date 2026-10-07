@@ -1570,6 +1570,14 @@ main:focus { outline: none; }
 
 .site-rail { display: none; }
 .theme-toggle { touch-action: manipulation; }
+.comments-panel {
+  background-color: rgb(var(--bg) / 0.72);
+  background-image:
+    radial-gradient(circle, rgb(var(--line) / 0.13) 1px, transparent 1.5px),
+    linear-gradient(rgb(var(--line) / 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(var(--line) / 0.06) 1px, transparent 1px);
+  background-size: 18px 18px, 200px 200px, 200px 200px;
+}
 :root:not([data-gui="console"]) { --status-ok: #15803d; }
 :root:not([data-gui="console"])[data-theme="dark"] { --status-ok: #4ade80; }
 :root:not([data-gui="console"]) .panel-source { display: none; }

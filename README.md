@@ -149,7 +149,7 @@ Blog、Talk 與 Library 詳頁可加入免登入愛心，支援取消與共用�
 
 ## 留言區
 
-首頁、Blog、近況與收藏詳頁支援匿名／暱稱留言與巢狀回覆。網站維持靜態部署，互動 API 與 SQLite 獨立架在 WSL，目前由 Cloudflare Worker 經 VPC Tunnel 提供 HTTPS；包含 Turnstile 驗證、限流與管理員刪除。前端未設定 API 時顯示「留言區準備中」。本機預覽與部署步驟見 [留言服務指南](comments-server/README.md)。
+首頁、Blog、近況與收藏詳頁支援匿名／暱稱留言與巢狀回覆，也可啟用 GitHub 登入、頭像與 Email 回覆通知。網站維持靜態部署，互動 API 與 SQLite 獨立架在 WSL，目前由 Cloudflare Worker 經 VPC Tunnel 提供 HTTPS；包含 Turnstile 驗證、限流與管理員刪除。前端未設定 API 時顯示「留言區準備中」。本機預覽與部署步驟見 [留言服務指南](comments-server/README.md)，OAuth 與寄信設定見 [啟用指南](comments-server/deploy/INTEGRATIONS-SETUP.md)。
 
 ## 寫作方式
 

@@ -6,7 +6,16 @@ export type CommentMessage = {
   replyTo: number | null;
   createdAt: string;
   deleted: number;
+  githubId?: number | null;
+  githubLogin?: string | null;
 };
+export type CommentUser = {
+  githubId: number;
+  githubLogin: string;
+  name: string;
+  avatarUrl: string;
+};
+export type CommentFeatures = { githubEnabled: boolean; emailEnabled: boolean };
 export type CommentHistory = { messages: CommentMessage[]; hasMore: boolean };
 
 export function commentsApiOrigin(value: string | undefined): string | null {
