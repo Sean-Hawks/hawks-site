@@ -41,6 +41,7 @@ Tailscale Funnel 曾啟用，但公開 DNS 持續 NXDOMAIN；留言新增的 por
 - Mac 與 WSL 的 31 項測試通過。WSL 真實 SMTP 測試信在 hold 佇列檢查 DKIM，再由 Rspamd 對公開 DNS 驗證，得到 `R_DKIM_ALLOW`，已移除測試信與 hold 規則，未對外投遞。
 - 使用者提供的 Gmail 測試信箱已收到真實外部測試信；Gmail 回覆 `250 2.0.0 OK`，收件端原始郵件確認 SPF、DKIM、DMARC 全部 PASS，使用 TLS 1.3，但歸入垃圾郵件。使用者已完成 `@Sean-Hawks` 的真實 GitHub 授權並在 `/blog/first-web/` 送出「測試」，正式 SQLite 身分及公開留言一致；訂閱確認信已送達 `me@hawks.tw`（IMAP UID 8），含 DKIM 簽章，完整回覆通知仍在驗證。
 - 本次修改前用 SQLite backup API 備份資料庫，並私密備份三個後端模組至 `.backups/notification-email-*`；Mac 與 WSL 的 35 項後端測試通過，正式 API 已恢復正常。已修正 session 逾期／重複登出仍可切回匿名。Cloudflare gateway 已允許登入 session 的信箱移除路由，管理 token 仍不能通過 gateway。
+- 使用者實際確認訂閱時發現表單回覆「不允許此網站連線」。原因是 HTML 頁面的 `Referrer-Policy: no-referrer` 會讓原生表單 POST 使用 `Origin: null`，被既有來源檢查拒絕（[Fetch 標準](https://fetch.spec.whatwg.org/#append-a-request-origin-header)）。已改為 `same-origin`：同源表單仍帶正確 Origin，外連不帶 referrer。沒有放寬 origin 白名單；測試確認確認／取消頁面的標頭與同源 POST，`Origin: null` 仍被拒絕。WSL 修正已部署，原確認信可沿用。
 - 對目前 IP 的 Spamhaus ZEN 查詢（透過 HiNet DNS）回傳 `127.0.0.11`，TXT 指向 PBL 查詢頁：Spamhaus 維護的 PBL。先前透過公共 resolver 得到的 `127.255.255.254` 是查詢錯誤，不能當成名單結果。
 - PBL 是一般用戶網段直接寄信的政策名單，不代表主機正在寄垃圾信。它可能影響收件端評分，但沒有證據能斷定 Gmail 本次分類的唯一原因。是否為配給此用戶的固定 IP 尚待確認；只有符合固定 IP、自有郵件伺服器、正反向 DNS 等條件才適合申請排除，且移除後仍不保證進入收件匣。見 [Spamhaus PBL 條件](https://www.spamhaus.org/faqs/policy-blocklist-pbl/)。
 

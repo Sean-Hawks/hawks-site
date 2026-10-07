@@ -262,7 +262,7 @@ function PageComments({ page }: { page: string }) {
       const element = document.getElementById(`comment-${sent.id}`);
       element?.focus({ preventScroll: true });
       element?.scrollIntoView({
-        block: "center",
+        block: "start",
         behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
           ? "instant"
           : "smooth",

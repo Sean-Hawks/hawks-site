@@ -82,7 +82,13 @@ async function fixture(t, options = {}, ports = {}) {
   const unsubUrl = (delivery) =>
     new URL(delivery.payload.headers["List-Unsubscribe"].slice(1, -1));
   const action = (url, method = "GET") =>
-    fetch(base + url.pathname + url.search, { method });
+    fetch(base + url.pathname + url.search, {
+      method,
+      headers: method === "POST" ? {
+        Origin: publicApi,
+        "Content-Type": "application/x-www-form-urlencoded",
+      } : {},
+    });
   return {
     app,
     base,
@@ -284,7 +290,9 @@ test("double opt-in scopes notifications to one nested thread and never publishe
   assert.equal(f.deliveries.length, 1);
   assert.equal(f.deliveries[0].payload.to[0], "reader@example.com");
   const confirmation = f.confirmUrl(f.deliveries[0]);
-  assert.equal((await f.action(confirmation)).status, 200); // Scanner only visits GET.
+  const confirmationPage = await f.action(confirmation);
+  assert.equal(confirmationPage.status, 200); // Scanner only visits GET.
+  assert.equal(confirmationPage.headers.get("Referrer-Policy"), "same-origin", "native form POSTs must retain a verifiable Origin");
   const firstReply = await (
     await f.message({ replyTo: root.message.id })
   ).json();
@@ -458,7 +466,8 @@ test("unsubscribe is explicit, removes queued mail, and confirmation tokens expi
   const confirmation = f.confirmUrl(f.deliveries[0]);
   const unsubscribe = f.unsubUrl(f.deliveries[0]);
   await f.action(confirmation, "POST");
-  await f.action(unsubscribe); // GET does not unsubscribe.
+  const unsubscribePage = await f.action(unsubscribe); // GET does not unsubscribe.
+  assert.equal(unsubscribePage.headers.get("Referrer-Policy"), "same-origin");
   await f.message({ replyTo: root.id });
   await f.app.flushMail();
   assert.equal(f.deliveries.length, 2);

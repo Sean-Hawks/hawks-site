@@ -14,7 +14,9 @@ export function escapeHtml(value) {
 export function html(res, title, content) {
   res.writeHead(200, {
     "Content-Type": "text/html; charset=utf-8",
-    "Referrer-Policy": "no-referrer",
+    // no-referrer makes native form POSTs send Origin: null (Fetch standard).
+    // Keep same-origin forms verifiable while hiding referrers on external links.
+    "Referrer-Policy": "same-origin",
     "Content-Security-Policy":
       "default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'",
   });
