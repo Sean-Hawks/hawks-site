@@ -23,6 +23,9 @@ dom.window.matchMedia = () => ({ matches: true });
 dom.window.HTMLElement.prototype.scrollIntoView = function () {};
 const { createRoot } = await import("react-dom/client");
 const icons = await import("lucide-react");
+const websiteParser = await import(
+  "../comments-server/shared/author-website.mjs"
+);
 
 // Run real components and hooks; substitute only Next routing/build configuration.
 const modules = new Map();
@@ -41,6 +44,7 @@ function load(path) {
   const localRequire = (name) => {
     if (name === "next/navigation") return { usePathname: () => "/blog/test/" };
     if (name === "lucide-react") return icons;
+    if (name.endsWith("/author-website.mjs")) return websiteParser;
     if (name.endsWith("/comments-config"))
       return {
         commentsConfig: { apiOrigin: "https://comments.test", siteKey: "" },
@@ -240,6 +244,7 @@ test("malformed drafts cannot restore an invalid reply target or oversized conte
     ),
     {
       name: "",
+      authorWebsite: "",
       body: "draft",
       email: null,
       subscribe: false,
@@ -290,4 +295,49 @@ test("retrying a temporary identity outage restores the saved account without cl
   assert.equal(document.getElementById("comment-body").value, "網路恢復後送出");
   await click(button("送出留言"));
   assert.equal(f.posts[0].authorization, "Bearer saved-session");
+});
+
+test("optional author website survives a retry and appears on the author name", async (t) => {
+  let fail = true;
+  const f = await fixture(t, {
+    send: (payload) => {
+      if (fail) throw new TypeError("response lost");
+      return Response.json({ message: { ...rootMessage, ...payload, id: 2 } });
+    },
+  });
+  await input("comment-name", "我的網站");
+  await input("comment-body", "歡迎交流");
+  await input("comment-author-website", "example.com/blog/");
+  await click(button("送出留言"));
+  await f.unmount();
+  await f.mount();
+  assert.equal(
+    document.getElementById("comment-author-website").value,
+    "example.com/blog/",
+  );
+  fail = false;
+  await click(button("送出留言"));
+  assert.equal(f.posts[1].payload.authorWebsite, "https://example.com/blog/");
+  assert.equal(f.posts[1].payload.requestId, f.posts[0].payload.requestId);
+  const link = document.querySelector('#comment-2 a[rel~="ugc"]');
+  assert.equal(link.textContent, "我的網站");
+  assert.equal(link.href, "https://example.com/blog/");
+  assert.match(link.rel, /nofollow/);
+  assert.match(link.rel, /noopener/);
+});
+
+test("an unsafe author URL is rejected in the form before any message is posted", async (t) => {
+  const f = await fixture(t);
+  await input("comment-body", "留言");
+  await input("comment-author-website", "javascript:alert(1)");
+  assert.ok(button("送出留言").disabled);
+  assert.equal(
+    document
+      .getElementById("comment-author-website")
+      .getAttribute("aria-invalid"),
+    "true",
+  );
+  assert.equal(f.posts.length, 0);
+  await input("comment-author-website", "");
+  assert.equal(button("送出留言").disabled, false);
 });

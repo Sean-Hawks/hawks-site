@@ -3,6 +3,7 @@ import type { CommentMessage } from "./comments-client";
 export type ReplyTarget = Pick<CommentMessage, "id" | "name" | "body">;
 export type CommentDraft = {
   name: string;
+  authorWebsite: string;
   body: string;
   subscribe: boolean;
   email: string | null;
@@ -28,6 +29,12 @@ export function readCommentDraft(raw: string | null): CommentDraft | null {
       (typeof draft.email !== "string" || draft.email.length > 254)
     )
       return null;
+    if (
+      draft.authorWebsite !== undefined &&
+      (typeof draft.authorWebsite !== "string" ||
+        draft.authorWebsite.length > 300)
+    )
+      return null;
     const reply = draft.replyTo;
     if (
       reply !== null &&
@@ -43,6 +50,7 @@ export function readCommentDraft(raw: string | null): CommentDraft | null {
     const attempt = draft.attempt;
     return {
       name: draft.name || "",
+      authorWebsite: draft.authorWebsite || "",
       body: draft.body,
       subscribe: draft.subscribe === true,
       email: draft.email ?? null,

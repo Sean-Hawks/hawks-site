@@ -318,3 +318,59 @@ test("SQLite persists across service restart and pagination loses no comments", 
     rmSync(dir, { recursive: true });
   }
 });
+
+test("optional author websites normalize, survive retry and history, and clear on deletion", async (t) => {
+  const f = await fixture(t);
+  const payload = {
+    requestId: randomUUID(),
+    authorWebsite: " example.com/blog/ ",
+  };
+  const created = await f.post(payload);
+  assert.equal(created.status, 201);
+  const { message } = await created.json();
+  assert.equal(message.authorWebsite, "https://example.com/blog/");
+  const retry = await f.post({
+    ...payload,
+    authorWebsite: "https://example.com/blog/",
+  });
+  assert.equal(retry.status, 200);
+  assert.equal((await retry.json()).message.id, message.id);
+  assert.equal(
+    (await f.post({ ...payload, authorWebsite: "other.example" })).status,
+    409,
+  );
+  assert.equal(
+    (await (await f.get()).json()).messages[0].authorWebsite,
+    "https://example.com/blog/",
+  );
+  assert.equal((await f.remove(message.id)).status, 200);
+  assert.equal((await (await f.get()).json()).messages[0].authorWebsite, null);
+  assert.equal((await f.post()).status, 201, "website is optional");
+});
+
+test("invalid author websites cannot become public links or bypass the honeypot", async (t) => {
+  let clock = Date.now();
+  const f = await fixture(t, {}, { now: () => clock });
+  for (const authorWebsite of [
+    "javascript:alert(1)",
+    "data:text/html,hello",
+    "ftp://example.com",
+    "https://user:password@example.com",
+    "https://example.com\n/evil",
+    "x".repeat(301),
+    123,
+  ]) {
+    assert.equal((await f.post({ authorWebsite })).status, 400);
+    clock += 61_000;
+  }
+  assert.equal((await (await f.get()).json()).messages.length, 0);
+  assert.equal(
+    (
+      await f.post({
+        authorWebsite: "https://example.com",
+        website: "bot-filled",
+      })
+    ).status,
+    400,
+  );
+});

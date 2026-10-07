@@ -7,6 +7,7 @@ import { createHash, randomUUID, timingSafeEqual } from "node:crypto";
 import { HttpError } from "./http.mjs";
 import { createIdentity } from "./identity.mjs";
 import { createNotifications, normalizeEmail } from "./notifications.mjs";
+import { normalizeAuthorWebsite } from "../shared/author-website.mjs";
 
 export function readConfig(env = process.env) {
   const origins = (env.COMMENTS_ORIGINS || "https://hawks.tw")
@@ -153,11 +154,12 @@ export function createCommentsServer(
     ["github_id", "INTEGER"],
     ["github_login", "TEXT"],
     ["notification_email", "TEXT"],
+    ["author_website", "TEXT"],
   ])
     if (!columns.has(name))
       db.exec(`ALTER TABLE messages ADD COLUMN ${name} ${type}`);
   const fields =
-    "id, page, name, body, reply_to AS replyTo, created_at AS createdAt, deleted, github_id AS githubId, github_login AS githubLogin";
+    "id, page, name, body, reply_to AS replyTo, created_at AS createdAt, deleted, github_id AS githubId, github_login AS githubLogin, author_website AS authorWebsite";
   const history = db.prepare(
     `SELECT ${fields} FROM messages WHERE page = ? AND id < ? ORDER BY id DESC LIMIT 101`,
   );
@@ -166,7 +168,7 @@ export function createCommentsServer(
     `SELECT ${fields}, notification_email AS notificationEmailHash FROM messages WHERE request_id = ?`,
   );
   const insert = db.prepare(
-    "INSERT INTO messages (request_id, page, name, body, reply_to, created_at, github_id, github_login, notification_email) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+    "INSERT INTO messages (request_id, page, name, body, reply_to, created_at, github_id, github_login, notification_email, author_website) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
   );
   const identity = createIdentity({ db, config, fetchImpl, now });
   const notifications = createNotifications({
@@ -277,7 +279,7 @@ export function createCommentsServer(
         if (!existing || existing.deleted)
           throw new HttpError(404, "留言不存在。");
         db.prepare(
-          "UPDATE messages SET deleted = 1, body = '', name = '已刪除', github_id=NULL, github_login=NULL, notification_email=NULL WHERE id = ?",
+          "UPDATE messages SET deleted = 1, body = '', name = '已刪除', github_id=NULL, github_login=NULL, notification_email=NULL, author_website=NULL WHERE id = ?",
         ).run(id);
         return json(res, 200, { ok: true });
       }
@@ -356,6 +358,8 @@ export function createCommentsServer(
           website,
         } = payload;
         const email = normalizeEmail(payload.email);
+        const authorWebsite = normalizeAuthorWebsite(payload.authorWebsite);
+        if (authorWebsite.error) throw new HttpError(400, authorWebsite.error);
         // Only keep a digest for request deduplication. The actual address
         // belongs to the private subscription, which can be removed entirely.
         const emailHash = email
@@ -438,6 +442,7 @@ export function createCommentsServer(
             previous.name !== name.trim() ||
             previous.body !== body.trim() ||
             previous.replyTo !== replyTo ||
+            (previous.authorWebsite || "") !== authorWebsite.value ||
             (previous.githubId ?? null) !== (author?.githubId ?? null) ||
             (previous.notificationEmailHash || "") !== emailHash
           )
@@ -460,6 +465,7 @@ export function createCommentsServer(
             author?.githubId ?? null,
             author?.githubLogin ?? null,
             emailHash || null,
+            authorWebsite.value || null,
           );
           message = find.get(Number(result.lastInsertRowid));
           notice = notifications.posted(message, email);

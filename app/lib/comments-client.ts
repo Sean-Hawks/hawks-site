@@ -8,6 +8,7 @@ export type CommentMessage = {
   deleted: number;
   githubId?: number | null;
   githubLogin?: string | null;
+  authorWebsite?: string | null;
 };
 export type CommentUser = {
   githubId: number;

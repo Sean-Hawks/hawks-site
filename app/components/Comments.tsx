@@ -20,6 +20,7 @@ import {
 } from "../lib/comments-client";
 
 import { commentsConfig } from "../lib/comments-config";
+import { normalizeAuthorWebsite } from "../../comments-server/shared/author-website.mjs";
 
 const { apiOrigin: api, siteKey } = commentsConfig;
 const fieldClass =
@@ -38,6 +39,8 @@ function PageComments({ page }: { page: string }) {
   const {
     name,
     setName,
+    authorWebsite,
+    setAuthorWebsite,
     email,
     setEmail,
     subscribe,
@@ -56,6 +59,7 @@ function PageComments({ page }: { page: string }) {
   const sendInFlight = useRef(false);
   const endpoint = `${api}/v1/comments/messages?page=${encodeURIComponent(page)}`;
   const emailValue = email ?? identity.notificationEmail;
+  const websiteResult = normalizeAuthorWebsite(authorWebsite);
   const load = useCallback(
     async (before?: number) => {
       if (!api || loadInFlight.current || sendInFlight.current) return;
@@ -127,6 +131,7 @@ function PageComments({ page }: { page: string }) {
       identity.removingEmail ||
       (subscribe && !emailValue.trim()) ||
       Boolean(commentValidation(name, body)) ||
+      Boolean(websiteResult.error) ||
       (siteKey && !token)
     )
       return;
@@ -140,6 +145,7 @@ function PageComments({ page }: { page: string }) {
       body: body.trim(),
       replyTo: replyTo?.id ?? null,
       email: subscribe ? emailValue.trim() : "",
+      authorWebsite: websiteResult.value,
     };
     const content = JSON.stringify({
       ...payload,
@@ -231,7 +237,9 @@ function PageComments({ page }: { page: string }) {
                 ? "正在移除通知信箱…"
                 : subscribe && !emailValue.trim()
                   ? "請填寫通知信箱。"
-                  : validation || (siteKey && !token ? "請完成安全驗證。" : "");
+                  : validation ||
+                    websiteResult.error ||
+                    (siteKey && !token ? "請完成安全驗證。" : "");
   const submitDisabled = sending || Boolean(submitGuidance);
 
   async function logout() {
@@ -435,94 +443,125 @@ function PageComments({ page }: { page: string }) {
               </div>
               <div>
                 <label
-                  htmlFor="comment-subscribe"
-                  className="flex min-h-11 cursor-pointer items-center gap-3 text-sm"
+                  htmlFor="comment-author-website"
+                  className="mb-1.5 block text-sm"
                 >
+                  你的網站{" "}
+                  <span className="text-xs text-[rgb(var(--muted))]">選填</span>
+                </label>
+                <input
+                  id="comment-author-website"
+                  type="text"
+                  inputMode="url"
+                  autoComplete="url"
+                  autoCapitalize="none"
+                  spellCheck={false}
+                  maxLength={300}
+                  value={authorWebsite}
+                  onChange={(event) => setAuthorWebsite(event.target.value)}
+                  disabled={sending || !draft.ready}
+                  className={fieldClass}
+                  placeholder="https://example.com"
+                  aria-describedby="comment-author-website-guidance"
+                  aria-invalid={Boolean(websiteResult.error)}
+                />
+                <p
+                  id="comment-author-website-guidance"
+                  className="mt-1 text-xs text-[rgb(var(--muted))]"
+                >
+                  {websiteResult.error || "留言者名稱會連到這個網站。"}
+                </p>
+              </div>
+            </div>
+            <div>
+              <label
+                htmlFor="comment-subscribe"
+                className="flex min-h-11 cursor-pointer items-center gap-3 text-sm"
+              >
+                <input
+                  id="comment-subscribe"
+                  type="checkbox"
+                  checked={subscribe}
+                  onChange={(event) => setSubscribe(event.target.checked)}
+                  disabled={
+                    sending ||
+                    identity.removingEmail ||
+                    (!subscribe && !identity.features?.emailEnabled)
+                  }
+                  className="h-4 w-4 accent-[rgb(var(--accent))]"
+                  aria-describedby="comment-email-guidance"
+                />
+                接收此討論串的回覆通知
+              </label>
+              {subscribe && (
+                <>
+                  <label
+                    htmlFor="comment-email"
+                    className="mb-1.5 mt-2 block text-sm"
+                  >
+                    通知信箱
+                  </label>
                   <input
-                    id="comment-subscribe"
-                    type="checkbox"
-                    checked={subscribe}
-                    onChange={(event) => setSubscribe(event.target.checked)}
-                    disabled={
-                      sending ||
-                      identity.removingEmail ||
-                      (!subscribe && !identity.features?.emailEnabled)
-                    }
-                    className="h-4 w-4 accent-[rgb(var(--accent))]"
+                    id="comment-email"
+                    type="email"
+                    autoComplete="email"
+                    maxLength={254}
+                    value={emailValue}
+                    onChange={(event) => setEmail(event.target.value)}
+                    disabled={sending || identity.removingEmail}
+                    required
+                    className={fieldClass}
+                    placeholder="你的 Email，不會公開"
                     aria-describedby="comment-email-guidance"
                   />
-                  接收此討論串的回覆通知
-                </label>
-                {subscribe && (
-                  <>
-                    <label
-                      htmlFor="comment-email"
-                      className="mb-1.5 mt-2 block text-sm"
-                    >
-                      通知信箱
-                    </label>
-                    <input
-                      id="comment-email"
-                      type="email"
-                      autoComplete="email"
-                      maxLength={254}
-                      value={emailValue}
-                      onChange={(event) => setEmail(event.target.value)}
-                      disabled={sending || identity.removingEmail}
-                      required
-                      className={fieldClass}
-                      placeholder="你的 Email，不會公開"
-                      aria-describedby="comment-email-guidance"
-                    />
-                  </>
-                )}
-                <p
-                  id="comment-email-guidance"
-                  className="mt-1.5 text-xs leading-5 text-[rgb(var(--muted))]"
-                >
-                  {identity.features?.emailEnabled
-                    ? !subscribe
-                      ? "選填。信箱不會公開，可隨時取消通知。"
-                      : identity.notificationEmail &&
-                          emailValue.trim().toLowerCase() ===
-                            identity.notificationEmail
-                        ? "已驗證的信箱，送出後即開啟通知。"
-                        : identity.user
-                          ? "此信箱首次使用需收信確認，之後同一帳號可直接訂閱。"
-                          : "需收信確認。登入 GitHub 可在驗證後沿用信箱。"
-                    : "回覆通知暫時無法使用。"}
-                </p>
-                {identity.notificationEmail && (
-                  <details className="mt-3 text-xs text-[rgb(var(--muted))]">
-                    <summary className="min-h-8 cursor-pointer">
-                      管理通知信箱
-                    </summary>
-                    <p className="mt-2 break-all">
-                      已驗證：{identity.notificationEmail}
-                    </p>
-                    <p className="mt-1">
-                      移除後會取消這個 GitHub 帳號的所有討論串通知。
-                    </p>
-                    <button
-                      type="button"
-                      disabled={
-                        sending || identity.signingOut || identity.removingEmail
+                </>
+              )}
+              <p
+                id="comment-email-guidance"
+                className="mt-1.5 text-xs leading-5 text-[rgb(var(--muted))]"
+              >
+                {identity.features?.emailEnabled
+                  ? !subscribe
+                    ? "選填。信箱不會公開，可隨時取消通知。"
+                    : identity.notificationEmail &&
+                        emailValue.trim().toLowerCase() ===
+                          identity.notificationEmail
+                      ? "已驗證的信箱，送出後即開啟通知。"
+                      : identity.user
+                        ? "此信箱首次使用需收信確認，之後同一帳號可直接訂閱。"
+                        : "需收信確認。登入 GitHub 可在驗證後沿用信箱。"
+                  : "回覆通知暫時無法使用。"}
+              </p>
+              {identity.notificationEmail && (
+                <details className="mt-3 text-xs text-[rgb(var(--muted))]">
+                  <summary className="min-h-8 cursor-pointer">
+                    管理通知信箱
+                  </summary>
+                  <p className="mt-2 break-all">
+                    已驗證：{identity.notificationEmail}
+                  </p>
+                  <p className="mt-1">
+                    移除後會取消這個 GitHub 帳號的所有討論串通知。
+                  </p>
+                  <button
+                    type="button"
+                    disabled={
+                      sending || identity.signingOut || identity.removingEmail
+                    }
+                    onClick={async () => {
+                      if (await identity.unlinkEmail()) {
+                        setSubscribe(false);
+                        setEmail(null);
                       }
-                      onClick={async () => {
-                        if (await identity.unlinkEmail()) {
-                          setSubscribe(false);
-                          setEmail(null);
-                        }
-                      }}
-                      className="mt-2 min-h-11 underline underline-offset-4 disabled:opacity-50"
-                    >
-                      {identity.removingEmail
-                        ? "移除中…"
-                        : "移除信箱並取消所有通知"}
-                    </button>
-                  </details>
-                )}
-              </div>
+                    }}
+                    className="mt-2 min-h-11 underline underline-offset-4 disabled:opacity-50"
+                  >
+                    {identity.removingEmail
+                      ? "移除中…"
+                      : "移除信箱並取消所有通知"}
+                  </button>
+                </details>
+              )}
             </div>
             <div id="comment-compose" className="scroll-mt-24 space-y-3">
               {replyTo && (

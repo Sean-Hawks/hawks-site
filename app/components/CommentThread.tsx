@@ -1,6 +1,7 @@
 import { Github, Reply } from "lucide-react";
 import type { CommentMessage } from "../lib/comments-client";
 import CommentFeedback from "./CommentFeedback";
+import { normalizeAuthorWebsite } from "../../comments-server/shared/author-website.mjs";
 
 export default function CommentThread({
   message,
@@ -19,6 +20,7 @@ export default function CommentThread({
   busy: boolean;
   depth?: number;
 }) {
+  const authorWebsite = normalizeAuthorWebsite(message.authorWebsite).value;
   return (
     <li
       id={`comment-${message.id}`}
@@ -56,9 +58,21 @@ export default function CommentThread({
               {message.deleted ? "·" : [...message.name][0]}
             </span>
           )}
-          <span className="break-all text-sm font-semibold">
-            {message.deleted ? "留言已刪除" : message.name}
-          </span>
+          {authorWebsite && !message.deleted ? (
+            <a
+              href={authorWebsite}
+              target="_blank"
+              rel="ugc nofollow noopener noreferrer"
+              className="break-all text-sm font-semibold underline decoration-[rgb(var(--accent)/0.4)] underline-offset-4 hover:text-[rgb(var(--accent))]"
+              aria-label={`${message.name} 的網站（另開分頁）`}
+            >
+              {message.name}
+            </a>
+          ) : (
+            <span className="break-all text-sm font-semibold">
+              {message.deleted ? "留言已刪除" : message.name}
+            </span>
+          )}
           <time
             dateTime={message.createdAt}
             className="text-xs text-[rgb(var(--muted))]"

@@ -11,13 +11,21 @@ export default function useCommentDraft(page: string) {
   const key = `hawks:comment-draft:${page}`;
   const [body, setBody] = useState("");
   const [name, setName] = useState("");
+  const [authorWebsite, setAuthorWebsite] = useState("");
   const [subscribe, setSubscribe] = useState(false);
   const [email, setEmail] = useState<string | null>(null);
   const [replyTo, setReplyTo] = useState<ReplyTarget | null>(null);
   const [ready, setReady] = useState(false);
   const [restored, setRestored] = useState(false);
   const attempt = useRef<CommentDraft["attempt"]>(null);
-  const snapshot = useRef({ name, body, replyTo, subscribe, email });
+  const snapshot = useRef({
+    name,
+    authorWebsite,
+    body,
+    replyTo,
+    subscribe,
+    email,
+  });
 
   const save = useCallback(
     (draft: CommentDraft) => {
@@ -39,6 +47,7 @@ export default function useCommentDraft(page: string) {
         if (draft) {
           setBody(draft.body);
           setName(draft.name);
+          setAuthorWebsite(draft.authorWebsite);
           setSubscribe(draft.subscribe);
           setEmail(draft.email);
           setReplyTo(draft.replyTo);
@@ -55,13 +64,13 @@ export default function useCommentDraft(page: string) {
 
   useEffect(() => {
     if (!ready) return;
-    snapshot.current = { name, body, replyTo, subscribe, email };
+    snapshot.current = { name, authorWebsite, body, replyTo, subscribe, email };
     const persist = () =>
       save({ ...snapshot.current, attempt: attempt.current });
     persist();
     window.addEventListener("pagehide", persist);
     return () => window.removeEventListener("pagehide", persist);
-  }, [save, name, body, replyTo, subscribe, email, ready]);
+  }, [save, name, authorWebsite, body, replyTo, subscribe, email, ready]);
 
   async function requestId(content: string) {
     const digest = await crypto.subtle.digest(
@@ -79,7 +88,14 @@ export default function useCommentDraft(page: string) {
 
   function clear() {
     attempt.current = null;
-    snapshot.current = { name, body: "", replyTo: null, subscribe, email };
+    snapshot.current = {
+      name,
+      authorWebsite,
+      body: "",
+      replyTo: null,
+      subscribe,
+      email,
+    };
     setBody("");
     setReplyTo(null);
     setRestored(false);
@@ -89,6 +105,8 @@ export default function useCommentDraft(page: string) {
   return {
     name,
     setName,
+    authorWebsite,
+    setAuthorWebsite,
     body,
     setBody,
     replyTo,

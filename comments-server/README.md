@@ -29,7 +29,7 @@ NEXT_PUBLIC_COMMENTS_API_URL=http://127.0.0.1:8790 npm run dev
 
 ## WSL：systemd 部署
 
-已獨立部署在 `/home/sean8/apps/hawks-comments`，使用 `hawks-comments.service`；與 `/home/sean8/apps/hawks-agent` 的資料及服務分開。2026-10-07 確認 Ubuntu-24.04 原先為 Stopped，從 Windows 啟動後已恢復 SSH、Tailscale 與 bot。Node 為 `/home/sean8/.local/opt/hawks-agent-node/bin/node`（22.23.2），留言、登入、通知、SMTP 與 gateway 測試 35 項通過。以下步驟供重新部署使用。
+已獨立部署在 `/home/sean8/apps/hawks-comments`，使用 `hawks-comments.service`；與 `/home/sean8/apps/hawks-agent` 的資料及服務分開。2026-10-07 確認 Ubuntu-24.04 原先為 Stopped，從 Windows 啟動後已恢復 SSH、Tailscale 與 bot。Node 為 `/home/sean8/.local/opt/hawks-agent-node/bin/node`（22.23.2），留言、登入、通知、SMTP 與 gateway 測試 37 項通過。以下步驟供重新部署使用。
 
 把本資料夾的程式碼帶到 WSL，**不複製本機 `.env`、`.data` 或 node_modules**；以下指令在 WSL 上執行：
 
@@ -163,4 +163,6 @@ npm test
 
 前端將留言列表、回饋提示、草稿與登入狀態分開維護。恢復登入期間不能送出；暫時的服務故障不會默默切換成匿名。回覆會帶到表單並顯示對象，登出保留內容並清除通知選項。草稿只保留在目前分頁，送出成功後移除；回應逾時後重試仍使用同一 request ID，避免重複留言。
 
-`npm test` 包含 `tests/comments-flow.test.mjs` 的 7 項真實 React DOM 操作測試。這些測試使用隔離 API 回應，並未向 GitHub 或真人寄信。正式 GitHub 授權、信箱確認及 WSL 隔離 SMTP／IMAP 收信驗證範圍記錄於 [整合設定](deploy/INTEGRATIONS-SETUP.md)；新版手機畫面與授權視窗操作仍待人工確認。
+`npm test` 包含 `tests/comments-flow.test.mjs` 的真實 React DOM 操作及草稿解析測試。這些測試使用隔離 API 回應，並未向 GitHub 或真人寄信。正式 GitHub 授權、信箱確認及 WSL 隔離 SMTP／IMAP 收信驗證範圍記錄於 [整合設定](deploy/INTEGRATIONS-SETUP.md)；新版手機畫面與授權視窗操作仍待人工確認。
+
+留言者可填寫公開的個人網站，名稱會連至該網址；網址驗證由前後端共用 `shared/author-website.mjs`。公開欄位為 `authorWebsite`；既有 `website` 是蜜罐欄位，兩者不可互換。管理刪除會一併清除網站資料。部署時須包含 `shared/` 資料夾。
