@@ -61,4 +61,6 @@ Windows 管理員修正腳本已放在：
 
 使用者要求將 `me@hawks.tw` 由轉址改為 WSL 實際信箱，並確認沒有其他轉址地址。已驗證既有 Dovecot 虛擬使用者、Maildir 儲存、IMAP 993、SMTP 587 STARTTLS 與 DKIM 簽署的本機投遞；從 Mac 連線也通過憑證驗證及登入。
 
-Windows SMTP 代理已完成並測試接受自有收件者、拒絕未知地址與外部 relay，兩個安裝腳本已放到 `%LOCALAPPDATA%\Hawks`。使用者已執行管理員安裝（輸出排程 Running）、完成路由器轉送與 DHCP 固定配給；Windows `0.0.0.0:25` 正在監聽。美國與瑞士外部節點都成功連上公開 TCP 25，Postfix 保留兩個原始來源 IP。經公開 IP 的 NAT loopback 測試信使用 TLS 1.3 並成功投遞至 IMAP。MX 尚指向 Gandi（權威 TTL 300 秒），已請使用者切換為 `10 mail.hawks.tw.`，跨 Internet 的完整外部收信與 Windows 重開機仍待驗證。操作、測試範圍與回復見 [MAILBOX-SETUP.md](MAILBOX-SETUP.md)。
+Windows SMTP 代理已完成並測試接受自有收件者、拒絕未知地址與外部 relay，兩個安裝腳本已放到 `%LOCALAPPDATA%\Hawks`。使用者已執行管理員安裝（輸出排程 Running）、完成路由器轉送與 DHCP 固定配給；Windows `0.0.0.0:25` 正在監聽。美國與瑞士外部節點都成功連上公開 TCP 25，Postfix 保留兩個原始來源 IP。經公開 IP 的 NAT loopback 測試信使用 TLS 1.3 並成功投遞至 IMAP。MX 已切換為 `10 mail.hawks.tw.`，三台 Gandi 權威 DNS、Cloudflare 與 Google resolver 皆已確認；SMTP 接受 `me@hawks.tw`；使用者 Gmail 的測試信已於 22:55:48 由 Google MTA 直接經 ESMTPS 投遞至 WSL Postfix／Dovecot，IMAP UID 6 的正文已讀回，完整外部收信通過。Windows 重開機仍未測試；PBL 排除尚未申請，`me@hawks.tw` 已可作為驗證收件地址。操作、測試範圍與回復見 [MAILBOX-SETUP.md](MAILBOX-SETUP.md)。
+
+留言通知寄件地址 `comments@hawks.tw` 已新增為 `me@hawks.tw` 的收件別名，接收回信與退信；原有 postmaster／abuse 別名保留，alias map 修改前已私密備份，公開 SMTP 收件測試通過。

@@ -1,6 +1,6 @@
 # WSL 自架信箱：me@hawks.tw
 
-2026-10-07（Asia/Taipei）。使用既有 Postfix 3.8、Dovecot 2.3、Rspamd 與虛擬使用者 `me@hawks.tw`。信件保存在 `/var/vmail/hawks.tw/me/Maildir`，啟用的 Sieve 為 `keep;`，目前不轉寄到 Gmail。使用者確認只有 `me@hawks.tw` 需要搬遷。
+2026-10-07（Asia/Taipei）。使用既有 Postfix 3.8、Dovecot 2.3、Rspamd 與虛擬使用者 `me@hawks.tw`。信件保存在 `/var/vmail/hawks.tw/me/Maildir`，啟用的 Sieve 為 `keep;`，目前不轉寄到 Gmail。使用者確認只有 `me@hawks.tw` 需要搬遷。`postmaster@hawks.tw`、`abuse@hawks.tw` 的既有別名保留；留言通知的 `comments@hawks.tw` 已新增為 `me@hawks.tw` 的收件別名，回信與退信進入此信箱。修改前的 alias map 備份在 `/etc/hawks-mail/backups/`（root 私密目錄），公開 SMTP 收件地址測試通過。
 
 ## 收信客戶端
 
@@ -49,7 +49,7 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$env:LOCALAPPDATA\Hawks
 
 ## Gandi MX 切換與回復
 
-**目前尚未切換。** 權威 DNS 的 MX 仍為 `10 spool.mail.gandi.net.` 與 `50 fb.mail.gandi.net.`（TTL 300 秒）。Windows 安裝與路由器轉送已由使用者完成，公開 TCP 25 已通過美國、瑞士節點連線測試，Postfix 也記錄到這兩個實際外部來源 IP。因此已可切換 MX；目前一般外部來信仍由 DNS 指向原 Gandi 轉址。
+**MX 已切換。** 2026-10-07 已確認三台 Gandi 權威 DNS，以及 Cloudflare `1.1.1.1`、Google `8.8.8.8` 都只回傳 `10 mail.hawks.tw.`，`mail.hawks.tw` 的 A 為 `114.32.161.42`。Windows 安裝與路由器轉送已由使用者完成，公開 TCP 25 已通過美國、瑞士節點連線測試，Postfix 也記錄到這兩個實際外部來源 IP。收信入口接受 `me@hawks.tw`（SMTP RCPT 250），使用者從 Gmail 寄來的測試信已實際投遞至 WSL INBOX，IMAP 讀回正文成功，完整外部收信已驗證。
 
 先在 Gandi 匯出／備份 DNS 記錄，再於 `hawks.tw` 的 DNS records 編輯 **MX 記錄組**，改為：
 
@@ -88,5 +88,6 @@ Remove-NetFirewallRule -Name 'Hawks-Mail-SMTP-Ingress'
 - 使用者完成路由器轉送與 DHCP 固定配給；有線 MAC 為 `74:56:3C:BD:CB:35`，目前 Windows Ethernet 是 `192.168.50.52`。
 - 真實外部 TCP 檢查：美國 Los Angeles（`38.145.202.12`）與瑞士 Zurich（`141.255.165.104`）均連上 `114.32.161.42:25`，WSL Postfix 日誌記錄兩個來源。見 [檢查報告](https://check-host.net/check-report/4f83b2b5k35b)。
 - 經公開 IP 的 SMTP STARTTLS 使用 TLS 1.3，投遞一份自有已簽章的測試信後，成功由 IMAP 讀回（queue `B80D4666D7`、UID 5）。這次郵件投遞來自同一 LAN，路由器使用 NAT loopback，Postfix 看到來源 `192.168.50.1`；不能將它當成跨 Internet 的完整收信測試。外部節點檢查僅建立 TCP 連線，未寄送郵件。
-- MX 切換、Gmail 等外部 MTA 的完整收信與 Windows 重開機仍待驗證。不要把 TCP 連線與 NAT loopback 投遞成功視為 MX 收信已完成。
-- 現有 IP 的 Spamhaus PBL 排除尚未申請。信箱接通後才能收到驗證信；使用者認為 IP 是固定配給，但仍須確認符合 [Spamhaus 的申請條件](https://www.spamhaus.org/faqs/policy-blocklist-pbl/)。
+- MX 切換已由權威與兩個公開 resolver 確認。使用者的 Gmail 測試信於 22:55:48 實際存入 INBOX，來源是 Google MTA `mail-vk1-f180.google.com [209.85.221.180]`，經 ESMTPS／STARTTLS → Postfix queue `C50B350FB9` → Dovecot LMTP Saved → IMAP UID 6；已讀回正文。這是實際跨 Internet 的郵件投遞，沒有經 Gandi 轉址。
+- 未測試 Windows 重開機；目前服務運作不代表已驗證重開機後常駐。
+- 現有 IP 的 Spamhaus PBL 排除尚未申請。`me@hawks.tw` 已可接收驗證信；透過 HiNet DNS 最新查詢仍回 `127.0.0.11`。使用者認為 IP 是固定配給，但仍須確認符合 [Spamhaus 的申請條件](https://www.spamhaus.org/faqs/policy-blocklist-pbl/)。
