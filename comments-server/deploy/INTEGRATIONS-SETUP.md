@@ -40,7 +40,9 @@ sudo python3 deploy/configure-comments-postfix.py
 
 SMTP 接受信件表示已進入 Postfix 佇列，仍需投遞到收件者 MX；`status=sent` 在 SMTP 模式表示 Postfix 已接受，不能當成已到收件匣。外部投遞失敗由 Postfix 的佇列重試與退信處理。SMTP 沒有 Resend 的 idempotency API；重試保留 Message-ID 與 Date，但在 SMTP 確認結果不明／接受後程序中斷時，仍可能重複寄送。預設每 24 小時最多 100 次應用程式投遞嘗試，含重試。
 
-現在已確認本機 SMTP、DKIM 簽章及公開 DNS 驗證；實際到信測試仍需使用自己的測試收件信箱。若更換公開 IP，須同步調整 SPF、mail 的 A 記錄及反向 DNS；收件端也可能因 IP 信譽或內容拒收／歸入垃圾郵件。Gmail 基本寄件需求見 [官方說明](https://support.google.com/mail/answer/81126)。
+已確認本機 SMTP、DKIM 簽章及公開 DNS 驗證，也已寄到使用者提供的 Gmail 測試信箱。收件端確認 SPF、DKIM、DMARC 全部 PASS 與 TLS 1.3，但信件進入垃圾郵件匣。若更換公開 IP，須同步調整 SPF、mail 的 A 記錄及反向 DNS；收件端也可能因 IP 信譽或內容拒收／歸入垃圾郵件。Gmail 基本寄件需求見 [官方說明](https://support.google.com/mail/answer/81126)。
+
+目前 IP 查到 Spamhaus PBL（HiNet DNS 查詢回傳 `127.0.0.11`，即 Spamhaus 維護的 PBL）；這是寄信政策名單，不能解讀為主機已被判定寄垃圾信。是否為固定 IP 尚待使用者確認。若是配給你的固定 IP，且郵件伺服器、正反向 DNS 等條件符合，可到 [官方查詢頁](https://check.spamhaus.org/query/ip/114.32.161.42) 查看排除步驟；申請確認信需要可收信、符合 mail server 網域的信箱，Gmail 等免費信箱不能用於 PBL 排除。若為浮動 IP，官方建議透過 ISP 寄信 relay。見 [PBL 官方條件](https://www.spamhaus.org/faqs/policy-blocklist-pbl/)。名單排除不保證 Gmail 收件匣分類；不要把三項驗證 PASS 或 SMTP 成功當成送達率已解決。
 
 ### Resend（替代方案）
 
@@ -99,4 +101,4 @@ Email 不出現在公開 API、留言或頭像網址；GitHub 帳號與頭像會
 
 SQLite 保留訂閱與待寄資料，取消訂閱會移除該訂閱與相關寄信紀錄。寄送完成的 outbox 清空信件內容，7 天後清理紀錄。已寄出的通知無法隨刪除留言撤回；尚未寄送的已刪除回覆會略過。
 
-HTTP 測試使用假的 GitHub、Resend 回應及本機 SMTP 測試伺服器，不會向真人寄信。WSL 額外使用真實 Postfix hold 佇列驗證 DKIM，測試信已刪除、未對外投遞。真實 GitHub 授權與外部到信仍須由實際帳號／自己的信箱確認。
+HTTP 測試使用假的 GitHub、Resend 回應及本機 SMTP 測試伺服器，不會向真人寄信。WSL 額外使用真實 Postfix hold 佇列驗證 DKIM，該測試信已刪除、未對外投遞。另經使用者提供測試收件信箱授權，單次寄出外部測試信，已確認 Gmail 到信與三項驗證 PASS，但進入垃圾郵件匣。真實 GitHub 授權與完整的確認訂閱／回覆通知收信流程，仍須在正式介面確認。

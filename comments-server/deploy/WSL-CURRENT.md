@@ -39,7 +39,9 @@ Tailscale Funnel 曾啟用，但公開 DNS 持續 NXDOMAIN；留言新增的 por
 - 發現 `postfix@-.service` 曾於開機失敗；已恢復服務，新增依賴 tailscaled 的啟動順序與每 15 秒失敗重啟。
 - 設定腳本：[configure-comments-postfix.py](configure-comments-postfix.py)。修改前備份在 `/etc/hawks-comments/mail-backups/`（root 私密目錄）。
 - Mac 與 WSL 的 31 項測試通過。WSL 真實 SMTP 測試信在 hold 佇列檢查 DKIM，再由 Rspamd 對公開 DNS 驗證，得到 `R_DKIM_ALLOW`，已移除測試信與 hold 規則，未對外投遞。
-- GitHub 實際授權與真人信箱收信仍需另外確認；HTTP 入口與本機簽章通過不能代替收件者的到信結果。
+- 使用者提供的 Gmail 測試信箱已收到真實外部測試信；Gmail 回覆 `250 2.0.0 OK`，收件端原始郵件確認 SPF、DKIM、DMARC 全部 PASS，使用 TLS 1.3，但歸入垃圾郵件。GitHub 實際授權仍未驗證。
+- 對目前 IP 的 Spamhaus ZEN 查詢（透過 HiNet DNS）回傳 `127.0.0.11`，TXT 指向 PBL 查詢頁：Spamhaus 維護的 PBL。先前透過公共 resolver 得到的 `127.255.255.254` 是查詢錯誤，不能當成名單結果。
+- PBL 是一般用戶網段直接寄信的政策名單，不代表主機正在寄垃圾信。它可能影響收件端評分，但沒有證據能斷定 Gmail 本次分類的唯一原因。是否為配給此用戶的固定 IP 尚待確認；只有符合固定 IP、自有郵件伺服器、正反向 DNS 等條件才適合申請排除，且移除後仍不保證進入收件匣。見 [Spamhaus PBL 條件](https://www.spamhaus.org/faqs/policy-blocklist-pbl/)。
 
 ## Windows／WSL 常駐
 
