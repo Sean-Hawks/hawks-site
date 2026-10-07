@@ -127,9 +127,9 @@ test("preflight allows login sessions while administrator routes stay blocked", 
 
 test("gateway forwards application sessions but never administrator credentials", async () => {
   const token = `Bearer hcs_${"a".repeat(43)}`;
-  for (const path of ["/v1/comments/messages", "/v1/comments/auth/me"]) {
+  for (const path of ["/v1/comments/messages", "/v1/comments/auth/me", "/v1/comments/auth/email/unlink"]) {
     const response = await gateway.fetch(
-      request(path, { headers: { Authorization: token } }),
+      request(path, { method: path.endsWith("/unlink") ? "POST" : "GET", headers: { Authorization: token } }),
       {
         COMMENTS_BACKEND: {
           fetch(req) {

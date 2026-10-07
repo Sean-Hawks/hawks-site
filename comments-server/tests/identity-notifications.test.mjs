@@ -26,6 +26,7 @@ const configuration = {
 };
 async function fixture(t, options = {}, ports = {}) {
   const deliveries = [];
+  let profile = { id: 1234, login: "Hawks-test", name: "Hawks" };
   let clock = Date.now();
   const fetchImpl = async (url, init) => {
     if (url === "https://github.com/login/oauth/access_token") {
@@ -37,7 +38,7 @@ async function fixture(t, options = {}, ports = {}) {
       return Response.json({ access_token: "private-github-access" });
     }
     if (url === "https://api.github.com/user")
-      return Response.json({ id: 1234, login: "Hawks-test", name: "Hawks" });
+      return Response.json(profile);
     if (url === "https://api.resend.com/emails") {
       deliveries.push({ ...init, payload: JSON.parse(init.body) });
       return Response.json({ id: randomUUID() });
@@ -95,7 +96,23 @@ async function fixture(t, options = {}, ports = {}) {
     advance(ms = 61_000) {
       clock += ms;
     },
+    setProfile(value) { profile = value; },
   };
+}
+
+async function signedIn(f) {
+  const login = await f.login();
+  const callback = await fetch(`${f.base}/v1/comments/auth/github/callback?code=test&state=${login.state}`);
+  assert.equal(callback.status, 200);
+  return (await f.post("/v1/comments/auth/github/session", {
+    state: login.state, verifier: login.verifier,
+  })).json();
+}
+
+async function identity(f, token) {
+  return (await fetch(`${f.base}/v1/comments/auth/me`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  })).json();
 }
 
 test("optional integration configuration is complete, HTTPS, and fail closed", () => {
@@ -178,6 +195,46 @@ test("GitHub uses PKCE, one-use state and browser proof; identity and logout sta
     200,
   );
   assert.equal((await f.message({}, session.token)).status, 401);
+  assert.equal(
+    (await f.post("/v1/comments/auth/logout", {}, session.token)).status,
+    200,
+    "a revoked session can still log out",
+  );
+});
+
+test("expired sessions can log out without allowing further authenticated comments", async (t) => {
+  const f = await fixture(t);
+  const login = await f.login();
+  await fetch(
+    `${f.base}/v1/comments/auth/github/callback?code=test&state=${login.state}`,
+  );
+  const session = await (
+    await f.post("/v1/comments/auth/github/session", {
+      state: login.state,
+      verifier: login.verifier,
+    })
+  ).json();
+  f.advance(8 * 24 * 60 * 60_000);
+  assert.equal((await f.message({}, session.token)).status, 401);
+  assert.equal(
+    (await f.post("/v1/comments/auth/logout", {}, session.token)).status,
+    200,
+  );
+  assert.equal((await f.message({}, session.token)).status, 401);
+  assert.equal((await f.message()).status, 201);
+  assert.equal(
+    (await f.post("/v1/comments/auth/logout", {}, "invalid-token")).status,
+    401,
+  );
+  assert.equal(
+    (
+      await fetch(`${f.base}/v1/comments/auth/logout`, {
+        method: "POST",
+        headers: { Origin: "https://untrusted.example" },
+      })
+    ).status,
+    403,
+  );
 });
 
 test("declined, expired and forged OAuth states fail without creating a session", async (t) => {
@@ -253,6 +310,84 @@ test("double opt-in scopes notifications to one nested thread and never publishe
   ).json();
   assert.ok(!JSON.stringify(history).includes("example.com"));
   assert.ok(!JSON.stringify(history).includes("notificationEmail"));
+});
+
+test("a GitHub account verifies its email once and reuses it only for explicitly selected threads", async (t) => {
+  const f = await fixture(t);
+  const session = await signedIn(f);
+  assert.equal((await identity(f, session.token)).notificationEmail, "");
+  await f.message({ email: "reader@example.com" }, session.token);
+  await f.app.flushMail();
+  const url = f.confirmUrl(f.deliveries[0]);
+  assert.match(f.deliveries[0].payload.text, /GitHub @Hawks-test/);
+  assert.match(await (await f.action(url)).text(), /@Hawks-test/);
+  assert.equal((await identity(f, session.token)).notificationEmail, "", "GET scanners must not bind an email");
+  await f.action(url, "POST");
+  assert.equal((await identity(f, session.token)).notificationEmail, "reader@example.com");
+  assert.equal((await identity(f)).notificationEmail, "", "anonymous readers cannot read a private email");
+  const next = await (await f.message({ email: "reader@example.com" }, session.token, "/blog/next/")).json();
+  assert.match(next.notice, /不需再次收信確認/);
+  await f.message({}, undefined, "/blog/unselected/");
+  await f.app.flushMail();
+  assert.equal(f.deliveries.length, 1, "no repeated verification or automatic subscription on unrelated pages");
+  await f.message({ replyTo: next.message.id, body: "另一位讀者回覆" }, undefined, "/blog/next/");
+  await f.app.flushMail();
+  assert.equal(f.deliveries.length, 2);
+  assert.match(f.deliveries[1].payload.text, /另一位讀者回覆/);
+  const history = await (await fetch(`${f.base}/v1/comments/messages?page=/blog/next/`)).text();
+  assert.ok(!history.includes("reader@example.com"));
+  const again = await signedIn(f);
+  assert.equal(again.notificationEmail, "reader@example.com", "verification survives logging in again");
+  await f.action(f.unsubUrl(f.deliveries[1]), "POST");
+  assert.equal((await identity(f, again.token)).notificationEmail, "reader@example.com", "unsubscribing one thread retains the account email verification");
+  await f.message({ email: "reader@example.com" }, again.token, "/blog/after-unsubscribe/");
+  await f.app.flushMail();
+  assert.equal(f.deliveries.length, 2);
+});
+
+test("email verification cannot be borrowed by an anonymous visitor, another GitHub account, or another address", async (t) => {
+  const f = await fixture(t);
+  const first = await signedIn(f);
+  await f.message({ email: "reader@example.com" }, first.token);
+  await f.app.flushMail();
+  await f.action(f.confirmUrl(f.deliveries[0]), "POST");
+  await f.message({ email: "reader@example.com", githubId: 1234 });
+  f.setProfile({ id: 5678, login: "Other-reader", name: "Other" });
+  const second = await signedIn(f);
+  assert.equal(second.notificationEmail, "");
+  const other = await (await f.message({ email: "reader@example.com", githubId: 1234 }, second.token)).json();
+  assert.match(other.notice, /確認/);
+  await f.message({ email: "new@example.com" }, first.token);
+  await f.app.flushMail();
+  assert.equal(f.deliveries.length, 4, "all three unverified combinations require their own confirmation");
+  assert.equal((await identity(f, second.token)).notificationEmail, "");
+});
+
+test("unlink requires authentication, cancels owned subscriptions and pending mail, and preserves other accounts", async (t) => {
+  const f = await fixture(t);
+  const first = await signedIn(f);
+  const root = (await (await f.message({ email: "reader@example.com" }, first.token)).json()).message;
+  await f.app.flushMail();
+  await f.action(f.confirmUrl(f.deliveries[0]), "POST");
+  f.setProfile({ id: 5678, login: "Other-reader", name: "Other" });
+  const second = await signedIn(f);
+  const otherRoot = (await (await f.message({ email: "other@example.com" }, second.token)).json()).message;
+  await f.app.flushMail();
+  await f.action(f.confirmUrl(f.deliveries[1]), "POST");
+  await f.message({ replyTo: root.id });
+  assert.equal((await f.post("/v1/comments/auth/email/unlink", {})).status, 401);
+  assert.equal((await f.post("/v1/comments/auth/email/unlink", {}, first.token)).status, 200);
+  assert.equal((await identity(f, first.token)).notificationEmail, "");
+  assert.equal((await identity(f, second.token)).notificationEmail, "other@example.com");
+  await f.app.flushMail();
+  assert.equal(f.deliveries.length, 2, "the pending reply for the unlinked account was cancelled");
+  await f.message({ replyTo: otherRoot.id });
+  await f.app.flushMail();
+  assert.equal(f.deliveries.length, 3);
+  assert.equal(f.deliveries[2].payload.to[0], "other@example.com");
+  await f.message({ email: "reader@example.com" }, first.token);
+  await f.app.flushMail();
+  assert.equal(f.deliveries.length, 4, "using an unlinked email requires fresh verification");
 });
 
 test("notification retries reuse the exact idempotency key and durable payload", async (t) => {

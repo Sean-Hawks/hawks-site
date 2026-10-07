@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import { Github, RefreshCw, Reply, Send, X } from "lucide-react";
+import { AlertCircle, CheckCircle2, Github, Loader2, RefreshCw, Reply, Send, X } from "lucide-react";
 import CommentVerification from "./CommentVerification";
 import useCommentIdentity from "./useCommentIdentity";
 import {
@@ -19,22 +19,70 @@ const { apiOrigin: api, siteKey } = commentsConfig;
 const fieldClass =
   "w-full border border-[rgb(var(--line)/0.22)] bg-[rgb(var(--panel)/0.65)] px-4 py-3.5 text-base text-[rgb(var(--text))] placeholder:text-[rgb(var(--muted))] disabled:opacity-55 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[rgb(var(--accent))]";
 
+function CommentFeedback({
+  tone,
+  title,
+  children,
+}: {
+  tone: "success" | "error" | "pending";
+  title: string;
+  children?: React.ReactNode;
+}) {
+  const Icon = tone === "error" ? AlertCircle : tone === "pending" ? Loader2 : CheckCircle2;
+  return (
+    <div
+      role={tone === "error" ? "alert" : "status"}
+      aria-atomic="true"
+      className={`flex items-start gap-3 border px-4 py-3 text-sm leading-6 ${
+        tone === "error"
+          ? "border-[rgb(var(--purple)/0.5)] bg-[rgb(var(--purple)/0.08)]"
+          : "border-[rgb(var(--accent)/0.4)] bg-[rgb(var(--accent)/0.08)]"
+      }`}
+    >
+      <Icon
+        size={20}
+        aria-hidden="true"
+        className={`mt-0.5 shrink-0 ${tone === "pending" ? "animate-spin motion-reduce:animate-none" : ""}`}
+      />
+      <div>
+        <p className="font-semibold">{title}</p>
+        {children && <div className="mt-1 text-[rgb(var(--muted))]">{children}</div>}
+      </div>
+    </div>
+  );
+}
+
 function CommentThread({
   message,
   childrenByParent,
   byId,
   onReply,
+  sent,
+  busy,
   depth = 0,
 }: {
   message: CommentMessage;
   childrenByParent: Map<number, CommentMessage[]>;
   byId: Map<number, CommentMessage>;
   onReply: (message: CommentMessage) => void;
+  sent: { id: number; notice: string } | null;
+  busy: boolean;
   depth?: number;
 }) {
   return (
-    <li id={`comment-${message.id}`} className="scroll-mt-24">
+    <li
+      id={`comment-${message.id}`}
+      tabIndex={-1}
+      className="scroll-mt-24 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[rgb(var(--accent))]"
+    >
       <article className="border-b border-[rgb(var(--line)/0.10)] py-5">
+        {sent?.id === message.id && (
+          <div className="mb-4">
+            <CommentFeedback tone="success" title="已新增這則留言">
+              {sent.notice}
+            </CommentFeedback>
+          </div>
+        )}
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
           {message.githubId && !message.deleted ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -103,7 +151,8 @@ function CommentThread({
           <button
             type="button"
             onClick={() => onReply(message)}
-            className="mt-3 inline-flex items-center gap-1.5 text-xs text-[rgb(var(--muted))] hover:text-[rgb(var(--accent))]"
+            disabled={busy}
+            className="mt-3 inline-flex items-center gap-1.5 text-xs text-[rgb(var(--muted))] hover:text-[rgb(var(--accent))] disabled:opacity-50"
           >
             <Reply size={14} aria-hidden="true" />
             回覆
@@ -125,6 +174,8 @@ function CommentThread({
               childrenByParent={childrenByParent}
               byId={byId}
               onReply={onReply}
+              sent={sent}
+              busy={busy}
               depth={depth + 1}
             />
           ))}
@@ -142,9 +193,10 @@ function PageComments({ page }: { page: string }) {
   const [sending, setSending] = useState(false);
   const [loadError, setLoadError] = useState("");
   const [sendError, setSendError] = useState("");
-  const [notice, setNotice] = useState("");
+  const [sent, setSent] = useState<{ id: number; notice: string } | null>(null);
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState<string | null>(null);
+  const [subscribe, setSubscribe] = useState(false);
   const [body, setBody] = useState("");
   const [website, setWebsite] = useState("");
   const [replyTo, setReplyTo] = useState<CommentMessage | null>(null);
@@ -156,6 +208,7 @@ function PageComments({ page }: { page: string }) {
   const loadInFlight = useRef(false);
   const sendInFlight = useRef(false);
   const endpoint = `${api}/v1/comments/messages?page=${encodeURIComponent(page)}`;
+  const emailValue = email ?? identity.notificationEmail;
   const load = useCallback(
     async (before?: number) => {
       if (!api || loadInFlight.current || sendInFlight.current) return;
@@ -203,12 +256,31 @@ function PageComments({ page }: { page: string }) {
     };
   }, [load]);
 
+  useEffect(() => {
+    if (!sent) return;
+    const frame = window.requestAnimationFrame(() => {
+      const element = document.getElementById(`comment-${sent.id}`);
+      element?.focus({ preventScroll: true });
+      element?.scrollIntoView({
+        block: "center",
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+          ? "instant"
+          : "smooth",
+      });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [sent]);
+
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (
       !api ||
       loadInFlight.current ||
       sendInFlight.current ||
+      identity.pending ||
+      identity.signingOut ||
+      identity.removingEmail ||
+      (subscribe && !emailValue.trim()) ||
       !body.trim() ||
       (siteKey && !token)
     )
@@ -216,12 +288,12 @@ function PageComments({ page }: { page: string }) {
     sendInFlight.current = true;
     setSending(true);
     setSendError("");
-    setNotice("");
+    setSent(null);
     const payload = {
       name: name.trim() || identity.user?.name || "匿名",
       body: body.trim(),
       replyTo: replyTo?.id ?? null,
-      email: email.trim(),
+      email: subscribe ? emailValue.trim() : "",
     };
     const content = JSON.stringify({
       ...payload,
@@ -253,7 +325,7 @@ function PageComments({ page }: { page: string }) {
       setBody("");
       setReplyTo(null);
       pending.current = null;
-      setNotice(data.notice || "留言已送出。");
+      setSent({ id: data.message.id, notice: data.notice || "留言已送出。" });
       try {
         localStorage.setItem("hawks:comment-name", name.trim());
       } catch {
@@ -281,12 +353,23 @@ function PageComments({ page }: { page: string }) {
   }
   function reply(message: CommentMessage) {
     setReplyTo(message);
-    setNotice("");
+    setSent(null);
+    setSendError("");
     textarea.current?.focus();
   }
   const byId = new Map(messages.map((message) => [message.id, message]));
   const childrenByParent = new Map<number, CommentMessage[]>();
   const roots: CommentMessage[] = [];
+  const submitGuidance =
+    loading ? "正在讀取留言，完成後即可送出。" :
+    identity.pending ? "請完成 GitHub 登入，或取消登入後匿名留言。" :
+    identity.signingOut ? "正在登出，完成後即可匿名留言。" :
+    identity.removingEmail ? "正在移除通知信箱，完成後即可送出。" :
+    subscribe && !emailValue.trim() ? "請填寫接收回覆通知的 Email，或取消勾選通知。" :
+    [...name.trim()].length > 24 ? "顯示名稱超過 24 字，請縮短後再送出。" :
+    [...body.trim()].length > 1000 ? "留言超過 1,000 字，請縮短後再送出。" :
+    !body.trim() ? "寫下留言後即可送出；名稱選填，回覆通知可自行開啟。" :
+    siteKey && !token ? "請先完成安全驗證，即可送出留言。" : "";
   for (const message of messages) {
     if (message.replyTo !== null && byId.has(message.replyTo)) {
       const siblings = childrenByParent.get(message.replyTo) || [];
@@ -321,11 +404,11 @@ function PageComments({ page }: { page: string }) {
               </span>
               <button
                 type="button"
-                disabled={sending}
+                disabled={sending || identity.signingOut || identity.removingEmail}
                 onClick={() => void identity.logout()}
                 className="border border-[rgb(var(--accent)/0.7)] px-4 py-2 disabled:opacity-50"
               >
-                登出，改用匿名
+                {identity.signingOut ? "登出中…" : "登出，改用匿名"}
               </button>
             </div>
           ) : (
@@ -337,8 +420,11 @@ function PageComments({ page }: { page: string }) {
               }
               className="inline-flex items-center gap-2 border border-[rgb(var(--accent)/0.75)] bg-[rgb(var(--bg)/0.7)] px-4 py-3 text-base disabled:cursor-not-allowed disabled:opacity-50"
             >
-              <Github size={19} aria-hidden="true" />
-              {identity.pending ? "等待 GitHub 授權…" : "GitHub 登入"}
+              {identity.pending ? (
+                <Loader2 size={19} aria-hidden="true" className="animate-spin motion-reduce:animate-none" />
+              ) : <Github size={19} aria-hidden="true" />}
+              {identity.pending ? "等待 GitHub 授權…" :
+                !identity.features && !identity.error ? "讀取登入設定…" : "GitHub 登入"}
             </button>
           ))}
       </div>
@@ -364,24 +450,40 @@ function PageComments({ page }: { page: string }) {
         </p>
       )}
       {identity.pending && (
-        <button
-          type="button"
-          onClick={identity.cancel}
-          className="mt-3 text-sm underline underline-offset-4"
-        >
-          取消登入
-        </button>
+        <div className="mt-4">
+          <CommentFeedback tone="pending" title="正在等待 GitHub 授權">
+            <p>請在登入視窗完成授權，這裡會自動更新登入狀態。</p>
+            <p>若已關閉登入視窗，可取消後再試。</p>
+            <button type="button" onClick={identity.cancel} className="mt-2 underline underline-offset-4">
+              取消登入，改用匿名
+            </button>
+          </CommentFeedback>
+        </div>
       )}
       {identity.error && (
-        <p role="alert" className="mt-3 text-sm text-[rgb(var(--purple))]">
-          {identity.error}
-        </p>
+        <div className="mt-4">
+          <CommentFeedback tone="error" title="帳號操作未完成">
+            <p>{identity.error}</p>
+            {!identity.features && (
+              <button type="button" onClick={identity.retryConfig} className="mt-2 underline underline-offset-4">
+                重新讀取登入與通知設定
+              </button>
+            )}
+          </CommentFeedback>
+        </div>
+      )}
+      {identity.notice && (
+        <div className="mt-4">
+          <CommentFeedback tone="success" title={identity.noticeTitle}>
+            {identity.notice}
+          </CommentFeedback>
+        </div>
       )}
       {!api ? (
         <p className="mt-5 text-sm text-[rgb(var(--muted))]">留言區準備中。</p>
       ) : (
         <>
-          <form onSubmit={submit} className="mt-8 space-y-6">
+          <form onSubmit={submit} aria-busy={sending} className="mt-8 space-y-6">
             <div className="grid gap-6 md:grid-cols-2">
               <div>
                 <label htmlFor="comment-name" className="mb-1.5 block text-sm">
@@ -402,6 +504,7 @@ function PageComments({ page }: { page: string }) {
                   className={fieldClass}
                   placeholder={identity.user?.name || "匿名"}
                   aria-describedby="comment-name-guidance"
+                  aria-invalid={[...name.trim()].length > 24}
                 />
                 <p
                   id="comment-name-guidance"
@@ -411,30 +514,67 @@ function PageComments({ page }: { page: string }) {
                 </p>
               </div>
               <div>
-                <label htmlFor="comment-email" className="mb-1.5 block text-sm">
-                  電子郵件{" "}
-                  <span className="text-xs text-[rgb(var(--muted))]">選填</span>
+                <label htmlFor="comment-subscribe" className="flex min-h-11 cursor-pointer items-center gap-3 text-sm">
+                  <input
+                    id="comment-subscribe"
+                    type="checkbox"
+                    checked={subscribe}
+                    onChange={(event) => setSubscribe(event.target.checked)}
+                    disabled={sending || identity.removingEmail || !identity.features?.emailEnabled}
+                    className="h-4 w-4 accent-[rgb(var(--accent))]"
+                    aria-describedby="comment-email-guidance"
+                  />
+                  接收此討論串的回覆通知
                 </label>
-                <input
+                {subscribe && <>
+                  <label htmlFor="comment-email" className="mb-1.5 mt-2 block text-sm">通知信箱</label>
+                  <input
                   id="comment-email"
                   type="email"
                   autoComplete="email"
                   maxLength={254}
-                  value={email}
+                  value={emailValue}
                   onChange={(event) => setEmail(event.target.value)}
-                  disabled={sending || !identity.features?.emailEnabled}
+                  disabled={sending || identity.removingEmail}
+                  required
                   className={fieldClass}
-                  placeholder="用於討論串回覆通知，不會公開"
+                  placeholder="你的 Email，不會公開"
                   aria-describedby="comment-email-guidance"
                 />
+                </>}
                 <p
                   id="comment-email-guidance"
                   className="mt-1.5 text-xs leading-5 text-[rgb(var(--muted))]"
                 >
                   {identity.features?.emailEnabled
-                    ? "填寫並送出即訂閱此討論串；需收信確認，可隨時取消。"
+                    ? !subscribe ? "不勾選就不寄信；仍可正常留言。"
+                      : identity.notificationEmail && emailValue.trim().toLowerCase() === identity.notificationEmail
+                        ? "使用帳號已驗證的信箱，送出後即訂閱，不必再收確認信。"
+                        : identity.user
+                          ? "第一次需收信確認；同一 GitHub 帳號之後訂閱其他討論串不必再驗證。"
+                          : "匿名訂閱需收信確認；登入 GitHub 可在驗證一次後沿用通知信箱。"
                     : "回覆通知暫時無法使用，留空仍可送出留言。"}
                 </p>
+                {identity.notificationEmail && (
+                  <details className="mt-3 text-xs text-[rgb(var(--muted))]">
+                    <summary className="min-h-8 cursor-pointer">管理通知信箱</summary>
+                    <p className="mt-2 break-all">已驗證：{identity.notificationEmail}</p>
+                    <p className="mt-1">移除後會取消這個 GitHub 帳號的所有討論串通知。</p>
+                    <button
+                      type="button"
+                      disabled={sending || identity.signingOut || identity.removingEmail}
+                      onClick={async () => {
+                        if (await identity.unlinkEmail()) {
+                          setSubscribe(false);
+                          setEmail(null);
+                        }
+                      }}
+                      className="mt-2 min-h-11 underline underline-offset-4 disabled:opacity-50"
+                    >
+                      {identity.removingEmail ? "移除中…" : "移除信箱並取消所有通知"}
+                    </button>
+                  </details>
+                )}
               </div>
             </div>
             {replyTo && (
@@ -471,6 +611,7 @@ function PageComments({ page }: { page: string }) {
                 maxLength={2000}
                 required
                 aria-describedby="comment-guidance"
+                aria-invalid={[...body.trim()].length > 1000}
                 className={`${fieldClass} resize-y`}
                 placeholder="寫下你的想法…"
               />
@@ -506,9 +647,15 @@ function PageComments({ page }: { page: string }) {
               </div>
             )}
             {sendError && (
-              <p role="alert" className="text-sm text-[rgb(var(--purple))]">
-                {sendError}
-              </p>
+              <CommentFeedback tone="error" title="留言尚未確認送出">
+                <p>{sendError}</p>
+                <p className="mt-1">內容已保留，請依提示處理後再按送出。</p>
+              </CommentFeedback>
+            )}
+            {sending && (
+              <CommentFeedback tone="pending" title="正在送出留言">
+                請稍候，確認結果後會顯示你的留言。
+              </CommentFeedback>
             )}
             <div className="flex flex-wrap items-center gap-3">
               <button
@@ -516,20 +663,25 @@ function PageComments({ page }: { page: string }) {
                 disabled={
                   loading ||
                   sending ||
+                  identity.pending ||
+                  identity.signingOut ||
+                  identity.removingEmail ||
+                  (subscribe && !emailValue.trim()) ||
                   !body.trim() ||
                   [...body.trim()].length > 1000 ||
                   [...name.trim()].length > 24 ||
                   Boolean(siteKey && !token)
                 }
+                aria-describedby="comment-submit-guidance"
                 className="inline-flex items-center gap-2 border border-[rgb(var(--accent)/0.75)] bg-[rgb(var(--bg)/0.7)] px-5 py-3 text-base font-semibold disabled:cursor-not-allowed disabled:opacity-45"
               >
-                <Send size={15} aria-hidden="true" />
+                {sending ? <Loader2 size={15} aria-hidden="true" className="animate-spin motion-reduce:animate-none" /> : <Send size={15} aria-hidden="true" />}
                 {sending ? "送出中…" : "送出留言"}
               </button>
-              <span role="status" className="text-sm text-[rgb(var(--muted))]">
-                {notice}
-              </span>
             </div>
+            <p id="comment-submit-guidance" className="text-sm text-[rgb(var(--muted))]">
+              {sending ? "" : submitGuidance}
+            </p>
           </form>
           <div className="mt-6 border-t border-[rgb(var(--line)/0.12)] pt-5">
             {loading && (
@@ -538,17 +690,17 @@ function PageComments({ page }: { page: string }) {
               </p>
             )}
             {loadError && (
-              <p role="alert" className="text-sm text-[rgb(var(--purple))]">
-                {loadError}{" "}
+              <CommentFeedback tone="error" title="無法讀取留言">
+                <p>{loadError}</p>
                 <button
                   type="button"
                   disabled={loading || sending}
-                  className="underline underline-offset-4"
+                  className="mt-2 underline underline-offset-4"
                   onClick={() => void load()}
                 >
-                  重試
+                  重新讀取留言
                 </button>
-              </p>
+              </CommentFeedback>
             )}
             {!loading && !loadError && messages.length === 0 && (
               <p className="py-4 text-sm text-[rgb(var(--muted))]">
@@ -573,6 +725,8 @@ function PageComments({ page }: { page: string }) {
                   childrenByParent={childrenByParent}
                   byId={byId}
                   onReply={reply}
+                  sent={sent}
+                  busy={sending}
                 />
               ))}
             </ol>

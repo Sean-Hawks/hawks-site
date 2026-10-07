@@ -4,7 +4,7 @@
 
 已支援匿名／暱稱、GitHub 身份與頭像、Email 回覆通知、首頁與每篇文章各自的討論串、巢狀回覆、較早留言分頁、送出重試去重、Turnstile 後端驗證、IP 速率限制與管理員刪除。首頁兩種 GUI、Blog、Talk、Library 詳頁都使用同一個留言元件。
 
-GitHub 與 Email 功能可各自啟用，缺少設定時不影響匿名留言。正式環境已設定 GitHub OAuth App，Email 使用 WSL 自架 Postfix／Rspamd，見 [啟用指南](deploy/INTEGRATIONS-SETUP.md)。Email 需收信確認，提供取消訂閱，不會出現在公開資料中。未登入者的暱稱不是已驗證身分；文字會直接公開。訊息以純文字顯示，不解譯 HTML 或 Markdown。未提供 Gravatar、審核佇列或圖片上傳。留言列表在進入頁面、按「重新整理」時讀取，送出後立即顯示自己的留言。
+GitHub 與 Email 功能可各自啟用，缺少設定時不影響匿名留言。正式環境已設定 GitHub OAuth App，Email 使用 WSL 自架 Postfix／Rspamd，見 [啟用指南](deploy/INTEGRATIONS-SETUP.md)。勾選「接收此討論串的回覆通知」才會訂閱；GitHub 帳號驗證一次信箱後，可在其他討論串沿用，匿名訂閱或新信箱仍需收信確認。可取消單串通知，或移除帳號信箱並取消所有通知，Email 不會出現在公開資料中。未登入者的暱稱不是已驗證身分；文字會直接公開。訊息以純文字顯示，不解譯 HTML 或 Markdown。未提供 Gravatar、審核佇列或圖片上傳。留言列表在進入頁面、按「重新整理」時讀取，送出後會定位到新留言並顯示結果；錯誤會保留內容並提示下一步。
 
 ## 本機預覽
 
@@ -29,7 +29,7 @@ NEXT_PUBLIC_COMMENTS_API_URL=http://127.0.0.1:8790 npm run dev
 
 ## WSL：systemd 部署
 
-已獨立部署在 `/home/sean8/apps/hawks-comments`，使用 `hawks-comments.service`；與 `/home/sean8/apps/hawks-agent` 的資料及服務分開。2026-10-07 確認 Ubuntu-24.04 原先為 Stopped，從 Windows 啟動後已恢復 SSH、Tailscale 與 bot。Node 為 `/home/sean8/.local/opt/hawks-agent-node/bin/node`（22.23.2），留言、登入、通知、SMTP 與 gateway 測試 31 項通過。以下步驟供重新部署使用。
+已獨立部署在 `/home/sean8/apps/hawks-comments`，使用 `hawks-comments.service`；與 `/home/sean8/apps/hawks-agent` 的資料及服務分開。2026-10-07 確認 Ubuntu-24.04 原先為 Stopped，從 Windows 啟動後已恢復 SSH、Tailscale 與 bot。Node 為 `/home/sean8/.local/opt/hawks-agent-node/bin/node`（22.23.2），留言、登入、通知、SMTP 與 gateway 測試 35 項通過。以下步驟供重新部署使用。
 
 把本資料夾的程式碼帶到 WSL，**不複製本機 `.env`、`.data` 或 node_modules**；以下指令在 WSL 上執行：
 

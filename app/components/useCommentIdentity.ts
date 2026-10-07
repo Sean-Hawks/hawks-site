@@ -10,7 +10,7 @@ import {
 const sessionKey = "hawks:comments-session";
 const pendingKey = "hawks:comments-login";
 type PendingLogin = { state: string; verifier: string; started: number };
-type LoginResult = { pending?: boolean; token?: string; user?: CommentUser };
+type LoginResult = { pending?: boolean; token?: string; user?: CommentUser; notificationEmail?: string };
 
 function storageGet(key: string) {
   try {
@@ -38,8 +38,16 @@ export default function useCommentIdentity(api: string | null) {
   const [features, setFeatures] = useState<CommentFeatures | null>(null);
   const [user, setUser] = useState<CommentUser | null>(null);
   const [token, setToken] = useState("");
+  const [notificationEmail, setNotificationEmail] = useState("");
+  const [removingEmail, setRemovingEmail] = useState(false);
+  const unlinkInFlight = useRef(false);
   const [pending, setPending] = useState<PendingLogin | null>(null);
   const [starting, setStarting] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
+  const logoutInFlight = useRef(false);
+  const [notice, setNotice] = useState("");
+  const [noticeTitle, setNoticeTitle] = useState("");
+  const [configRevision, setConfigRevision] = useState(0);
   const startInFlight = useRef(false);
   const attemptId = useRef(0);
   const [error, setError] = useState("");
@@ -48,6 +56,8 @@ export default function useCommentIdentity(api: string | null) {
     storageSet(sessionKey, null);
     setToken("");
     setUser(null);
+    setNotificationEmail("");
+    setNotice("");
   }, []);
   useEffect(() => {
     if (!api) return;
@@ -62,7 +72,7 @@ export default function useCommentIdentity(api: string | null) {
         const saved = storageGet(sessionKey);
         if (saved) {
           try {
-            const session = await commentsRequest<{ user: CommentUser }>(
+            const session = await commentsRequest<{ user: CommentUser; notificationEmail?: string }>(
               `${api}/v1/comments/auth/me`,
               { headers: { Authorization: `Bearer ${saved}` } },
             );
@@ -70,6 +80,7 @@ export default function useCommentIdentity(api: string | null) {
             if (active) {
               setToken(saved);
               setUser(session.user);
+              setNotificationEmail(session.notificationEmail || "");
             }
           } catch {
             if (active) invalidate();
@@ -97,7 +108,29 @@ export default function useCommentIdentity(api: string | null) {
     return () => {
       active = false;
     };
-  }, [api, invalidate]);
+  }, [api, invalidate, configRevision]);
+  useEffect(() => {
+    if (!api || !token) return;
+    let active = true;
+    // Returning from the email confirmation page refreshes the private binding
+    // without a full-page reload that would discard the comment draft.
+    async function refreshEmail() {
+      try {
+        const session = await commentsRequest<{ notificationEmail?: string }>(
+          `${api}/v1/comments/auth/me`,
+          { headers: { Authorization: `Bearer ${token}` } },
+        );
+        if (active) setNotificationEmail(session.notificationEmail || "");
+      } catch {
+        /* A temporary outage must not discard an otherwise valid session. */
+      }
+    }
+    window.addEventListener("focus", refreshEmail);
+    return () => {
+      active = false;
+      window.removeEventListener("focus", refreshEmail);
+    };
+  }, [api, token]);
   useEffect(() => {
     if (!api || !pending) return;
     let active = true;
@@ -129,7 +162,10 @@ export default function useCommentIdentity(api: string | null) {
         storageSet(pendingKey, null);
         setToken(result.token);
         setUser(result.user);
+        setNotificationEmail(result.notificationEmail || "");
         setPending(null);
+        setNoticeTitle("GitHub 登入成功");
+        setNotice(`已登入 @${result.user.githubLogin}，接下來的留言會顯示 GitHub 身分。`);
         try {
           popup.current?.close();
         } catch {
@@ -161,6 +197,7 @@ export default function useCommentIdentity(api: string | null) {
     const attempt = ++attemptId.current;
     setStarting(true);
     setError("");
+    setNotice("");
     popup.current = window.open(
       "",
       "hawks-comments-github",
@@ -219,6 +256,8 @@ export default function useCommentIdentity(api: string | null) {
     setStarting(false);
     storageSet(pendingKey, null);
     setPending(null);
+    setNoticeTitle("已取消登入");
+    setNotice("已取消登入，仍可匿名留言。");
     try {
       popup.current?.close();
     } catch {
@@ -226,8 +265,11 @@ export default function useCommentIdentity(api: string | null) {
     }
   }
   async function logout() {
-    if (!api) return;
+    if (!api || logoutInFlight.current) return;
+    logoutInFlight.current = true;
+    setSigningOut(true);
     setError("");
+    setNotice("");
     try {
       await commentsRequest(`${api}/v1/comments/auth/logout`, {
         method: "POST",
@@ -238,19 +280,59 @@ export default function useCommentIdentity(api: string | null) {
         body: "{}",
       });
       invalidate();
+      setNoticeTitle("已切換匿名留言");
+      setNotice("已登出，接下來會以匿名或你填寫的暱稱留言。");
     } catch {
       setError("暫時無法登出，請稍後再試。");
+    } finally {
+      logoutInFlight.current = false;
+      setSigningOut(false);
+    }
+  }
+  function retryConfig() {
+    setError("");
+    setConfigRevision((value) => value + 1);
+  }
+  async function unlinkEmail() {
+    if (!api || !token || unlinkInFlight.current) return false;
+    unlinkInFlight.current = true;
+    setRemovingEmail(true);
+    setError("");
+    setNotice("");
+    try {
+      await commentsRequest(`${api}/v1/comments/auth/email/unlink`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: "{}",
+      });
+      setNotificationEmail("");
+      setNoticeTitle("已移除通知信箱");
+      setNotice("已取消此 GitHub 帳號的所有回覆通知。之後仍可重新驗證信箱。");
+      return true;
+    } catch {
+      setError("無法移除通知信箱，請稍後重試。");
+      return false;
+    } finally {
+      unlinkInFlight.current = false;
+      setRemovingEmail(false);
     }
   }
   return {
     features,
     user,
     token,
+    notificationEmail,
+    removingEmail,
     pending: Boolean(pending) || starting,
+    signingOut,
+    notice,
+    noticeTitle,
     error,
     login,
     cancel,
     logout,
     invalidate,
+    retryConfig,
+    unlinkEmail,
   };
 }

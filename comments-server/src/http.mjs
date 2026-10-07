@@ -5,6 +5,12 @@ export class HttpError extends Error {
   }
 }
 
+export function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, (character) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+  })[character]);
+}
+
 export function html(res, title, content) {
   res.writeHead(200, {
     "Content-Type": "text/html; charset=utf-8",

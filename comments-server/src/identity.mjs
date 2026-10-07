@@ -17,6 +17,10 @@ export function createIdentity({ db, config, fetchImpl, now }) {
     );
     CREATE TABLE IF NOT EXISTS login_sessions (
       token_hash TEXT PRIMARY KEY, user_id INTEGER NOT NULL REFERENCES github_users(id), expires INTEGER NOT NULL
+    );
+    CREATE TABLE IF NOT EXISTS notification_emails (
+      user_id INTEGER NOT NULL REFERENCES github_users(id), email TEXT NOT NULL,
+      verified_at INTEGER NOT NULL, PRIMARY KEY(user_id,email)
     );`);
   const enabled = Boolean(config.githubClientId && config.githubClientSecret);
   function publicUser(user) {
@@ -41,6 +45,11 @@ export function createIdentity({ db, config, fetchImpl, now }) {
       throw new HttpError(401, "登入已到期，請重新登入或改用匿名留言。");
     return publicUser(record);
   }
+  function notificationEmail(userId) {
+    return db.prepare(
+      "SELECT email FROM notification_emails WHERE user_id=? ORDER BY verified_at DESC,email LIMIT 1",
+    ).get(userId)?.email || "";
+  }
   async function handle(
     req,
     res,
@@ -50,16 +59,41 @@ export function createIdentity({ db, config, fetchImpl, now }) {
     const path = url.pathname;
     if (!path.startsWith("/v1/comments/auth/")) return false;
     if (path === "/v1/comments/auth/me" && req.method === "GET") {
-      json(res, 200, { user: user(req.headers.authorization) });
+      const account = user(req.headers.authorization);
+      json(res, 200, {
+        user: account,
+        notificationEmail: account ? notificationEmail(account.githubId) : "",
+      });
+      return true;
+    }
+    if (path === "/v1/comments/auth/email/unlink" && req.method === "POST") {
+      requireOrigin();
+      const account = user(req.headers.authorization);
+      if (!account) throw new HttpError(401, "請先登入 GitHub。");
+      db.exec("BEGIN IMMEDIATE");
+      try {
+        db.prepare("DELETE FROM notification_emails WHERE user_id=?").run(account.githubId);
+        db.prepare("DELETE FROM subscriptions WHERE github_id=?").run(account.githubId);
+        db.exec("COMMIT");
+      } catch (error) {
+        db.exec("ROLLBACK");
+        throw error;
+      }
+      json(res, 200, { ok: true });
       return true;
     }
     if (path === "/v1/comments/auth/logout" && req.method === "POST") {
       requireOrigin();
-      user(req.headers.authorization);
-      const token = req.headers.authorization?.slice("Bearer hcs_".length);
-      if (token)
+      // Logout must still succeed after expiry or a previous revocation so the
+      // browser can clear its session and return to anonymous commenting.
+      const match = /^Bearer hcs_([A-Za-z0-9_-]{43})$/.exec(
+        req.headers.authorization || "",
+      );
+      if (req.headers.authorization && !match)
+        throw new HttpError(401, "登入驗證資料無效。");
+      if (match)
         db.prepare("DELETE FROM login_sessions WHERE token_hash=?").run(
-          hash(token),
+          hash(match[1]),
         );
       json(res, 200, { ok: true });
       return true;
@@ -219,6 +253,7 @@ export function createIdentity({ db, config, fetchImpl, now }) {
             .prepare("SELECT * FROM github_users WHERE id=?")
             .get(record.user_id),
         ),
+        notificationEmail: notificationEmail(record.user_id),
         expiresAt: new Date(expires).toISOString(),
       });
       return true;

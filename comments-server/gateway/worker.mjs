@@ -53,6 +53,7 @@ const gateway = {
       "/v1/comments/config": ["GET"],
       "/v1/comments/auth/me": ["GET"],
       "/v1/comments/auth/logout": ["POST"],
+      "/v1/comments/auth/email/unlink": ["POST"],
       "/v1/comments/auth/github/start": ["POST"],
       "/v1/comments/auth/github/session": ["POST"],
       "/v1/comments/auth/github/callback": ["GET"],
@@ -90,7 +91,7 @@ const gateway = {
     const authorization = request.headers.get("Authorization");
     if (
       (messages ||
-        ["/v1/comments/auth/me", "/v1/comments/auth/logout"].includes(
+        ["/v1/comments/auth/me", "/v1/comments/auth/logout", "/v1/comments/auth/email/unlink"].includes(
           url.pathname,
         )) &&
       /^Bearer hcs_[A-Za-z0-9_-]{43}$/.test(authorization || "")
