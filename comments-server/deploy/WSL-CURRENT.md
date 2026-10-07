@@ -64,3 +64,9 @@ Windows 管理員修正腳本已放在：
 Windows SMTP 代理已完成並測試接受自有收件者、拒絕未知地址與外部 relay，兩個安裝腳本已放到 `%LOCALAPPDATA%\Hawks`。使用者已執行管理員安裝（輸出排程 Running）、完成路由器轉送與 DHCP 固定配給；Windows `0.0.0.0:25` 正在監聽。美國與瑞士外部節點都成功連上公開 TCP 25，Postfix 保留兩個原始來源 IP。經公開 IP 的 NAT loopback 測試信使用 TLS 1.3 並成功投遞至 IMAP。MX 已切換為 `10 mail.hawks.tw.`，三台 Gandi 權威 DNS、Cloudflare 與 Google resolver 皆已確認；SMTP 接受 `me@hawks.tw`；使用者 Gmail 的測試信已於 22:55:48 由 Google MTA 直接經 ESMTPS 投遞至 WSL Postfix／Dovecot，IMAP UID 6 的正文已讀回，完整外部收信通過。Windows 重開機仍未測試；PBL 排除尚未申請，`me@hawks.tw` 已可作為驗證收件地址。操作、測試範圍與回復見 [MAILBOX-SETUP.md](MAILBOX-SETUP.md)。
 
 留言通知寄件地址 `comments@hawks.tw` 已新增為 `me@hawks.tw` 的收件別名，接收回信與退信；原有 postmaster／abuse 別名保留，alias map 修改前已私密備份，公開 SMTP 收件測試通過。
+
+## Roundcube 網頁信箱
+
+使用者選擇 Roundcube。已恢復既有 1.7.4 的網頁服務，入口為 **https://hawks-wsl.tail5bdb5f.ts.net:9443/**（Tailscale tailnet only），帳號 `me@hawks.tw`，密碼與 IMAP 相同。
+
+發現 Caddy 於開機時綁定尚未就緒的 Tailscale IP 而失敗；已新增依賴 tailscaled／PHP FPM 與每 15 秒失敗重試的 drop-in，設定修改前已私密備份。Caddy、PHP FPM active，既有 HTTPS 9443 → loopback 9080 路由已正常運作。Roundcube 自身 PHP 類別的 SQLite、IMAP 登入／讀信與 SMTP STARTTLS 登入／本機寄信測試通過；網頁與 CSS 回覆 200，installer／config 404。瀏覽器控制逾時，網頁實際登入待使用者確認；Windows 重開機仍未測試。細節見 [MAILBOX-SETUP.md](MAILBOX-SETUP.md)。

@@ -1,0 +1,8 @@
+# /etc/systemd/system/caddy.service.d/hawks-webmail-retry.conf
+[Unit]
+Wants=tailscaled.service php8.3-fpm.service
+After=tailscaled.service php8.3-fpm.service network-online.target
+
+[Service]
+Restart=on-failure
+RestartSec=15s

@@ -25,6 +25,32 @@ wsl -d Ubuntu-24.04 -u root -- cat /etc/hawks-mail/initial-password
 
 只在自己的終端取得並填入郵件客戶端，無須貼回聊天室。
 
+## Roundcube 網頁信箱
+
+使用者選擇免費開源的 Roundcube。入口：**https://hawks-wsl.tail5bdb5f.ts.net:9443/**，須先連上 Tailscale，帳號為 `me@hawks.tw`，密碼與 IMAP 相同。這是網頁信箱網址；上方未帶埠號的主機名則供郵件軟體填寫伺服器。
+
+沿用 WSL 既有 Roundcube **1.7.4**（[官方穩定版](https://roundcube.net/download/)）、PHP 8.3 FPM 與 Caddy：
+
+- 程式：`/opt/hawks-webmail/current` → `/opt/hawks-webmail/releases/1.7.4`。
+- 設定：`/etc/hawks-webmail/config.inc.php`；session 加密 key 留在 WSL 私密檔案。
+- SQLite：`/var/lib/hawks-webmail/roundcube.sqlite`（webmail 0600），儲存使用者偏好／通訊錄等，信件仍在 Dovecot Maildir。
+- 網頁：Tailscale Serve **9443（tailnet only）** → Caddy `127.0.0.1:9080` → `/run/php/hawks-webmail.sock` → PHP FPM 的 `webmail` 使用者。
+- HTTP document root 為 `public_html`；installer、config 等路徑回覆 404。Session cookie 帶 Secure／HttpOnly／SameSite=Lax，介面為繁體中文 Elastic。
+- IMAP `ssl://hawks-wsl.tail5bdb5f.ts.net:993`、SMTP `tls://hawks-wsl.tail5bdb5f.ts.net:587`，兩者均保留憑證與主機名驗證；使用登入者自己的帳密，不將密碼寫入程式碼。
+
+發現 Caddy 開機時嘗試綁定尚未出現的 Tailscale IP `100.122.23.119:9081`，導致整個 Caddy 服務失敗，包括 Roundcube。已新增 [caddy-webmail-retry.conf.example](caddy-webmail-retry.conf.example) 對應的 systemd drop-in，等待 tailscaled／PHP FPM 並在失敗後每 15 秒重試，恢復 Caddy；既有網站設定沿用。修改前的設定備份在 `/etc/hawks-webmail/backups/`（root 私密目錄）。未新增公開 Funnel 或路由器 HTTP 埠。
+
+```sh
+ssh hawks-wsl 'sudo systemctl status caddy php8.3-fpm --no-pager'
+ssh hawks-wsl 'sudo systemctl restart caddy'
+```
+
+驗證：HTTPS 首頁與 CSS 回覆 200，installer／config 回覆 404；以 PHP FPM 相同的 `webmail` 使用者透過 **Roundcube 自身的 PHP 類別**確認 SQLite、TLS IMAP 登入與讀取 Gmail 測試信，SMTP STARTTLS 驗證及本機投遞通過，新測試信的 DKIM 簽章與 IMAP 讀回通過（UID 7）。Chrome 控制操作逾時，尚未自動完成瀏覽器登入；已請使用者確認網頁能登入並看見「hi」。沒有用替代瀏覽器自動化繞過控制連線。
+
+## 手機 Gmail App
+
+使用者表示手機一直連著 Tailscale，可以加入此 IMAP 信箱。Gmail App → 頭像 → 新增其他帳戶 → 其他 → 輸入 `me@hawks.tw` → 個人（IMAP），使用本文件的收信／寄信主機、埠、加密方式及完整帳密。參考 [Google 官方手動設定步驟](https://support.google.com/mail/answer/6078445?hl=zh-Hant&co=GENIE.Platform%3DAndroid)。這是手機 App 直接讀取 WSL 信箱，目前沒有把信件轉寄到 Gmail 網頁版。
+
 ## Windows 收信入口
 
 Internet TCP 25 → ASUS 路由器 → Windows TCP 25 → Tailscale → Postfix `100.122.23.119:2525` → Rspamd → Dovecot LMTP → Maildir。
