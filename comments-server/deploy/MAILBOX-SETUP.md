@@ -1,0 +1,88 @@
+# WSL 自架信箱：me@hawks.tw
+
+2026-10-07（Asia/Taipei）。使用既有 Postfix 3.8、Dovecot 2.3、Rspamd 與虛擬使用者 `me@hawks.tw`。信件保存在 `/var/vmail/hawks.tw/me/Maildir`，啟用的 Sieve 為 `keep;`，目前不轉寄到 Gmail。使用者確認只有 `me@hawks.tw` 需要搬遷。
+
+## 收信客戶端
+
+客戶端須先連上此帳號的 Tailscale。
+
+| 項目 | 設定 |
+| --- | --- |
+| Email／登入帳號 | `me@hawks.tw` |
+| IMAP 主機 | `hawks-wsl.tail5bdb5f.ts.net` |
+| IMAP 埠／加密 | `993`，SSL/TLS |
+| SMTP 主機 | `hawks-wsl.tail5bdb5f.ts.net` |
+| SMTP 埠／加密 | `587`，STARTTLS |
+| SMTP 驗證 | 使用與 IMAP 相同的完整帳號及密碼 |
+
+憑證由 Let's Encrypt 簽發，名稱是上述 Tailscale 主機名；客戶端使用 `mail.hawks.tw` 會遇到憑證名稱不符。既有每日 `hawks-mail-renew-tls.timer` 負責更新憑證。993 與 587 僅綁定 WSL loopback／Tailscale，無須開放到 Internet。
+
+密碼保留在 WSL `/etc/hawks-mail/initial-password`（root 0600）；沒有寫入 Git 或本文件。在自己 Windows 的 PowerShell 查看：
+
+```powershell
+wsl -d Ubuntu-24.04 -u root -- cat /etc/hawks-mail/initial-password
+```
+
+只在自己的終端取得並填入郵件客戶端，無須貼回聊天室。
+
+## Windows 收信入口
+
+Internet TCP 25 → ASUS 路由器 → Windows TCP 25 → Tailscale → Postfix `100.122.23.119:2525` → Rspamd → Dovecot LMTP → Maildir。
+
+[windows-mail-ingress.ps1](windows-mail-ingress.ps1) 用 Windows PowerShell 5.1 的 .NET TCP 代理傳遞 PROXY v1 原始來源 IP；WSL 防火牆只允許 Windows 的 Tailscale IP 與 loopback 連入 2525。代理限制 64 個並行連線、10 秒後端連線逾時與 120 秒串流閒置逾時，內容及 TLS 位元組不經修改。Postfix 負責收件地址與 relay 限制。
+
+[install-windows-mail-ingress.ps1](install-windows-mail-ingress.ps1) 已放到 Windows 使用者的 `%LOCALAPPDATA%\Hawks`。在 Windows **管理員 PowerShell** 執行：
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$env:LOCALAPPDATA\Hawks\install-windows-mail-ingress.ps1"
+```
+
+安裝程式將代理放進 `%ProgramData%\Hawks\Mail`，目錄僅 SYSTEM／管理員可修改，建立 SYSTEM 開機排程 `Hawks Mail SMTP Ingress`（不限執行時間、失敗重試）與單一 TCP 25 防火牆規則 `Hawks-Mail-SMTP-Ingress`。更新前會備份既有同名排程與腳本，遇到其他 TCP 25 listener 會停止安裝而保留它。這個腳本不修改路由器或 DNS。
+
+路由器 UPnP 對 TCP 25 回覆 `718 ConflictInMappingEntry`，沒有成功建立映射。需要在 ASUS `192.168.50.1` 手動設定：
+
+- 外部 TCP 25 → Windows Ethernet `192.168.50.52` 的 TCP 25。
+- 對 Hawks-PC Ethernet 設定 DHCP 固定配給，避免轉送目的 IP 改變。
+- 若已有 TCP 25 規則，先核對用途及目的 IP，不要直接覆蓋。
+
+先驗證從外部網路連線 `114.32.161.42:25` 能收到 `220 mail.hawks.tw ESMTP`，並測試寄給 `me@hawks.tw` 可由 IMAP 讀取，才進行 MX 切換。若路由器正確轉送仍無法連入，需要查 Windows 防火牆或 ISP 入站 25 埠限制。
+
+## Gandi MX 切換與回復
+
+**目前尚未切換。** 公開 MX 仍為 `10 spool.mail.gandi.net.` 與 `50 fb.mail.gandi.net.`，公開 SMTP 25 埠仍未通過測試。因此外部信件仍走原本 Gandi 轉址，WSL 尚不能接收一般外部來信。
+
+外部 SMTP 測試通過後，先在 Gandi 匯出／備份 DNS 記錄，再於 `hawks.tw` 的 DNS records 編輯 **MX 記錄組**，改為：
+
+```dns
+@ 300 IN MX 10 mail.hawks.tw.
+```
+
+`mail.hawks.tw` 的 A 已為 `114.32.161.42`，現有 SPF、DKIM、DMARC 可保留。Gandi 的 [DNS 記錄管理說明](https://docs.gandi.net/en/domain_names/common_operations/dns_records.html) 提供操作與備份方法。不要改動網站 A／CNAME、NS 或其他 TXT。
+
+切換後等待舊 MX 的快取 TTL，從外部信箱寄到 `me@hawks.tw`，檢查 WSL IMAP 收件與 Postfix／Dovecot 紀錄，再申請 Spamhaus 驗證信。原 Gandi 轉址先保留，待過渡完成再整理。
+
+若自架入口故障，將 MX 記錄組恢復為：
+
+```dns
+@ IN MX 10 spool.mail.gandi.net.
+@ IN MX 50 fb.mail.gandi.net.
+```
+
+DNS 回復仍需等待快取過期。停用 Windows 代理可在管理員 PowerShell 執行：
+
+```powershell
+Stop-ScheduledTask -TaskName 'Hawks Mail SMTP Ingress'
+Unregister-ScheduledTask -TaskName 'Hawks Mail SMTP Ingress' -Confirm:$false
+Remove-NetFirewallRule -Name 'Hawks-Mail-SMTP-Ingress'
+```
+
+## 驗證紀錄與目前限制
+
+- WSL 與 Mac 都成功使用公開 CA 憑證驗證 IMAP 993 和 SMTP 587 STARTTLS，完整帳號密碼登入通過。
+- 留言專用 SMTP → Postfix → Dovecot LMTP → INBOX → IMAP 讀回通過。
+- Mac 的 SMTP 587 實際登入投遞至同一個自有信箱，DKIM 簽章 `d=hawks.tw; s=mail202609` 存在，IMAP 讀回通過。兩封本機測試信保留在 INBOX，未向外部收件者寄送。
+- Windows 代理實際編譯與 TCP／STARTTLS 轉送通過；Postfix 紀錄保留 Mac 的原始 Tailscale 來源 IP。
+- 收件者 `me@hawks.tw` 接受；不存在信箱回 `550`；未授權外部 relay 回 `554`，未提交測試信 DATA。
+- 最終兩個 PowerShell 腳本語法檢查通過。臨時 Windows 測試程序已停止。
+- Windows 管理員常駐安裝、手動路由器轉送、公開 TCP 25、MX 切換、真實外部收信與 Windows 重開機仍待驗證。不要把本機投遞成功視為外部收信已完成。
+- 現有 IP 的 Spamhaus PBL 排除尚未申請。信箱接通後才能收到驗證信；使用者認為 IP 是固定配給，但仍須確認符合 [Spamhaus 的申請條件](https://www.spamhaus.org/faqs/policy-blocklist-pbl/)。
