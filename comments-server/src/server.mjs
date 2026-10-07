@@ -50,10 +50,15 @@ export function readConfig(env = process.env) {
   const githubClientSecret = env.COMMENTS_GITHUB_CLIENT_SECRET || "";
   const resendApiKey = env.COMMENTS_RESEND_API_KEY || "";
   const mailFrom = env.COMMENTS_MAIL_FROM || "";
+  const mailTransport = env.COMMENTS_MAIL_TRANSPORT || "resend";
+  if (!["resend", "smtp"].includes(mailTransport))
+    throw new Error("COMMENTS_MAIL_TRANSPORT 必須為 resend 或 smtp");
   if (Boolean(githubClientId) !== Boolean(githubClientSecret))
     throw new Error("GitHub Client ID 與 Secret 必須一起設定");
-  if (Boolean(resendApiKey) !== Boolean(mailFrom))
+  if (mailTransport === "resend" && Boolean(resendApiKey) !== Boolean(mailFrom))
     throw new Error("Resend API Key 與寄件者必須一起設定");
+  if (mailTransport === "smtp" && !mailFrom)
+    throw new Error("SMTP 必須設定 COMMENTS_MAIL_FROM");
   if (mailFrom && (/[\r\n]/.test(mailFrom) || !mailFrom.includes("@")))
     throw new Error("COMMENTS_MAIL_FROM 無效");
   const publicApi = env.COMMENTS_PUBLIC_API_URL || "";
@@ -71,8 +76,18 @@ export function readConfig(env = process.env) {
     )
       throw new Error("COMMENTS_PUBLIC_API_URL 必須是 HTTPS origin");
   }
-  if ((githubClientId || resendApiKey) && !publicApi)
+  if ((githubClientId || mailFrom) && !publicApi)
     throw new Error("請設定 COMMENTS_PUBLIC_API_URL");
+  const smtpHost = env.COMMENTS_SMTP_HOST || "127.0.0.1";
+  const smtpPort = Number(env.COMMENTS_SMTP_PORT || 2526);
+  const smtpLocalAddress = env.COMMENTS_SMTP_LOCAL_ADDRESS || "127.2.4.7";
+  if (mailTransport === "smtp") {
+    for (const address of [smtpHost, smtpLocalAddress])
+      if (isIP(address) !== 4 || !address.startsWith("127."))
+        throw new Error("SMTP 僅支援本機 IPv4 loopback 位址");
+    if (!Number.isInteger(smtpPort) || smtpPort < 1 || smtpPort > 65535)
+      throw new Error("COMMENTS_SMTP_PORT 無效");
+  }
   const mailDailyLimit = Number(env.COMMENTS_MAIL_DAILY_LIMIT || 100);
   if (
     !Number.isInteger(mailDailyLimit) ||
@@ -94,6 +109,10 @@ export function readConfig(env = process.env) {
     githubClientSecret,
     resendApiKey,
     mailFrom,
+    mailTransport,
+    smtpHost,
+    smtpPort,
+    smtpLocalAddress,
     publicApi,
     siteOrigin,
     mailDailyLimit,
@@ -102,7 +121,12 @@ export function readConfig(env = process.env) {
 
 export function createCommentsServer(
   config,
-  { fetchImpl = fetch, now = Date.now, scheduleMail = true } = {},
+  {
+    fetchImpl = fetch,
+    now = Date.now,
+    scheduleMail = true,
+    smtpTransport,
+  } = {},
 ) {
   if (config.database !== ":memory:")
     mkdirSync(dirname(config.database), { recursive: true, mode: 0o700 });
@@ -145,7 +169,13 @@ export function createCommentsServer(
     "INSERT INTO messages (request_id, page, name, body, reply_to, created_at, github_id, github_login, notification_email) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
   );
   const identity = createIdentity({ db, config, fetchImpl, now });
-  const notifications = createNotifications({ db, config, fetchImpl, now });
+  const notifications = createNotifications({
+    db,
+    config,
+    fetchImpl,
+    now,
+    smtpTransport,
+  });
   const rates = new Map();
   const salt = randomUUID();
 

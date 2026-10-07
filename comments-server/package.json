@@ -3,10 +3,15 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=22.13" },
+  "engines": {
+    "node": ">=22.13"
+  },
   "scripts": {
     "start": "node --env-file-if-exists=.env src/main.mjs",
     "test": "node --test tests/*.test.mjs",
     "delete": "node --env-file-if-exists=.env src/delete.mjs"
+  },
+  "dependencies": {
+    "nodemailer": "10.0.15"
   }
 }

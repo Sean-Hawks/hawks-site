@@ -35,7 +35,7 @@ jobs:
           cache: "npm"
 
       - name: Install
-        run: npm ci
+        run: npm ci && npm ci --prefix comments-server
 
       - name: Verify source and regression tests
         run: npm run lint && npm test && npm --prefix comments-server test && npm run test:export

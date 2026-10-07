@@ -1,5 +1,6 @@
 import { createHash, randomBytes } from "node:crypto";
 import { HttpError, html } from "./http.mjs";
+import { createMailDelivery } from "./mail-delivery.mjs";
 
 const random = () => randomBytes(32).toString("base64url");
 const hash = (value) => createHash("sha256").update(value).digest("hex");
@@ -20,7 +21,13 @@ export function normalizeEmail(value) {
   return email;
 }
 
-export function createNotifications({ db, config, fetchImpl, now }) {
+export function createNotifications({
+  db,
+  config,
+  fetchImpl,
+  now,
+  smtpTransport,
+}) {
   db.exec(`
     CREATE TABLE IF NOT EXISTS subscriptions (
       id INTEGER PRIMARY KEY, page TEXT NOT NULL, root_id INTEGER NOT NULL REFERENCES messages(id),
@@ -38,7 +45,8 @@ export function createNotifications({ db, config, fetchImpl, now }) {
     CREATE INDEX IF NOT EXISTS mail_outbox_pending ON mail_outbox(status,next_attempt);
     CREATE TABLE IF NOT EXISTS mail_attempts (attempted_at INTEGER NOT NULL);
   `);
-  const enabled = Boolean(config.resendApiKey && config.mailFrom);
+  const delivery = createMailDelivery({ config, fetchImpl, smtpTransport });
+  const enabled = delivery.enabled;
   let dispatchPromise = null;
   let stopping = false;
   function queue(subscription, kind, message, text) {
@@ -225,17 +233,11 @@ export function createNotifications({ db, config, fetchImpl, now }) {
         now(),
       );
       try {
-        const response = await fetchImpl("https://api.resend.com/emails", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${config.resendApiKey}`,
-            "Content-Type": "application/json",
-            "Idempotency-Key": item.idempotency_key,
-          },
-          body: item.payload,
-          signal: AbortSignal.timeout(8000),
-        });
-        if (!response.ok) throw new Error("mail unavailable");
+        await delivery.send(
+          JSON.parse(item.payload),
+          item.idempotency_key,
+          item.created_at,
+        );
         db.prepare(
           "UPDATE mail_outbox SET status='sent',payload='{}',attempts=attempts+1 WHERE id=?",
         ).run(item.id);
@@ -260,6 +262,7 @@ export function createNotifications({ db, config, fetchImpl, now }) {
   async function stop() {
     stopping = true;
     await dispatchPromise;
+    delivery.close();
   }
   function cleanup() {
     db.prepare(

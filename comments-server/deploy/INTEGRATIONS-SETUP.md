@@ -1,6 +1,6 @@
 # 啟用 GitHub 登入與 Email 回覆通知
 
-程式與留言介面已完成。正式 WSL 尚未設定 OAuth App 與 Resend，兩項功能先顯示暫不可用；匿名留言與文章回覆正常運作。完成設定後重啟後端並重新整理網站即可啟用，不需修改網站公開 build variables。
+程式與留言介面已完成。正式 WSL 已啟用 GitHub OAuth 與自架 Postfix Email 通知；Resend 是可選的替代方案。設定後重啟後端並重新整理網站即可啟用，不需修改網站公開 build variables。
 
 ## 1. GitHub OAuth App
 
@@ -16,7 +16,33 @@
 
 流程使用 OAuth state 與 S256 PKCE。GitHub access token 不保存到 SQLite 或交給網站。網站取得獨立、可登出的 7 天 session，存在分頁 sessionStorage，不依賴跨站 Cookie。依 [GitHub 官方流程](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps)。
 
-## 2. Resend 寄信網域
+## 2. WSL 自架寄信（目前使用）
+
+現有 WSL 已有 Postfix 與 Rspamd，`hawks.tw` 的 SPF、DKIM、DMARC 與 `mail.hawks.tw` DNS 已設定。留言使用新增的本機 relay，不需要 Resend：
+
+```dotenv
+COMMENTS_MAIL_TRANSPORT=smtp
+COMMENTS_MAIL_FROM="Hawks <comments@hawks.tw>"
+COMMENTS_SMTP_HOST=127.0.0.1
+COMMENTS_SMTP_PORT=2526
+COMMENTS_SMTP_LOCAL_ADDRESS=127.2.4.7
+COMMENTS_MAIL_DAILY_LIMIT=100
+```
+
+此入口只綁定 loopback，僅接受來源 `127.2.4.7`、寄件者 `comments@hawks.tw`，不開放公網或匿名轉寄。應用程式與 Postfix 之間使用本機 SMTP，Postfix 向外投遞時使用既有 TLS 設定，Rspamd 使用已發布的 `mail202609` DKIM selector 簽章。詳見 [Postfix 設定](https://www.postfix.org/BASIC_CONFIGURATION_README.html)、[Rspamd DKIM](https://docs.rspamd.com/modules/dkim_signing/)、[Nodemailer SMTP](https://nodemailer.com/smtp)。
+
+既有 mail server 的重建步驟（需要先安裝及設定 Postfix、Rspamd 和相符的 DKIM key；腳本不會建立新私鑰）：
+
+```sh
+cd ~/apps/hawks-comments
+sudo python3 deploy/configure-comments-postfix.py
+```
+
+SMTP 接受信件表示已進入 Postfix 佇列，仍需投遞到收件者 MX；`status=sent` 在 SMTP 模式表示 Postfix 已接受，不能當成已到收件匣。外部投遞失敗由 Postfix 的佇列重試與退信處理。SMTP 沒有 Resend 的 idempotency API；重試保留 Message-ID 與 Date，但在 SMTP 確認結果不明／接受後程序中斷時，仍可能重複寄送。預設每 24 小時最多 100 次應用程式投遞嘗試，含重試。
+
+現在已確認本機 SMTP、DKIM 簽章及公開 DNS 驗證；實際到信測試仍需使用自己的測試收件信箱。若更換公開 IP，須同步調整 SPF、mail 的 A 記錄及反向 DNS；收件端也可能因 IP 信譽或內容拒收／歸入垃圾郵件。Gmail 基本寄件需求見 [官方說明](https://support.google.com/mail/answer/81126)。
+
+### Resend（替代方案）
 
 登入 [Resend](https://resend.com/domains)，建立寄信網域 **`mail.hawks.tw`**。在管理 `hawks.tw` DNS 的 Gandi 加入 Resend 畫面提供的 DNS 記錄，再按 Verify，等狀態變成 **Verified**。使用畫面上的實際值，不需要變更 nameservers。依 [Resend 網域驗證指南](https://resend.com/docs/dashboard/domains/introduction)。
 
@@ -51,7 +77,7 @@ COMMENTS_MAIL_FROM="Hawks <comments@mail.hawks.tw>"
 COMMENTS_MAIL_DAILY_LIMIT=100
 ```
 
-GitHub ID／Secret、Resend API Key／寄件者各自須成對填寫，也可先只啟用其中一項。儲存後：
+上面是 Resend 替代方案：選用時另設 `COMMENTS_MAIL_TRANSPORT=resend`，API Key／寄件者須成對填寫。自架 SMTP 使用第 2 節的設定，`COMMENTS_RESEND_API_KEY` 可留空。GitHub ID／Secret 須成對填寫，也可先只啟用其中一項。儲存後：
 
 ```sh
 chmod 600 .env
@@ -73,4 +99,4 @@ Email 不出現在公開 API、留言或頭像網址；GitHub 帳號與頭像會
 
 SQLite 保留訂閱與待寄資料，取消訂閱會移除該訂閱與相關寄信紀錄。寄送完成的 outbox 清空信件內容，7 天後清理紀錄。已寄出的通知無法隨刪除留言撤回；尚未寄送的已刪除回覆會略過。
 
-目前 HTTP 測試使用假的 GitHub、Resend 回應，不會向真人寄信。真實授權、寄信與到達信箱的測試，需完成上述帳號設定後才能執行。
+HTTP 測試使用假的 GitHub、Resend 回應及本機 SMTP 測試伺服器，不會向真人寄信。WSL 額外使用真實 Postfix hold 佇列驗證 DKIM，測試信已刪除、未對外投遞。真實 GitHub 授權與外部到信仍須由實際帳號／自己的信箱確認。

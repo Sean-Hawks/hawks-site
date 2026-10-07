@@ -29,7 +29,17 @@ Tailscale Funnel 曾啟用，但公開 DNS 持續 NXDOMAIN；留言新增的 por
 
 ## GitHub 與 Email 設定
 
-程式與資料庫 migration 已支援 GitHub OAuth、獨立分頁 session、Email 雙重確認、回覆通知與取消訂閱。正式環境未設定 OAuth App 或 Resend 憑證，`/v1/comments/config` 目前回傳兩項皆 false，介面明確顯示暫不可用。依使用者要求先完成程式與設定步驟；啟用操作見 [INTEGRATIONS-SETUP.md](INTEGRATIONS-SETUP.md)。測試使用假的 provider 回應，未進行真實 GitHub 授權或寄信。
+程式與資料庫 migration 已支援 GitHub OAuth、獨立分頁 session、Email 雙重確認、回覆通知與取消訂閱。正式環境已設定 OAuth App，Email 依使用者要求改為 WSL 自架 SMTP，不需要 Resend 帳號或 API Key。`/v1/comments/config` 回傳兩項皆 true。啟用操作見 [INTEGRATIONS-SETUP.md](INTEGRATIONS-SETUP.md)。
+
+- 既有 Postfix／Rspamd 保留原本的收信、轉寄與 submission 設定。
+- 新增留言專用 SMTP：`127.0.0.1:2526`，僅接受來源 `127.2.4.7/32`、寄件者 `comments@hawks.tw`；不公開此埠。
+- 前端 → WSL 通知佇列 → Nodemailer → 本機 Postfix → 收件者 MX。寄件者為 `Hawks <comments@hawks.tw>`。
+- 既有 Rspamd 為來源 `127.2.4.7` 簽署 DKIM，domain `hawks.tw`、selector `mail202609`，私鑰留在原本的 Rspamd 路徑。
+- 現有公開 IP `114.32.161.42` 已列入 `hawks.tw` SPF，`mail.hawks.tw` 指向該 IP，PTR 及對應 A 記錄一致，DMARC 已發布。
+- 發現 `postfix@-.service` 曾於開機失敗；已恢復服務，新增依賴 tailscaled 的啟動順序與每 15 秒失敗重啟。
+- 設定腳本：[configure-comments-postfix.py](configure-comments-postfix.py)。修改前備份在 `/etc/hawks-comments/mail-backups/`（root 私密目錄）。
+- Mac 與 WSL 的 31 項測試通過。WSL 真實 SMTP 測試信在 hold 佇列檢查 DKIM，再由 Rspamd 對公開 DNS 驗證，得到 `R_DKIM_ALLOW`，已移除測試信與 hold 規則，未對外投遞。
+- GitHub 實際授權與真人信箱收信仍需另外確認；HTTP 入口與本機簽章通過不能代替收件者的到信結果。
 
 ## Windows／WSL 常駐
 
