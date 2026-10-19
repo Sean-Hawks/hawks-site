@@ -55,4 +55,5 @@ export const friendSites: FriendSite[] = [
   { name: "魔閻", href: "https://moyan-5hx.pages.dev/zh" },
   { name: "Eric's Blog", href: "https://blog.ichika.tw/" },
   { name: "Frank", href: "https://frk.tw/" },
+  { name: "原阿", href: "https://github-io-sigma-ten.vercel.app/" },
 ];
