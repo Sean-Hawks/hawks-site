@@ -14,7 +14,7 @@ export const recommendedBlogs: RecommendedBlog[] = [
   {
     name: "wiwi.blog",
     href: "https://wiwi.blog/",
-    note: "讓我認識部落格這個生態的起點，官老師對網路有很強烈的看法。",
+    note: "讓我認識部落格這個生態的起點。",
   },
   {
     name: "JN",
