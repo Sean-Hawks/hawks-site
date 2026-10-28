@@ -4,7 +4,7 @@ subtitle: Daemons of the Shadow Realm
 category: anime
 year: "2026"
 date: "2026-06-17"
-status: watching
+status: watched
 rating: 8.3
 tags:
   - fantasy
