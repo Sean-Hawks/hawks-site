@@ -98,10 +98,9 @@ export const resumeItems: ResumeItem[] = [
     period: "2026.11.07 — 08",
     dateTime: "2026-11-07",
     categories: ["競賽"],
-    title: "2026 臺北秋季程式設計節｜城市通微服務大黑客松",
+    title: "2026 臺北秋季程式設計節｜佳作",
     organization: "臺北市政府資訊局",
-    summary:
-      "報名參與城市通微服務大黑客松，將以城市通開源架構與臺北市開放資料開發市政微服務。",
+    summary: "參與城市通微服務大黑客松，獲得佳作。",
     tags: ["Hackathon", "Open Data", "Microservices"],
     links: [external("競賽官網", "https://codefest.taipei/")],
   },
