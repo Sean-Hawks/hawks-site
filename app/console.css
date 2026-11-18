@@ -1206,29 +1206,6 @@ html[data-gui="console"] {
     max-width: none !important;
     padding: 0 !important;
   }
-
-  :root[data-gui="console"] .resume-timeline {
-    margin-top: 2rem !important;
-  }
-
-  :root[data-gui="console"] .resume-timeline-line {
-    left: 9.25rem !important;
-  }
-
-  :root[data-gui="console"] .resume-timeline-item {
-    break-inside: avoid;
-    grid-template-columns: 7.5rem 1.25rem minmax(0, 1fr) !important;
-    column-gap: 1.25rem !important;
-    padding-bottom: 1.5rem !important;
-  }
-
-  :root[data-gui="console"] .resume-period-desktop {
-    display: block !important;
-  }
-
-  :root[data-gui="console"] .resume-period-mobile {
-    display: none !important;
-  }
 }
 
 /* Keep keyboard navigation visible without changing pointer interactions. */

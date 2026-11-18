@@ -1,18 +1,38 @@
 "use client";
 
 /* eslint-disable @next/next/no-img-element */
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 
 import { optimizedSrc, optimizedSrcSet } from "../lib/image-loader";
 
 type Img = { src: string; alt?: string; title?: string };
+type PhotoPreview = { index: number; src: string; width: number; height: number };
 
 // 相簿格子：文章欄最寬約 760px，兩欄各佔一半
 const GRID_SIZES = "(min-width: 640px) 380px, 50vw";
 const SINGLE_SIZES = "(min-width: 800px) 760px, 100vw";
 const LIGHTBOX_SIZES = "94vw";
+const enlargedPhoto = { transform: "none", clipPath: "inset(0px 0px round 8px)" };
+
+function thumbnailPose(thumbnail: HTMLImageElement | undefined, photo: HTMLElement): Keyframe | null {
+  if (!thumbnail?.naturalWidth) return null;
+  const from = thumbnail.getBoundingClientRect();
+  const to = photo.getBoundingClientRect();
+  if (!from.width || !from.height || !to.width || !to.height || from.bottom <= 0 || from.top >= window.innerHeight) return null;
+
+  const scale = Math.max(from.width / to.width, from.height / to.height);
+  const x = from.left + from.width / 2 - to.left - to.width / 2;
+  const y = from.top + from.height / 2 - to.top - to.height / 2;
+  // Keep the photo's aspect ratio and match the thumbnail crop at the end of the move.
+  const clipX = Math.max(0, (to.width - from.width / scale) / 2);
+  const clipY = Math.max(0, (to.height - from.height / scale) / 2);
+  return {
+    transform: `translate(${x}px, ${y}px) scale(${scale})`,
+    clipPath: `inset(${clipY}px ${clipX}px round ${12 / scale}px)`,
+  };
+}
 
 // 先把上一張／下一張抓進快取，翻頁時就不用等
 function preload(img: Img) {
@@ -25,7 +45,7 @@ function preload(img: Img) {
   el.src = optimizedSrc(img.src, 1600);
 }
 
-function LightboxImage({ img, index, total }: { img: Img; index: number; total: number }) {
+function LightboxImage({ img, index, total, preview }: { img: Img; index: number; total: number; preview?: PhotoPreview }) {
   const [loaded, setLoaded] = useState(false);
   const [failed, setFailed] = useState(false);
 
@@ -35,6 +55,11 @@ function LightboxImage({ img, index, total }: { img: Img; index: number; total: 
   }, []);
 
   const caption = captionOf(img);
+  const fullSrc = optimizedSrc(img.src, 1600);
+  const previewSize = preview ? {
+    aspectRatio: `${preview.width} / ${preview.height}`,
+    width: `min(${fullSrc === img.src ? `${preview.width}px, ` : ""}94vw, ${86 * preview.width / preview.height}vh)`,
+  } : undefined;
   if (failed) return (
     <div role="status" className="max-w-sm rounded-xl bg-black/80 p-6 text-center text-white" onClick={event => event.stopPropagation()}>
       <p>圖片暫時無法載入。</p>
@@ -44,28 +69,28 @@ function LightboxImage({ img, index, total }: { img: Img; index: number; total: 
 
   return (
     <figure onClick={event => event.stopPropagation()} className="m-0 flex max-h-[92vh] max-w-[94vw] flex-col items-center">
-      <div className="relative flex max-h-[86vh] max-w-[94vw] items-center justify-center">
+      <div data-photo-index={index} style={previewSize} className="relative flex max-h-[86vh] max-w-[94vw] items-center justify-center">
         {!loaded && (
           <>
             {/* 先用相簿已載好的小圖當模糊底圖，避免整片黑等待 */}
             <img
-              src={optimizedSrc(img.src, 480)}
+              src={preview?.src ?? optimizedSrc(img.src, 480)}
               alt=""
               aria-hidden="true"
-              className="max-h-[86vh] max-w-[94vw] rounded-lg object-contain opacity-60 blur-md"
+              className={`max-h-[86vh] max-w-[94vw] rounded-lg object-contain opacity-60 blur-md ${preview ? "absolute inset-0 h-full w-full" : ""}`}
             />
             <span
               role="status"
               aria-label="圖片載入中"
               className="absolute grid h-12 w-12 place-items-center rounded-full bg-black/55"
             >
-              <span className="h-6 w-6 animate-spin rounded-full border-2 border-white/25 border-t-white" />
+              <span className="h-6 w-6 rounded-full border-2 border-white/25 border-t-white motion-safe:animate-spin" />
             </span>
           </>
         )}
         <img
           ref={attach}
-          src={optimizedSrc(img.src, 1600)}
+          src={fullSrc}
           srcSet={optimizedSrcSet(img.src)}
           sizes={LIGHTBOX_SIZES}
           alt={img.alt ?? ""}
@@ -74,9 +99,10 @@ function LightboxImage({ img, index, total }: { img: Img; index: number; total: 
           onError={() => setFailed(true)}
           onClick={(e) => e.stopPropagation()}
           className={[
-            "max-h-[86vh] max-w-[94vw] rounded-lg object-contain shadow-2xl transition-opacity duration-200",
-            loaded ? "opacity-100" : "absolute inset-0 h-full w-full opacity-0",
-          ].join(" ")}
+            "max-h-[86vh] max-w-[94vw] rounded-lg object-contain shadow-2xl motion-safe:transition-opacity motion-safe:duration-200",
+            (preview || !loaded) && "absolute inset-0 h-full w-full",
+            loaded ? "opacity-100" : "opacity-0",
+          ].filter(Boolean).join(" ")}
         />
       </div>
       <figcaption className="mt-3 flex items-center gap-3 text-sm text-white/80">
@@ -113,20 +139,65 @@ function captionOf(img: Img) {
 
 export default function ArticleImages({ images }: { images: Img[] }) {
   const [active, setActive] = useState<number | null>(null);
+  const [preview, setPreview] = useState<PhotoPreview>();
+  const galleryRef = useRef<HTMLElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
+  const opener = useRef<HTMLButtonElement>(null);
+  const animations = useRef<Animation[]>([]);
+  const closing = useRef(false);
   const isOpen = active !== null;
-  const close = useCallback(() => setActive(null), []);
   const isGrid = images.length > 1;
   const previewImages = images.slice(0, 4);
 
-  useEffect(() => {
+  function open(index: number, button: HTMLButtonElement) {
+    const thumbnail = button.querySelector("img");
+    opener.current = button;
+    setPreview(thumbnail?.naturalWidth && thumbnail.naturalHeight ? {
+      index, src: thumbnail.currentSrc, width: thumbnail.naturalWidth, height: thumbnail.naturalHeight,
+    } : undefined);
+    setActive(index);
+  }
+
+  const close = useCallback(() => {
+    if (closing.current) return;
+    const dialog = dialogRef.current;
+    if (!dialog?.animate || !window.matchMedia("(prefers-reduced-motion: no-preference)").matches) {
+      setActive(null);
+      return;
+    }
+
+    closing.current = true;
+    const opacity = getComputedStyle(dialog).opacity;
+    const photo = dialog.querySelector<HTMLElement>("[data-photo-index]");
+    const photoStyle = photo ? getComputedStyle(photo) : null;
+    const currentPose = photoStyle ? {
+      transform: photoStyle.transform,
+      clipPath: photoStyle.clipPath === "none" ? enlargedPhoto.clipPath : photoStyle.clipPath,
+    } : enlargedPhoto;
+    for (const animation of animations.current) animation.cancel();
+
+    const thumbnail = photo && galleryRef.current?.querySelectorAll<HTMLImageElement>("button img")[Number(photo.dataset.photoIndex)];
+    const destination = photo ? thumbnailPose(thumbnail ?? undefined, photo) : null;
+    const timing: KeyframeAnimationOptions = { duration: destination ? 240 : 150, easing: "ease-out", fill: "forwards" };
+    const fade = dialog.animate([{ opacity }, { opacity: 0 }], timing);
+    animations.current = [fade];
+    if (photo && destination) animations.current.push(photo.animate([currentPose, destination], timing));
+    fade.onfinish = () => setActive(null);
+  }, []);
+
+  const step = useCallback((direction: number) => {
+    if (closing.current) return;
+    setActive((index) => index === null ? null : (index + direction + images.length) % images.length);
+  }, [images.length]);
+
+  useLayoutEffect(() => {
     if (!isOpen) return;
     const dialog = dialogRef.current;
-    const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const previousFocus = opener.current;
     const background = Array.from(document.body.children).filter((element): element is HTMLElement => element instanceof HTMLElement && element !== dialog);
     const previousInert = background.map(element => element.inert);
     background.forEach(element => { element.inert = true; });
-    dialog?.querySelector<HTMLButtonElement>("button")?.focus();
+    dialog?.querySelector<HTMLButtonElement>("button")?.focus({ preventScroll: true });
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") close();
       if (e.key === "Tab") {
@@ -141,23 +212,30 @@ export default function ArticleImages({ images }: { images: Img[] }) {
           first?.focus();
         }
       }
-      if (e.key === "ArrowRight")
-        setActive((i) => (i === null ? i : (i + 1) % images.length));
-      if (e.key === "ArrowLeft")
-        setActive((i) =>
-          i === null ? i : (i - 1 + images.length) % images.length,
-        );
+      if (e.key === "ArrowRight") step(1);
+      if (e.key === "ArrowLeft") step(-1);
     };
     document.addEventListener("keydown", onKey);
     const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    document.body.style.setProperty("overflow", "hidden");
+    if (dialog?.animate && window.matchMedia("(prefers-reduced-motion: no-preference)").matches) {
+      animations.current = [dialog.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 180, easing: "ease-out" })];
+      const photo = dialog.querySelector<HTMLElement>("[data-photo-index]");
+      const origin = photo ? thumbnailPose(previousFocus?.querySelector("img") ?? undefined, photo) : null;
+      if (photo && origin) {
+        animations.current.push(photo.animate([origin, enlargedPhoto], { duration: 260, easing: "cubic-bezier(0.2, 0.8, 0.2, 1)" }));
+      }
+    }
     return () => {
+      for (const animation of animations.current) animation.cancel();
+      animations.current = [];
+      closing.current = false;
       document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = prevOverflow;
+      document.body.style.setProperty("overflow", prevOverflow);
       background.forEach((element, index) => { element.inert = previousInert[index]; });
-      previousFocus?.focus();
+      previousFocus?.focus({ preventScroll: true });
     };
-  }, [isOpen, images.length, close]);
+  }, [isOpen, close, step]);
 
   useEffect(() => {
     if (active === null || images.length < 2) return;
@@ -171,6 +249,7 @@ export default function ArticleImages({ images }: { images: Img[] }) {
     <>
       {isGrid ? (
         <section
+          ref={galleryRef}
           className="my-10"
           aria-label={`${images.length} 張文章照片`}
         >
@@ -188,7 +267,7 @@ export default function ArticleImages({ images }: { images: Img[] }) {
                 <figure key={`${img.src}-${i}`} className="m-0 min-w-0">
                   <button
                     type="button"
-                    onClick={() => setActive(i)}
+                    onClick={(event) => open(i, event.currentTarget)}
                     aria-label={hasMore ? `查看全部 ${images.length} 張照片` : `放大第 ${i + 1} 張照片`}
                     className="group relative block aspect-[4/3] w-full cursor-zoom-in overflow-hidden rounded-xl border border-[rgb(var(--line)/0.12)] bg-[rgb(var(--panel2)/0.5)] shadow-md transition-[border-color,transform] duration-300 hover:-translate-y-0.5 hover:border-[rgb(var(--accent)/0.32)] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent)/0.5)] sm:rounded-2xl"
                   >
@@ -219,11 +298,12 @@ export default function ArticleImages({ images }: { images: Img[] }) {
         </section>
       ) : (
         <figure
+          ref={galleryRef}
           className={["my-10 mx-auto", sizeToClass(images[0].title)].join(" ")}
         >
           <button
             type="button"
-            onClick={() => setActive(0)}
+            onClick={(event) => open(0, event.currentTarget)}
             aria-label="放大圖片"
             className="group flex w-full cursor-zoom-in justify-center focus:outline-none"
           >
@@ -270,9 +350,7 @@ export default function ArticleImages({ images }: { images: Img[] }) {
                 aria-label="上一張"
                 onClick={(e) => {
                   e.stopPropagation();
-                  setActive((i) =>
-                    i === null ? i : (i - 1 + images.length) % images.length,
-                  );
+                  step(-1);
                 }}
                 className="absolute left-3 top-1/2 z-10 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 sm:left-6"
               >
@@ -283,7 +361,7 @@ export default function ArticleImages({ images }: { images: Img[] }) {
                 aria-label="下一張"
                 onClick={(e) => {
                   e.stopPropagation();
-                  setActive((i) => (i === null ? i : (i + 1) % images.length));
+                  step(1);
                 }}
                 className="absolute right-3 top-1/2 z-10 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 sm:right-6"
               >
@@ -292,7 +370,7 @@ export default function ArticleImages({ images }: { images: Img[] }) {
             </>
           )}
 
-          <LightboxImage key={active} img={images[active]} index={active} total={images.length} />
+          <LightboxImage key={active} img={images[active]} index={active} total={images.length} preview={preview?.index === active ? preview : undefined} />
         </div>,
         document.body,
       )}

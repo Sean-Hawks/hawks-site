@@ -19,6 +19,7 @@ export type ResumeItem = {
   title: string;
   organization?: string;
   summary: string;
+  cover?: { src: string; alt: string };
   tags: string[];
   links?: {
     label: string;
@@ -146,10 +147,12 @@ export const resumeItems: ResumeItem[] = [
     categories: ["競賽"],
     title: "HiPAC 2026｜佳作・NVIDIA 特別獎・未來之星獎",
     organization: "第五屆國網盃應用程式效能優化競賽",
+    cover: { src: "/images/Pasted image 20260902020953.png", alt: "從參賽座位拍攝的 HiPAC 頒獎典禮現場" },
     summary:
       "參與 HiPAC 2026，在國網中心舉辦的應用程式效能優化競賽獲得三項獎項。",
     tags: ["HPC", "Optimization", "NVIDIA"],
     links: [
+      { label: "讀競賽心得", href: "/blog/hipac/" },
       external("競賽官網", "https://event1.nchc.org.tw/2026/hipac/"),
       external("獎項說明", "https://event1.nchc.org.tw/2026/hipac/awards.html"),
     ],
@@ -160,6 +163,7 @@ export const resumeItems: ResumeItem[] = [
     categories: ["營隊"],
     title: "AIS3 2026 新型態資安實務暑期課程",
     organization: "Advanced Information Security Summer School",
+    cover: { src: "/images/PXL_20260721_011040098.jpg", alt: "從筆電後方拍攝的 AIS3 2026 課堂" },
     summary:
       "課程接觸暗網情資、Android 逆向、Web Security 與 AI Agent，並以 LLM 資安能力評測作為專題方向。",
     tags: ["Cybersecurity", "LLM", "CTF"],

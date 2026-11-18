@@ -1495,29 +1495,6 @@ html {
     max-width: none !important;
     padding: 0 !important;
   }
-
-  .resume-timeline {
-    margin-top: 2rem !important;
-  }
-
-  .resume-timeline-line {
-    left: 9.25rem !important;
-  }
-
-  .resume-timeline-item {
-    break-inside: avoid;
-    grid-template-columns: 7.5rem 1.25rem minmax(0, 1fr) !important;
-    column-gap: 1.25rem !important;
-    padding-bottom: 1.5rem !important;
-  }
-
-  .resume-period-desktop {
-    display: block !important;
-  }
-
-  .resume-period-mobile {
-    display: none !important;
-  }
 }
 
 /* Keep keyboard navigation visible without changing pointer interactions. */
@@ -1534,6 +1511,48 @@ html {
 .skip-link:focus { transform: translateY(0); }
 :focus-visible { outline: 2px solid rgb(var(--accent)); outline-offset: 4px; }
 main:focus { outline: none; }
+
+.article-toc-link[aria-current="location"] {
+  border-radius: 0.25rem;
+  background-color: rgb(var(--accent) / 0.11);
+  color: rgb(var(--accent));
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.timeline-filter-trace,
+.timeline-filter-node { display: none; }
+
+@media screen and (prefers-reduced-motion: no-preference) {
+  .article-toc-link { transition: color 150ms ease, background-color 150ms ease; }
+  .timeline-filter-trace {
+    position: absolute;
+    display: block;
+    inset: 0 0 auto;
+    height: min(5rem, 100%);
+    background: var(--info, rgb(var(--accent)));
+    transform-origin: top;
+    animation: timeline-filter-draw 420ms ease-out both;
+  }
+  .timeline-filter-node {
+    position: absolute;
+    display: block;
+    inset: -1px;
+    border: 1px solid var(--info, rgb(var(--accent)));
+    border-radius: 50%;
+    animation: timeline-filter-pulse 360ms 50ms ease-out both;
+  }
+}
+
+@keyframes timeline-filter-draw {
+  from { transform: scaleY(0); opacity: 1; }
+  45% { transform: scaleY(1); opacity: 1; }
+  to { transform: scaleY(1); opacity: 0; }
+}
+@keyframes timeline-filter-pulse {
+  from { transform: scale(0.8); opacity: 1; }
+  to { transform: scale(1.85); opacity: 0; }
+}
 
 /* Reader actions belong after the content and use a quiet, shared treatment. */
 .article-action-button {

@@ -454,11 +454,28 @@ export default function LibraryCategoryClient({
   category: LibraryCategoryInfo;
   items: LibraryItem[];
 }) {
-  const [params, update] = useQueryParams();
+  const [params, updateQueryParams] = useQueryParams();
+  const results = React.useRef<HTMLElement>(null);
+  const previousCardTops = React.useRef<Map<string, number> | null>(null);
+  const queryString = params.toString();
   const query = params.get("q") ?? "";
   const recommendation = recommendationOptions.find(option => option.value === params.get("recommendation"))?.value ?? "all";
   const status = statusOptions.find(option => option.value === params.get("status"))?.value ?? "all";
   const sort = sortOptions.find(option => option.value === params.get("sort"))?.value ?? "rating";
+
+  function update(values: Record<string, string | null>) {
+    const changesFilter = Object.entries(values).some(([key, value]) => params.get(key) !== (value || null));
+    const list = results.current;
+    if (changesFilter && list && window.matchMedia("(prefers-reduced-motion: no-preference)").matches) {
+      const listTop = list.getBoundingClientRect().top;
+      // Measure the current visual positions so another filter change can interrupt a move.
+      previousCardTops.current = new Map(Array.from(list.children, (card) => [
+        card.id, card.getBoundingClientRect().top - listTop,
+      ]));
+    }
+    updateQueryParams(values);
+  }
+
   const setQuery = (value: string) => update({ q: value });
   const setRecommendation = (value: RecommendationFilter) => update({ recommendation: value === "all" ? null : value });
   const setStatus = (value: StatusFilter) => update({ status: value === "all" ? null : value });
@@ -486,6 +503,32 @@ export default function LibraryCategoryClient({
         return a.title.localeCompare(b.title);
       });
   }, [items, query, recommendation, sort, status]);
+
+  React.useLayoutEffect(() => {
+    const previous = previousCardTops.current;
+    previousCardTops.current = null;
+    const list = results.current;
+    if (!previous || !list || !window.matchMedia("(prefers-reduced-motion: no-preference)").matches) return;
+
+    const listTop = list.getBoundingClientRect().top;
+    const viewportHeight = window.innerHeight;
+    const moves = Array.from(list.children).flatMap((card) => {
+      const before = previous.get(card.id);
+      if (before === undefined) return [];
+      const { top, bottom } = card.getBoundingClientRect();
+      const offset = before - (top - listTop);
+      if (Math.abs(offset) < 1 || bottom < 0 || top > viewportHeight) return [];
+
+      const visibleBefore = top + offset < viewportHeight && bottom + offset > 0;
+      // A card coming from offscreen enters near its destination.
+      return [{ card, offset: visibleBefore ? offset : Math.sign(offset) * 20, opacity: visibleBefore ? 1 : 0.65 }];
+    });
+    const animations = moves.map(({ card, offset, opacity }) => card.animate?.(
+      [{ transform: `translateY(${offset}px)`, opacity }, { transform: "translateY(0)", opacity: 1 }],
+      { duration: 240, easing: "cubic-bezier(0.2, 0.8, 0.2, 1)" },
+    ));
+    return () => { for (const animation of animations) animation?.cancel(); };
+  }, [queryString]);
 
   const resetFilters = () => {
     update({ q: null, recommendation: null, status: null, sort: null });
@@ -580,7 +623,7 @@ export default function LibraryCategoryClient({
       </div>
 
       {filteredItems.length > 0 ? (
-        <section className="grid gap-4">
+        <section ref={results} className="grid gap-4">
           {filteredItems.map((item) => (
             <LibraryCard key={item.id} item={item} />
           ))}

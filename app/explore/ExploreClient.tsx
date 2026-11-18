@@ -118,8 +118,9 @@ export default function ExploreClient({ items }: { items: ExploreItem[] }) {
       </p>
       {selected ? (
         <section
+          key={selected.id}
           aria-label="這次的閱讀提案"
-          className="mt-7 rounded-2xl border border-[rgb(var(--accent)/0.22)] bg-[rgb(var(--panel)/0.9)] p-6 shadow-[0_16px_50px_rgba(90,76,55,0.08)] sm:p-9"
+          className="mt-7 rounded-2xl border border-[rgb(var(--accent)/0.22)] bg-[rgb(var(--panel)/0.9)] p-6 shadow-[0_16px_50px_rgba(90,76,55,0.08)] motion-safe:animate-[console-arrive_180ms_ease-out] sm:p-9"
         >
           <p className="flex flex-wrap items-center gap-3 text-xs text-[rgb(var(--muted))]">
             <span className="font-bold text-[rgb(var(--accent))]">

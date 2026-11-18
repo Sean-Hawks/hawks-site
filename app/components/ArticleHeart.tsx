@@ -18,6 +18,8 @@ function ConnectedHeart({ id, api }: { id: string; api: string }) {
   const [temporary, setTemporary] = useState(false);
   const request = useRef<AbortController | null>(null);
   const pending = useRef(false);
+  const icon = useRef<SVGSVGElement>(null);
+  const pulse = useRef<Animation | undefined>(undefined);
 
   const refresh = useCallback(async () => {
     if (pending.current) return;
@@ -56,14 +58,28 @@ function ConnectedHeart({ id, api }: { id: string; api: string }) {
     return () => {
       window.clearTimeout(initialLoad);
       request.current?.abort();
+      pulse.current?.cancel();
       pending.current = false;
       window.removeEventListener("storage", onStorage);
       window.removeEventListener("focus", revalidate);
     };
   }, [refresh]);
 
+  function playLikeFeedback() {
+    if (!window.matchMedia("(prefers-reduced-motion: no-preference)").matches) return;
+    pulse.current = icon.current?.animate?.(
+      [
+        { transform: "scale(1)" },
+        { transform: "scale(1.35)", offset: 0.4 },
+        { transform: "scale(1)" },
+      ],
+      { duration: 260, easing: "ease-out" },
+    );
+  }
+
   async function toggle() {
     if (!value || phase !== "ready" || pending.current) return;
+    pulse.current?.cancel();
     pending.current = true;
     const controller = new AbortController();
     request.current = controller;
@@ -80,6 +96,7 @@ function ConnectedHeart({ id, api }: { id: string; api: string }) {
       setValue(next);
       setPhase("ready");
       setMessage(next.liked ? "已送出喜歡，謝謝你！" : "已取消喜歡。");
+      if (liked && next.liked) playLikeFeedback();
     } catch (error) {
       if (controller.signal.aborted || request.current !== controller) return;
       // A dropped response does not tell us whether the PUT reached the server.
@@ -95,6 +112,7 @@ function ConnectedHeart({ id, api }: { id: string; api: string }) {
           : error instanceof HeartRequestError && error.status === 429
             ? "操作太頻繁，請稍後再試。"
             : "這次變更未完成，請再按一次。");
+        if (liked && confirmed.liked) playLikeFeedback();
       } catch {
         if (controller.signal.aborted || request.current !== controller) return;
         setPhase("error");
@@ -118,7 +136,7 @@ function ConnectedHeart({ id, api }: { id: string; api: string }) {
           aria-busy={loading}
           className="article-action-button"
         >
-          <Heart aria-hidden="true" className="h-4 w-4" fill={value?.liked ? "currentColor" : "none"} />
+          <Heart ref={icon} aria-hidden="true" className="h-4 w-4 origin-center" fill={value?.liked ? "currentColor" : "none"} />
           {value?.liked ? "已喜歡" : "喜歡"}
           {value && phase !== "error" && <span className="tabular-nums">{value.count.toLocaleString("zh-TW")}</span>}
           {!value && phase === "loading" && <span className="text-xs">讀取中</span>}
